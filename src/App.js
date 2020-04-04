@@ -1,26 +1,25 @@
 import React from 'react';
-import logo from './logo.svg';
+import logo from './team.png';
 import './App.css';
+import LoginComponent from './LoginComponent'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	return (
+		<div className="App">
+			<header className="App-header">
+				<img src={logo} className="App-logo" alt="logo" />
+				<p className="bottom-text">
+					Welcome to Online Coup
+					<br/>
+					Brought to you by MVPs
+				</p>
+			</header>
+			<body className="App-body">
+				<LoginComponent/>
+			</body>
+		</div>
+		
+	);
 }
 
 export default App;
