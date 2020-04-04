@@ -1,25 +1,12 @@
 import React from 'react';
-import logo from './team.png';
 import './App.css';
-import LoginComponent from './LoginComponent'
+import Duke from './character_cards.js';
+
 
 function App() {
-	return (
-		<div className="App">
-			<header className="App-header">
-				<img src={logo} className="App-logo" alt="logo" />
-				<p className="bottom-text">
-					Welcome to Online Coup
-					<br/>
-					Brought to you by MVPs
-				</p>
-			</header>
-			<body className="App-body">
-				<LoginComponent/>
-			</body>
-		</div>
-		
-	);
+  return (
+      <Duke />
+  );
 }
 
 export default App;
