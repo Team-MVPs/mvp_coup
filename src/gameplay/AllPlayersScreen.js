@@ -1,4 +1,5 @@
-// @flow
+// @flow 
+
 import React from 'react';
 import Character from '../characters/Character.js';
 
