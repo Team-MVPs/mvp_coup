@@ -3,8 +3,9 @@
 import React from 'react';
 import './App.css';
 import {firestore} from './config/firebase';
-// import Duke from './character_cards.js';
+
 import LoginComponent from "./LoginComponent";
+import MainGameScreen from './gameplay/MainScreen.js';
 
 
 function App() {
@@ -14,7 +15,10 @@ function App() {
       }, (error) => console.error(error));
 
   return (
+    <div align="center">
       <LoginComponent />
+      <MainGameScreen />
+    </div>
   );
 }
 

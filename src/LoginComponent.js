@@ -1,6 +1,10 @@
 import React from 'react';
 import {firestore} from './config/firebase';
 
+
+// Why is this a class :(
+// I'm BIG MAD
+
 class LoginComponent extends React.Component {
 	constructor(props) {
 		super(props);
@@ -24,7 +28,6 @@ class LoginComponent extends React.Component {
 		// event.preventDefault();
 		
 		event.preventDefault();
-		
 		
 		const userRef = firestore.collection("testing").doc("Aravind").set({
 			key1: this.state.value,
