@@ -1,6 +1,10 @@
 import React from 'react';
 import firebase from 'firebase';
 
+
+// Why is this a class :(
+// I'm BIG MAD
+
 class LoginComponent extends React.Component {
 	constructor(props) {
 		super(props);
@@ -36,7 +40,7 @@ class LoginComponent extends React.Component {
 			measurementId: "G-MDTYYPRVDF"
 		};
 		// Initialize Firebase
-		firebase.initializeApp(firebaseConfig);
+		!firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
 		firebase.analytics();
 		
 		const db = firebase.firestore();
