@@ -19,7 +19,7 @@ export function playerRegistrationCallback() {
             console.log(playersRegistered);
             //Couldnt get popups to work for some reason
             if (playersRegistered.length > 0) {
-                //     showPopup("Players Registered", playersRegistered.join(","));
+                //  showPopup("Players Registered", playersRegistered.join(","));
                 alert(playersRegistered.join(",") + " joined the game");
             }
         }, (error) => console.error(error));
