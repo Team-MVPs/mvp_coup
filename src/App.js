@@ -31,7 +31,7 @@ function App() {
         <Switch>
           <Route path="/start">
             <div align="center">
-              <MainGameScreen />
+              <MainGameScreen popupCallback={showPopup} />
             </div>
           </Route>
           <Route path="/">

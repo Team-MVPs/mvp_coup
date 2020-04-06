@@ -8,7 +8,7 @@ import UserDetails from './UserDetails.js';
 import {playerRegistrationCallback} from "../backend/callbacks.js"
 
 function MainGameScreen(props) {
-    playerRegistrationCallback();
+    playerRegistrationCallback(props.popupCallback);
 
     return (
         <Container>

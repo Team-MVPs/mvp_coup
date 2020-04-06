@@ -4,7 +4,7 @@ import playerID from './startup';
 var roomName = "vip";
 var players = new Set();
 
-export function playerRegistrationCallback() {
+export function playerRegistrationCallback(popupCallback) {
     firestore.collection(roomName)
         .onSnapshot((snapshot) => {
             console.log("in snapshot");
@@ -19,8 +19,8 @@ export function playerRegistrationCallback() {
             console.log(playersRegistered);
             //Couldnt get popups to work for some reason
             if (playersRegistered.length > 0) {
-                //  showPopup("Players Registered", playersRegistered.join(","));
-                alert(playersRegistered.join(",") + " joined the game");
+                popupCallback("Players Registered", playersRegistered.join(","));
+                // alert(playersRegistered.join(",") + " joined the game");
             }
         }, (error) => console.error(error));
 }
