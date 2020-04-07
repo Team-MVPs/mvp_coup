@@ -5,7 +5,8 @@ import {Container, Row, Col} from 'react-bootstrap';
 import PlayerScreen from './AllPlayersScreen.js';
 import PastMoves from './PastMoves.js';
 import UserDetails from './UserDetails.js';
-import {playerRegistrationCallback} from "../backend/callbacks.js"
+//import {playerRegistrationCallback} from "../backend/callbacks.js"
+import {playerRegistrationCallback} from "../backend/firebaseTestingPreet.js"
 
 function MainGameScreen(props) {
     playerRegistrationCallback(props.popupCallback);

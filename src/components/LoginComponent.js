@@ -19,7 +19,8 @@ function LoginComponent(props) {
 	}
 
 	if (redirect) {
-		return (<Redirect to="/start" />)
+		//return (<Redirect to="/start" />)
+		return (<Redirect to="/GameStart" />)
 	}
 
 	return (

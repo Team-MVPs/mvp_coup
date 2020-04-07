@@ -1,7 +1,8 @@
 import { firestore } from '../config/firebase';
 
 //Default Room Name can change this later
-var roomName = "vip";
+//var roomName = "vip";
+var roomName = 'Preet Testing'
 var playerID = "";
 
 export async function register(name) {
