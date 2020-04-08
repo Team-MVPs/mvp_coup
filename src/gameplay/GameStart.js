@@ -11,6 +11,10 @@ function GameStart(props) {
   const [count, setCount] = React.useState(0);
   const handleClick = (event) => {setClicked(true); setJoin("Accepted!"); setCount(count+1)}; 
 
+  console.log("PLAYER ID IS.....")
+  console.log(props.playerID);
+  console.log("-----------------")
+
   const [players, setPlayers] = React.useState([]);
   React.useEffect(() => {
     const subscribe = firestore.collection(roomName).onSnapshot((snapshot)=>{

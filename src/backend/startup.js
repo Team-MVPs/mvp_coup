@@ -5,7 +5,7 @@ import { firestore } from '../config/firebase';
 var roomName = 'Preet Testing'
 var playerID = "";
 
-export async function register(name) {
+export async function register(setPlayerID, name) {
     await firestore.collection(roomName).add({
         name: name,
         count: 0,
@@ -13,6 +13,7 @@ export async function register(name) {
     })
     .then(function(docRef) {
         playerID = docRef.id;
+        setPlayerID(playerID);
         console.log("Document written with ID: ", playerID);
     })
     firestore.collection(roomName).onSnapshot((snapshot)=>{
