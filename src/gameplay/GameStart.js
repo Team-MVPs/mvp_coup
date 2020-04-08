@@ -20,7 +20,6 @@ function GameStart(props) {
       newPlayers.push(playerName);
     });
     setPlayers(newPlayers);
-  	console.log(players);
   })
   return () => subscribe();
 },[]);
