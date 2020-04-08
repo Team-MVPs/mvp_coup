@@ -3,19 +3,21 @@ import {firestore} from '../config/firebase';
 import { Modal, Button } from 'react-bootstrap';
 
 var roomName = 'Preet Testing';
-var newPlayers = ['A','B'];
 
+function _newPlayers(update_current_players){
+  firestore.collection(roomName).onSnapshot((snapshot)=>{
+    let newPlayers = [];
+    snapshot.docs.forEach((doc)=>{
+      let playerName = doc.data().name;
+      newPlayers.push(playerName);
+    });
+    update_current_players(newPlayers);
+  });
+}
 
 function GameStart(props) {
-  firestore.collection(roomName).onSnapshot((snapshot)=>{
-  	//let newPlayers = [];
-  	snapshot.docs.forEach((doc)=>{
-  		let playerName = doc.data().name;
-  		newPlayers.push(playerName);
-  	});
-  	console.log(newPlayers);
-  })
-
+  _newPlayers(props.updatePlayers);
+  const newPlayers = props.newPlayers;
   return (
     <ol>
       {newPlayers.map(name => (

@@ -10,7 +10,7 @@ import {playerRegistrationCallback} from "../backend/firebaseTestingPreet.js"
 
 function MainGameScreen(props) {
     playerRegistrationCallback(props.popupCallback);
-
+    console.log(props);
     return (
         <Container>
             <Row>

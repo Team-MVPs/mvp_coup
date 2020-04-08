@@ -14,12 +14,14 @@ import MainGameScreen from './gameplay/MainScreen.js';
 import Popup from "./components/PopupComponent";
 import GameStart from './gameplay/GameStart.js';
 
-
+ 
 function App() {
   const [popupShow, setPopupShow] = React.useState(false);
   const [popupTitle, setPopupTitle] = React.useState("Sample Title");
   const [popupContent, setPopupContent] = React.useState("Sample Content");
 
+  const [players, setPlayers] = React.useState([]);
+  
   function showPopup(title, content){
     setPopupTitle(title);
     setPopupContent(content);
@@ -39,12 +41,12 @@ function App() {
           </Route>
           <Route exact path="/start">
             <div align="center">
-              <MainGameScreen popupCallback={showPopup} />
+              <MainGameScreen popupCallback={showPopup}/>
             </div>
           </Route>
           <Route exact path="/GameStart">
             <div align="center">
-              <GameStart/>
+              <GameStart newPlayers={players} updatePlayers={setPlayers}/>
             </div>
           </Route>          
         </Switch>
