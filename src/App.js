@@ -20,6 +20,7 @@ function App() {
   const [popupTitle, setPopupTitle] = React.useState("Sample Title");
   const [popupContent, setPopupContent] = React.useState("Sample Content");
 
+
   function showPopup(title, content){
     setPopupTitle(title);
     setPopupContent(content);

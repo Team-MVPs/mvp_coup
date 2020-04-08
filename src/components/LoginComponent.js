@@ -1,6 +1,6 @@
 import React from 'react';
 import { register } from '../backend/startup';
-import { Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom';
 
 function LoginComponent(props) {
 	const [value, setValue] = React.useState("");
@@ -9,18 +9,20 @@ function LoginComponent(props) {
 	const handleChange = (event) => { setValue(event.target.value) }
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		if (value.length == 0){
+		if (value.length === 0){
 			alert('Please input a Name');
 			return (<Redirect to = "/" />);
 		} else{
 			register(value);
+
 			setRedirect(true);
 		}		
 	}
 
 	if (redirect) {
 		//return (<Redirect to="/start" />)
-		return (<Redirect to="/GameStart" />)
+		return (
+			<Redirect to="/GameStart" />)
 	}
 
 	return (
