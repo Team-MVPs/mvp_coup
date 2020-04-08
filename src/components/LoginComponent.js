@@ -9,18 +9,12 @@ function LoginComponent(props) {
 	const handleChange = (event) => { setValue(event.target.value) }
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		if (value.length == 0){
-			alert('Please input a Name');
-			return (<Redirect to = "/" />);
-		} else{
-			register(value);
-			setRedirect(true);
-		}		
+		register(value);
+		setRedirect(true);
 	}
 
 	if (redirect) {
-		//return (<Redirect to="/start" />)
-		return (<Redirect to="/GameStart" />)
+		return (<Redirect to="/start" />)
 	}
 
 	return (
