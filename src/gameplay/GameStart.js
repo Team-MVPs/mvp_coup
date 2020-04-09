@@ -8,12 +8,8 @@ var roomName = 'Preet Testing';
 function GameStart(props) {
   const [isClicked, setClicked] = React.useState(false);
   const [joinGame, setJoin] = React.useState("Join Game!");
-  const [count, setCount] = React.useState(0);
-  const handleClick = (event) => {setClicked(true); setJoin("Accepted!"); setCount(count+1)}; 
-
-  console.log("PLAYER ID IS.....")
-  console.log(props.playerID);
-  console.log("-----------------")
+  const [accepted, setAccept] = React.useState(false);
+  const handleClick = (event) => {setClicked(true); setJoin("Accepted!"); setAccept(true)}; 
 
   const [players, setPlayers] = React.useState([]);
   React.useEffect(() => {
@@ -35,11 +31,11 @@ function GameStart(props) {
 	      ))}
 	    </ol>
 	    <button 
-        type="button" className="btn btn-lg btn-primary" disabled = {isClicked} onClick = {handleClick} style ={{marginBottom:10}}>
+        type="button" className="btn btn-lg btn-primary" disabled = {isClicked} onClick = {handleClick} style ={{marginBottom:50}}>
         {joinGame}
       </button>
       <div>
-         <CountTesting id = {props.playerID}/>
+         <CountTesting id = {props.playerID} accepted = {accepted}/>
       </div>
 	 
 	</div>

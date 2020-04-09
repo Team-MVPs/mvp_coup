@@ -3,15 +3,31 @@ import {firestore} from '../config/firebase';
 import { Modal, Button } from 'react-bootstrap';
 
 var roomName = 'Preet Testing';
-var totalCount = 0;
+var roomSize = -1;
 
 function CountTesting(props){
-	if (props.countVal === 1){
-		firestore.collection(roomName).doc(props.id)
-	} 
+	const [totalCount, setTotalCount] = React.useState(0)
+	if (props.accepted){
+		firestore.collection(roomName).doc(props.id).update({
+			count: 1
+		});
+	} else{
+		console.log('not accepted')
+	};
+	firestore.collection(roomName).onSnapshot((snapshot)=>{
+		let playerCount = 0;
+		snapshot.docs.forEach((doc)=>{
+			let eachCount = doc.data().count;
+			playerCount += eachCount;
+		});
+		setTotalCount(playerCount);
+	})
+	firestore.collection(roomName).get().then((docs)=>{
+		roomSize = docs.size;
+	})
 	return (
 		<div>
-		<h1>{props.id}</h1>
+		<h4>{totalCount}/{roomSize} have accepted!</h4>
 		</div>)
 }	
 
