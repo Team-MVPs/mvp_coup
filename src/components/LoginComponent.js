@@ -1,6 +1,6 @@
 import React from 'react';
 import { register } from '../backend/startup';
-import { Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom';
 
 function LoginComponent(props) {
 	const [value, setValue] = React.useState("");
@@ -9,21 +9,31 @@ function LoginComponent(props) {
 	const handleChange = (event) => { setValue(event.target.value) }
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		register(value);
-		setRedirect(true);
+		if (value.length === 0){
+			alert('Please input a Name');
+			return (<Redirect to = "/" />);
+		} else{
+			register(props.setPlayerID, value);
+			setRedirect(true);			
+		}		
 	}
 
 	if (redirect) {
-		return (<Redirect to="/start" />)
+		//return (<Redirect to="/start" />)
+		return (
+			<Redirect to="/GameStart" />)
 	}
 
 	return (
 		<form onSubmit={handleSubmit}>
-			<label>
-				Name:
-				<input type="text" value={value} onChange={handleChange} />
-			</label>
-			<input type="submit" value="Submit" />
+			<div className = "form=group">
+				<label style = {{marginTop:50}}>
+					<input className ="form-control" type="text" value={value} onChange={handleChange} placeholder = "Enter Name"/>
+				</label>
+			</div>
+			<div>
+				<button type="Submit" className="btn btn-primary mb-2" onClick = {handleSubmit}>Submit</button>
+			</div>
 		</form>
 	)
 }
