@@ -12,9 +12,6 @@ import './App.css';
 import LoginComponent from "./components/LoginComponent";
 import MainGameScreen from './gameplay/MainScreen.js';
 import Popup from "./components/PopupComponent";
-import GameStart from './gameplay/GameStart.js';
-
-
 function App() {
   const [popupShow, setPopupShow] = React.useState(false);
   const [popupTitle, setPopupTitle] = React.useState("Sample Title");
@@ -45,11 +42,11 @@ function App() {
               <MainGameScreen popupCallback={showPopup} />
             </div>
           </Route>
-          <Route exact path="/GameStart">
+          <Route path="/">
             <div align="center">
               <GameStart playerID={playerID}/>
             </div>
-          </Route>          
+          </Route>
         </Switch>
         <Popup
           show={popupShow}
