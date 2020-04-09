@@ -13,7 +13,7 @@ function LoginComponent(props) {
 			alert('Please input a Name');
 			return (<Redirect to = "/" />);
 		} else{
-			let playerID = register(props.setPlayerID, value);
+			register(props.setPlayerID, value);
 			setRedirect(true);			
 		}		
 	}
