@@ -9,20 +9,27 @@ function GameStart(props) {
   const [isClicked, setClicked] = React.useState(false);
   const [joinGame, setJoin] = React.useState("Join Game!");
   const [accepted, setAccept] = React.useState(false);
+//  const [currentState, setCurrentState] = React.useState(" has joined the lobby");
   const handleClick = (event) => {setClicked(true); setJoin("Accepted!"); setAccept(true)}; 
 
   const [players, setPlayers] = React.useState([]);
   React.useEffect(() => {
+    let mounted = true
     const subscribe = firestore.collection(roomName).onSnapshot((snapshot)=>{
   	let newPlayers = [];
   	snapshot.docs.forEach((doc)=>{
       let playerName = doc.data().name;
       newPlayers.push(playerName);
     });
-    setPlayers(newPlayers);
+    if (mounted){
+      setPlayers(newPlayers);
+    }
   })
-  return () => subscribe();
+  return () => {
+    subscribe();
+    mounted = false;}
 },[]);
+
   return (
   	<div>
 	    <ol className="list-group list-group-flush" style = {{marginBottom: 50, marginTop: 20}}>
@@ -41,6 +48,8 @@ function GameStart(props) {
 	</div>
   );
 }
+
+
 
 export default GameStart;
 

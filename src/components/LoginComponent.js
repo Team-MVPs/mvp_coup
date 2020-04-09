@@ -14,7 +14,6 @@ function LoginComponent(props) {
 			return (<Redirect to = "/" />);
 		} else{
 			let playerID = register(props.setPlayerID, value);
-			console.log('player id is: ' + playerID);
 			setRedirect(true);			
 		}		
 	}
@@ -27,11 +26,14 @@ function LoginComponent(props) {
 
 	return (
 		<form onSubmit={handleSubmit}>
-			<label>
-				Name:
-				<input type="text" value={value} onChange={handleChange} />
-			</label>
-			<input type="submit" value="Submit" />
+			<div className = "form=group">
+				<label style = {{marginTop:50}}>
+					<input className ="form-control" type="text" value={value} onChange={handleChange} placeholder = "Enter Name"/>
+				</label>
+			</div>
+			<div>
+				<button type="Submit" className="btn btn-primary mb-2" onClick = {handleSubmit}>Submit</button>
+			</div>
 		</form>
 	)
 }
