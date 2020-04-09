@@ -13,8 +13,7 @@ function LoginComponent(props) {
 			alert('Please input a Name');
 			return (<Redirect to = "/" />);
 		} else{
-			let playerID = register(value);
-			console.log('player id is: ' + playerID);
+			register(value, props.setPlayerID);
 			setRedirect(true);			
 		}		
 	}

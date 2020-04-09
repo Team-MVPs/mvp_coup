@@ -7,11 +7,11 @@ var totalCount = 0;
 
 function CountTesting(props){
 	if (props.countVal === 1){
-		totalCount += 1;
+		firestore.collection(roomName).doc(props.id)
 	} 
 	return (
 		<div>
-		{console.log('total count is ' + totalCount)}
+		<h1>{props.id}</h1>
 		</div>)
 }	
 

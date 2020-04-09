@@ -35,7 +35,7 @@ function GameStart(props) {
         {joinGame}
       </button>
       <div>
-        <CountTesting countVal = {count}/>
+         <CountTesting id = {props.id}/>
       </div>
 	 
 	</div>
