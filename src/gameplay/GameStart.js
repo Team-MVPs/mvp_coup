@@ -14,20 +14,16 @@ function GameStart(props) {
 
   const [players, setPlayers] = React.useState([]);
   React.useEffect(() => {
-    let mounted = true
     const subscribe = firestore.collection(roomName).onSnapshot((snapshot)=>{
   	let newPlayers = [];
   	snapshot.docs.forEach((doc)=>{
       let playerName = doc.data().name;
       newPlayers.push(playerName);
     });
-    if (mounted){
       setPlayers(newPlayers);
-    }
+
   })
-  return () => {
-    subscribe();
-    mounted = false;}
+  return () => subscribe();
 },[]);
 
   return (

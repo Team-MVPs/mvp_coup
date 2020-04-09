@@ -13,15 +13,18 @@ function CountTesting(props){
 			count: 1
 		});
 	} 
-
-	firestore.collection(roomName).onSnapshot((snapshot)=>{
-		let playerCount = 0;
-		snapshot.docs.forEach((doc)=>{
-			let eachCount = doc.data().count;
-			playerCount += eachCount;
-		});
+	React.useEffect(()=>{
+		const unsubscribe = firestore.collection(roomName).onSnapshot((snapshot)=>{
+			let playerCount = 0;
+			snapshot.docs.forEach((doc)=>{
+				let eachCount = doc.data().count;
+				playerCount += eachCount;
+			});
 		setTotalCount(playerCount);
-	})
+		})
+		return ()=> unsubscribe();	
+	});
+
 	firestore.collection(roomName).get().then((docs)=>{
 		roomSize = docs.size;
 	})
