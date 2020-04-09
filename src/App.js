@@ -19,7 +19,9 @@ function App() {
   const [popupShow, setPopupShow] = React.useState(false);
   const [popupTitle, setPopupTitle] = React.useState("Sample Title");
   const [popupContent, setPopupContent] = React.useState("Sample Content");
-  const [playerID, setPlayerID] = React.useState("SampleID");
+
+
+  const [playerID, setPlayerID] = React.useState(-1);
 
 
   function showPopup(title, content){
@@ -27,7 +29,6 @@ function App() {
     setPopupContent(content);
     setPopupShow(true);
   }
-
   return (
     <Router>
       <div>
@@ -36,7 +37,7 @@ function App() {
         <Switch>
           <Route exact path="/">
             <div align="center">
-              <LoginComponent setPlayerID = {setPlayerID}/>
+              <LoginComponent setPlayerID={setPlayerID}/>
             </div>
           </Route>
           <Route exact path="/start">
@@ -46,7 +47,7 @@ function App() {
           </Route>
           <Route exact path="/GameStart">
             <div align="center">
-              <GameStart id = {playerID}/>
+              <GameStart playerID={playerID}/>
             </div>
           </Route>          
         </Switch>

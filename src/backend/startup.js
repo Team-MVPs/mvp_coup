@@ -5,7 +5,7 @@ import { firestore } from '../config/firebase';
 var roomName = 'Preet Testing'
 var playerID = "";
 
-export async function register(name, setPlayerID) {
+export async function register(setPlayerID, name) {
     await firestore.collection(roomName).add({
         name: name,
         count: 0,
