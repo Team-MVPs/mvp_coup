@@ -7,7 +7,7 @@ var root = "root";
 export async function register(setPlayerID, name, roomName) {
     await firestore.collection(root).doc(roomName).collection("players").add({
         name: name,
-        count: 0,
+        count: 0
     })
         .then(function (docRef) {
             playerID = docRef.id;
