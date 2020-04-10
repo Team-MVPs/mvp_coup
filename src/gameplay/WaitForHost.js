@@ -13,13 +13,13 @@ function WaitForHost(props){
 
     const [gameStarted, setStart] = React.useState(false);
     React.useEffect(() => {
-        const unsubscribe = firestore.collection("root").doc(props.roomName).onSnapshot((doc) => {
+        const subscribe = firestore.collection("root").doc(props.roomName).onSnapshot((doc) => {
           if(doc.data().startGame){
               console.log("Game started");
               setStart(true);
           }
         })
-        return () => unsubscribe();
+        return () => subscribe();
       }, []);
       
       if(leave){

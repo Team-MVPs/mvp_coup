@@ -1,3 +1,4 @@
+
 import { firestore } from '../config/firebase';
 
 //Default Room Name can change this later
@@ -40,4 +41,3 @@ export async function startGame(roomName){
         startGame: true
     });
 }
-
