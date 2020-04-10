@@ -10,21 +10,12 @@ export async function register(setPlayerID, name, roomName) {
     await firestore.collection(root).doc(roomName).collection("players").add({
         name: name,
         count: 0,
-        id: 0
     })
         .then(function (docRef) {
             playerID = docRef.id;
             setPlayerID(playerID);
             console.log("Document written with ID: ", playerID);
         })
-    firestore.collection(roomName).onSnapshot((snapshot) => {
-        snapshot.docs.forEach((doc) => {
-            let docId = doc.id;
-            firestore.collection(roomName).doc(docId).update({
-                id: docId
-            });
-        })
-    })
 }
 
 export async function checkRoomNameExists(roomName) {
