@@ -8,11 +8,10 @@ import WaitForHost from "./WaitForHost.js";
 
 var root = 'root';
 //var testRoom = "New Test";
-
 function GameStart(props) {
   const [players, setPlayers] = React.useState([]);
 	const [redirect, setRedirect] = React.useState(false);
-  const [isdisabled, setDisabled] = React.useState(false);
+  const [isDisabled, setDisabled] = React.useState(true);
 
   const handleClick = (event) => {
     startGame(props.roomName);
@@ -25,16 +24,18 @@ function GameStart(props) {
       snapshot.docs.forEach((doc) => {
         let playerName = doc.data().name;
         newPlayers.push(playerName);
-        if (newPlayers.length>=2){
-          console.log('greater');
-          setDisabled(true);
-        }else{console.log('not yet')}
-
       });
       setPlayers(newPlayers);
+
     })
     return () => unsubscribe();
   }, []);
+  if (players.length>=2 && isDisabled){
+    setDisabled(false);
+  }else if(players.length<2 && !isDisabled){
+    setDisabled(true);
+  }
+  console.log(players.length);
 
   if(redirect){
     return (<Redirect to="/start" />);
@@ -44,13 +45,13 @@ function GameStart(props) {
     if (props.isHost) {
       return (
         <button
-          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }} disabled = {!isdisabled}>
+          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }} disabled = {isDisabled}>
           Start Game!
         </button>)
     } else {
       console.log(props.playerID);
       return (
-        <WaitForHost roomName={props.roomName} id = {props.playerID}/>
+        <WaitForHost roomName={props.roomName} id = {props.playerID} playerArray = {players}/>
       );
     }
   }

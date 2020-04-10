@@ -6,6 +6,7 @@ import { Button } from 'react-bootstrap';
 
 function WaitForHost(props){
     const [leave, setLeave] = React.useState(false);
+    const [name, setName] = React.useState("test name");
 
     const handleLeaveRoom = (event) =>{
       setLeave(true);
@@ -23,6 +24,7 @@ function WaitForHost(props){
       }, []);
       
       if(leave){
+        console.log(name);
         firestore.collection("root").doc(props.roomName).collection("players").doc(props.id).delete().then(()=>{
         console.log('A player left ' + props.roomName);
         })
