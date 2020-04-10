@@ -1,4 +1,3 @@
-
 import { firestore } from '../config/firebase';
 
 //Default Room Name can change this later
@@ -42,8 +41,3 @@ export async function startGame(roomName){
     });
 }
 
-export async function startGame(roomName){
-    await firestore.collection(root).doc(roomName).set({
-        startGame: true
-    });
-}
