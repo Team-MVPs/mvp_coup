@@ -19,7 +19,7 @@ function GameStart(props) {
   };
 
   React.useEffect(() => {
-    const subscribe = firestore.collection(root).doc(props.roomName).collection("players").onSnapshot((snapshot) => {
+    const unsubscribe = firestore.collection(root).doc(props.roomName).collection("players").onSnapshot((snapshot) => {
       let newPlayers = [];
       snapshot.docs.forEach((doc) => {
         let playerName = doc.data().name;
@@ -28,7 +28,7 @@ function GameStart(props) {
       setPlayers(newPlayers);
 
     })
-    return () => subscribe();
+    return () => unsubscribe();
   }, []);
   if (players.length>=2 && isDisabled){
     setDisabled(false);

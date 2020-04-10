@@ -41,3 +41,9 @@ export async function startGame(roomName){
         startGame: true
     });
 }
+
+export async function startGame(roomName){
+    await firestore.collection(root).doc(roomName).set({
+        startGame: true
+    });
+}
