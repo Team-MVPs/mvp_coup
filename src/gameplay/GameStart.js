@@ -1,16 +1,17 @@
 import React from 'react';
 import { firestore } from '../config/firebase';
-import { Modal, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import CountTesting from "../backend/countTesting.js";
 import { startGame } from '../backend/startup';
 import { Redirect } from 'react-router-dom';
 import WaitForHost from "./WaitForHost.js";
 
 var root = 'root';
-
+//var testRoom = "New Test";
 function GameStart(props) {
   const [players, setPlayers] = React.useState([]);
 	const [redirect, setRedirect] = React.useState(false);
+  const [isDisabled, setDisabled] = React.useState(true);
 
   const handleClick = (event) => {
     startGame(props.roomName);
@@ -25,23 +26,32 @@ function GameStart(props) {
         newPlayers.push(playerName);
       });
       setPlayers(newPlayers);
+
     })
     return () => unsubscribe();
   }, []);
+  if (players.length>=2 && isDisabled){
+    setDisabled(false);
+  }else if(players.length<2 && !isDisabled){
+    setDisabled(true);
+  }
+  console.log(players.length);
 
   if(redirect){
     return (<Redirect to="/start" />);
   }
+
   function JoinGame(props) {
     if (props.isHost) {
       return (
         <button
-          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }}>
+          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }} disabled = {isDisabled}>
           Start Game!
         </button>)
     } else {
+      console.log(props.playerID);
       return (
-        <WaitForHost roomName={props.roomName}/>
+        <WaitForHost roomName={props.roomName} id = {props.playerID} playerArray = {players}/>
       );
     }
   }
@@ -53,7 +63,7 @@ function GameStart(props) {
 	        <li className="list-group-item" key={name}>{name} has joined the lobby</li>
 	      ))}
 	    </ol>
-	    <JoinGame isHost={props.isHost} roomName={props.roomName}/>
+	    <JoinGame isHost={props.isHost} roomName={props.roomName} playerID = {props.playerID}/>
       {/* <div>
         <CountTesting id={props.playerID} accepted={accepted} />
       </div> */}
