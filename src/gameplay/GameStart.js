@@ -1,47 +1,63 @@
 import React from 'react';
-import {firestore} from '../config/firebase';
+import { firestore } from '../config/firebase';
 import { Modal, Button } from 'react-bootstrap';
 import CountTesting from "../backend/countTesting.js";
+import { startGame } from '../backend/startup';
+import { Redirect } from 'react-router-dom';
+import WaitForHost from "./WaitForHost.js";
 
-var roomName = 'Preet Testing';
+var root = 'root';
 
 function GameStart(props) {
-  const [isClicked, setClicked] = React.useState(false);
-  const [joinGame, setJoin] = React.useState("Join Game!");
-  const [accepted, setAccept] = React.useState(false);
-//  const [currentState, setCurrentState] = React.useState(" has joined the lobby");
-  const handleClick = (event) => {setClicked(true); setJoin("Accepted!"); setAccept(true)}; 
-
   const [players, setPlayers] = React.useState([]);
-  React.useEffect(() => {
-    const subscribe = firestore.collection(roomName).onSnapshot((snapshot)=>{
-  	let newPlayers = [];
-  	snapshot.docs.forEach((doc)=>{
-      let playerName = doc.data().name;
-      newPlayers.push(playerName);
-    });
-      setPlayers(newPlayers);
+	const [redirect, setRedirect] = React.useState(false);
 
-  })
-  return () => subscribe();
-},[]);
+  const handleClick = (event) => {
+    startGame(props.roomName);
+    setRedirect(true);
+  };
+
+  React.useEffect(() => {
+    const unsubscribe = firestore.collection(root).doc(props.roomName).collection("players").onSnapshot((snapshot) => {
+      let newPlayers = [];
+      snapshot.docs.forEach((doc) => {
+        let playerName = doc.data().name;
+        newPlayers.push(playerName);
+      });
+      setPlayers(newPlayers);
+    })
+    return () => unsubscribe();
+  }, []);
+
+  if(redirect){
+    return (<Redirect to="/start" />);
+  }
+  function JoinGame(props) {
+    if (props.isHost) {
+      return (
+        <button
+          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }}>
+          Start Game!
+        </button>)
+    } else {
+      return (
+        <WaitForHost roomName={props.roomName}/>
+      );
+    }
+  }
 
   return (
-  	<div>
+    <div>
 	    <ol className="list-group list-group-flush" style = {{marginBottom: 50, marginTop: 20}}>
 	      {players.map(name => (
 	        <li className="list-group-item" key={name}>{name} has joined the lobby</li>
 	      ))}
 	    </ol>
-	    <button 
-        type="button" className="btn btn-lg btn-primary" disabled = {isClicked} onClick = {handleClick} style ={{marginBottom:50}}>
-        {joinGame}
-      </button>
-      <div>
-         <CountTesting id = {props.playerID} accepted = {accepted}/>
-      </div>
-	 
-	</div>
+	    <JoinGame isHost={props.isHost} roomName={props.roomName}/>
+      {/* <div>
+        <CountTesting id={props.playerID} accepted={accepted} />
+      </div> */}
+    </div>
   );
 }
 
