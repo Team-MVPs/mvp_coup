@@ -22,9 +22,10 @@ function App() {
 
 
   const [playerID, setPlayerID] = React.useState(-1);
+  const [isHost, setHost]  = React.useState(false);
+  const [roomName, setRoomName] = React.useState("");
 
-
-  function showPopup(title, content){
+  function showPopup(title, content) {
     setPopupTitle(title);
     setPopupContent(content);
     setPopupShow(true);
@@ -36,8 +37,8 @@ function App() {
           renders the first one that matches the current URL. */}
         <Switch>
           <Route exact path="/">
-            <div align="center">
-              <LoginComponent setPlayerID={setPlayerID}/>
+            <div align="center" style={{ position: "absolute", top: "0", bottom: "0", left: "0", right: "0", margin: "auto" }}>
+              <LoginComponent setPlayerID={setPlayerID} setHost={setHost} setRoomName={setRoomName} />
             </div>
           </Route>
           <Route exact path="/start">
@@ -47,7 +48,7 @@ function App() {
           </Route>
           <Route exact path="/GameStart">
             <div align="center">
-              <GameStart playerID={playerID}/>
+              <GameStart playerID={playerID} isHost={isHost} roomName={roomName} />
             </div>
           </Route>
         </Switch>
@@ -57,7 +58,8 @@ function App() {
           content={popupContent}
           onHide={() => {
             console.log("Hiding Now");
-            setPopupShow(false)}
+            setPopupShow(false)
+          }
           }
         />
       </div>
