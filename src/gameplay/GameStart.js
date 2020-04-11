@@ -10,7 +10,7 @@ var root = 'root';
 //var testRoom = "New Test";
 function GameStart(props) {
   const [players, setPlayers] = React.useState([]);
-	const [redirect, setRedirect] = React.useState(false);
+  const [redirect, setRedirect] = React.useState(false);
   const [isDisabled, setDisabled] = React.useState(true);
 
   const handleClick = (event) => {

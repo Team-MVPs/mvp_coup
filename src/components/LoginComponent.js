@@ -59,7 +59,7 @@ function LoginComponent(props) {
 				}
 			})
 		}
-	}
+	};
 
 	if (redirect) {
 		return (

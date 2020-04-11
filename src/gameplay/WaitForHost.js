@@ -1,15 +1,13 @@
 import React from 'react';
 import { firestore } from '../config/firebase';
 import { Redirect } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
-
 
 function WaitForHost(props){
     const [leave, setLeave] = React.useState(false);
 
-    const handleLeaveRoom = (event) =>{
+    const handleLeaveRoom = (event) => {
       setLeave(true);
-    }
+    };
 
     const [gameStarted, setStart] = React.useState(false);
     React.useEffect(() => {
@@ -18,14 +16,14 @@ function WaitForHost(props){
               console.log("Game started");
               setStart(true);
           }
-        })
+        });
         return () => subscribe();
       }, []);
       
       if(leave){
         firestore.collection("root").doc(props.roomName).collection("players").doc(props.id).delete().then(()=>{
         console.log('A player left ' + props.roomName);
-        })
+        });
         return (<Redirect to ="/" />);
       }
 

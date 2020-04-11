@@ -21,7 +21,7 @@ function App() {
   const [popupContent, setPopupContent] = React.useState("Sample Content");
 
 
-  const [playerID, setPlayerID] = React.useState(-1);
+  const [playerID, setPlayerID] = React.useState("");
   const [isHost, setHost]  = React.useState(false);
   const [roomName, setRoomName] = React.useState("");
 
@@ -43,7 +43,7 @@ function App() {
           </Route>
           <Route exact path="/start">
             <div align="center">
-              <MainGameScreen popupCallback={showPopup} />
+              <MainGameScreen playerID={playerID} isHost={isHost} roomName={roomName}/>
             </div>
           </Route>
           <Route exact path="/GameStart">
