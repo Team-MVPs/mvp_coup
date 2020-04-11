@@ -2,8 +2,7 @@
 
 import React from 'react';
 import Character from '../characters/Character.js';
-
-const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador"];
+import {all_chars} from '../backend/game_logic.js'
 
 const chars = all_chars.map((name, inx) => (
     <Character name={name} key={inx} show_card={false}/>

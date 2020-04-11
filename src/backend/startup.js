@@ -1,13 +1,11 @@
-import { firestore } from '../config/firebase';
+import { firestore, root } from '../config/firebase';
 
 //Default Room Name can change this later
-var playerID = "";
-var root = "root";
+let playerID = "";
 
 export async function register(setPlayerID, name, roomName) {
     await firestore.collection(root).doc(roomName).collection("players").add({
-        name: name,
-        count: 0
+        name: name
     })
         .then(function (docRef) {
             playerID = docRef.id;
