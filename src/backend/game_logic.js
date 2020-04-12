@@ -47,7 +47,7 @@ export function playerStateCallback(roomName, playerId) {
 	const playerRef = playerCollection.doc(playerId);
 	playerRef.onSnapshot((doc) => {
 			console.log("Player State Updated");
-			alert(JSON.stringify(doc.data()));
+			//alert(JSON.stringify(doc.data()));
 		}, (error) => console.error(error));
 }
 

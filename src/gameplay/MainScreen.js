@@ -31,19 +31,19 @@ function MainGameScreen(props) {
     playerStateCallback(roomName, playerID);
 
     return (
-        <Container>
+        <div>
             <Row>
-                <Col xs={3}>
+                <Col style ={{marginRight:100, border:"1px solid", height:700, width:"100px"}}>
                    <UserDetails />
                 </Col>
-                <Col xs={6}>
+                <Col style = {{border:"1px solid"}}>
                     <PlayerScreen />
                 </Col>
-                <Col xs={3}>
+                <Col>
                     <PastMoves />
                 </Col>
             </Row>
-        </Container>
+        </div>
     );
 }
 

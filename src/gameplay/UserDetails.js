@@ -10,13 +10,18 @@ const chars = all_chars.map((name, inx) => (
 ));
 
 function UserDetails(props) {
-    return (
+/*    return (
         <div align="center">
             Face Up Cards
             <br></br>
             {chars}
         </div>
-    );
+    );*/
+    return(
+    	<div>
+    		<h3>Player Information</h3>
+    		
+    	</div>)
 }
 
 export default UserDetails;
