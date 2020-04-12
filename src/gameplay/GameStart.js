@@ -14,8 +14,9 @@ function GameStart(props) {
   const [isDisabled, setDisabled] = React.useState(true);
 
   const handleClick = (event) => {
-    startGame(props.roomName);
-    setRedirect(true);
+    startGame(props.roomName).then(() => {
+      setRedirect(true);
+    })
   };
 
   React.useEffect(() => {
@@ -46,7 +47,7 @@ function GameStart(props) {
     if (props.isHost) {
       return (
         <button
-          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }} disabled = {isDisabled}>
+          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }}> //disabled = {isDisabled}
           Start Game!
         </button>)
     } else {
