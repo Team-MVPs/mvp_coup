@@ -25,9 +25,6 @@ function MainGameScreen(props) {
         isHost = true;
     }
     
-    if (isHost) {
-        distributeCards(roomName);
-    }
     playerStateCallback(roomName, playerID);
 
     return (
