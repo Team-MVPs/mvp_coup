@@ -14,8 +14,9 @@ function GameStart(props) {
   const [isDisabled, setDisabled] = React.useState(true);
 
   const handleClick = (event) => {
-    startGame(props.roomName);
-    setRedirect(true);
+    startGame(props.roomName).then(() => {
+      setRedirect(true);
+    })
   };
 
   React.useEffect(() => {

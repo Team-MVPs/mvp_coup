@@ -1,4 +1,5 @@
 import { firestore, root } from '../config/firebase';
+import {distributeCards} from "../backend/game_logic.js"
 
 //Default Room Name can change this later
 let playerID = "";
@@ -34,8 +35,10 @@ export async function createRoomName(roomName) {
 }
 
 export async function startGame(roomName){
-    await firestore.collection(root).doc(roomName).set({
-        startGame: true
-    });
+    await distributeCards(roomName).then(() => {
+        firestore.collection(root).doc(roomName).set({
+            startGame: true
+        });
+    })
 }
 
