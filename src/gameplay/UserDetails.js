@@ -1,7 +1,9 @@
 // @flow
 import React from 'react';
+import { Container, Row, Col, Card } from 'react-bootstrap';
 import Character from '../characters/Character.js';
 import OtherPlayerInfo from '../components/OtherPlayerInfoComponent.js';
+import PlayCard from '../components/PlayCard.js';
 import { firestore } from '../config/firebase';
 import { playerStateCallback } from '../backend/game_logic.js'
 
@@ -15,29 +17,59 @@ const chars = all_chars.map((name, inx) => (
 var root = "root";
 
 function UserDetails(props) {
-    const [cards, setCards] = React.useState([]);
+    const [playerDetails, setDetails] = React.useState({});
 
 
     React.useEffect(() => {
-        const unsubscribe = firestore.collection(root).doc(props.roomName).collection("players").doc(props.playerID).onSnapshot((doc) => {
-            setCards(doc.data().cards)
+        const unsubscribe = firestore.collection(root).doc(props.roomName).collection("players").onSnapshot((docs) => {
+            var dict = {};
+            docs.forEach(function (doc) {
+                dict[doc.id] = doc.data();
+            });
+            console.log(dict);
+            setDetails(dict);
         });
         return () => unsubscribe;
     }, [])
+    console.log(props.playerID);
 
+    function OwnCards(props) {
+        if (playerDetails[props.playerID] !== undefined) {
+            return (
+                <div>
+                    <Container style={{width:"20em"}}>
+                        <Row>
+                            <Col xs={6}>
+                                <PlayCard cardName={playerDetails[props.playerID].cards[0]} />
+                            </Col>
+                            <Col xs={6}>
+                                <PlayCard cardName={playerDetails[props.playerID].cards[1]} />
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>);
+        } else {
+            return (<div></div>);
+        }
+    }
     return (
         <div align="center">
             <h3>Player Information</h3>
-            <div align="left" style={{ border: "1px solid", height: 160 }}>
-                <h4>Your Cards:</h4>
-                <br></br>
-    			Card1:{cards[0]}
-                <br></br>
-    			Card2: {cards[1]}
+            <div align="left" style={{paddingBottom: "1em"}}>
+                <Card>
+                    <Card.Header><h4>Your Cards</h4></Card.Header>
+                    <Card.Body>
+                    <OwnCards playerID={props.playerID} />
+                    </Card.Body>
+                </Card>
             </div>
-            <div align="left" style={{ border: "1px solid" }}>
-                <h4>Other Player Information</h4>
-                <OtherPlayerInfo />
+            <div align="left">
+                <Card>
+                    <Card.Header><h4>Other Players</h4></Card.Header>
+                    <Card.Body>
+                    <OtherPlayerInfo playerDetails={playerDetails} ownID={props.playerID} />
+                    </Card.Body>
+                </Card>
             </div>
 
         </div>)
