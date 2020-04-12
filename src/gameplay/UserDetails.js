@@ -20,9 +20,6 @@ function UserDetails(props) {
 
     React.useEffect(() => {
         const unsubscribe = firestore.collection(root).doc(props.roomName).collection("players").doc(props.playerID).onSnapshot((doc) => {
-            console.log(doc.data().cards)
-            console.log("data");
-            console.log(doc.data());
             setCards(doc.data().cards)
         });
         return () => unsubscribe;
