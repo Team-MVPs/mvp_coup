@@ -17,7 +17,7 @@ function MainGameScreen(props) {
     // TODO: remove this later
     // keeping this here as it becomes hard to test without having to create a new room each time
     if (!roomName) {
-        console.log("Room name not provided, using test roomname");
+        console.log("Room name not provided, using test roomname mvp");
         roomName = "mvp";
     }
     if (!playerID) {
@@ -33,13 +33,13 @@ function MainGameScreen(props) {
     return (
         <div>
             <Row>
-                <Col style ={{marginRight:100, border:"1px solid", height:700, width:"100px"}}>
-                   <UserDetails />
+                <Col style ={{marginLeft: 0, border:"1px solid", height:700}}>
+                   <UserDetails playerID = {playerID} roomName = {roomName}/>
                 </Col>
                 <Col style = {{border:"1px solid"}}>
                     <PlayerScreen />
                 </Col>
-                <Col>
+                <Col style = {{marighRight: 0, border:"1px solid"}}>
                     <PastMoves />
                 </Col>
             </Row>

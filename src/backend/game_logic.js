@@ -1,4 +1,5 @@
 import { firestore, root } from '../config/firebase';
+import React from 'react';
 
 export const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador"];
 
@@ -40,7 +41,7 @@ export function distributeCards(roomName) {
 	});
 }
 
-export function playerStateCallback(roomName, playerId) {
+export async function playerStateCallback(roomName, playerId) {
 	console.log(roomName, playerId);
 	const roomRef = firestore.collection(root).doc(roomName);
 	const playerCollection = roomRef.collection("players");
@@ -48,6 +49,6 @@ export function playerStateCallback(roomName, playerId) {
 	playerRef.onSnapshot((doc) => {
 			console.log("Player State Updated");
 			//alert(JSON.stringify(doc.data()));
-		}, (error) => console.error(error));
+			}, (error) => console.error(error));
 }
 
