@@ -6,9 +6,6 @@ import captain from '../images/captain.JPG';
 import contessa from '../images/contessa.JPG';
 import duke from '../images/duke.JPG';
 
-export const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador"];
-
-
 function PlayCard(props) {
     switch(props.cardName){
         case "Duke": {
