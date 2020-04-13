@@ -13,10 +13,10 @@ function LoginComponent(props) {
 
 	const newRoom = (event) => {
 		event.preventDefault();
-		if (playerName.length === 0) {
+		if (playerName.trim().length === 0) {
 			alert('Please input a Player Name');
 			return (<Redirect to="/" />);
-		} else if (roomName.length === 0) {
+		} else if (roomName.trim().length === 0) {
 			alert('Please enter a Room name');
 			return (<Redirect to="/" />);
 		} else {
@@ -40,10 +40,10 @@ function LoginComponent(props) {
 	const existingRoom = (event) => {
 		console.log("In Existing Room");
 		event.preventDefault();
-		if (playerName.length === 0) {
+		if (playerName.trim().length === 0) {
 			alert('Please input a Player Name');
 			return (<Redirect to="/" />);
-		} else if (roomName.length === 0) {
+		} else if (roomName.trim().length === 0) {
 			alert('Please enter a Room name');
 			return (<Redirect to="/" />);
 		} else {

@@ -27,7 +27,6 @@ function GameStart(props) {
         newPlayers.push(playerName);
       });
       setPlayers(newPlayers);
-
     })
     return () => unsubscribe();
   }, []);
