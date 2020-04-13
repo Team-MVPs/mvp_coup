@@ -4,18 +4,15 @@ import { Container, Row, Col, Card } from 'react-bootstrap';
 import Character from '../characters/Character.js';
 import OtherPlayerInfo from '../components/OtherPlayerInfoComponent.js';
 import PlayCard from '../components/PlayCard.js';
-import { firestore } from '../config/firebase';
-import { playerStateCallback } from '../backend/game_logic.js';
+import { firestore, root } from '../config/firebase';
+import { playerStateCallback } from '../backend/game_logic.js'
 import coins from '../images/coins.jpg';
-
 
 /*const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador"];
 
 const chars = all_chars.map((name, inx) => (
     <Character name={name} key={inx} show_card={true}/>
 ));*/
-
-var root = "root";
 
 function UserDetails(props) {
     const [playerDetails, setDetails] = React.useState({});

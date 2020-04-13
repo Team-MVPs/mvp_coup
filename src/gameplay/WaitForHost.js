@@ -1,5 +1,5 @@
 import React from 'react';
-import { firestore } from '../config/firebase';
+import { firestore, root } from '../config/firebase';
 import { Redirect } from 'react-router-dom';
 
 function WaitForHost(props) {
@@ -11,7 +11,7 @@ function WaitForHost(props) {
 
   const [gameStarted, setStart] = React.useState(false);
   React.useEffect(() => {
-    const subscribe = firestore.collection("root").doc(props.roomName).onSnapshot((doc) => {
+    const subscribe = firestore.collection(root).doc(props.roomName).onSnapshot((doc) => {
       if (doc.data().startGame) {
         console.log("Game started");
         setStart(true);
@@ -21,7 +21,7 @@ function WaitForHost(props) {
   }, []);
 
   if (leave) {
-    firestore.collection("root").doc(props.roomName).collection("players").doc(props.id).delete().then(() => {
+    firestore.collection(root).doc(props.roomName).collection("players").doc(props.id).delete().then(() => {
       console.log('A player left ' + props.roomName);
     });
     return (<Redirect to="/" />);

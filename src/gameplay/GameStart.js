@@ -1,12 +1,11 @@
 import React from 'react';
-import { firestore } from '../config/firebase';
+import { firestore, root } from '../config/firebase';
 import { Button } from 'react-bootstrap';
 import CountTesting from "../backend/countTesting.js";
 import { startGame } from '../backend/startup';
 import { Redirect } from 'react-router-dom';
 import WaitForHost from "./WaitForHost.js";
 
-var root = 'root';
 //var testRoom = "New Test";
 function GameStart(props) {
   const [players, setPlayers] = React.useState([]);
