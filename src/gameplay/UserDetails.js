@@ -62,6 +62,8 @@ function UserDetails(props) {
 	                        </Row>
 	                    </Container>
 	                </div>);        		
+        	}else{
+        		return (<div>You are out of the game!</div>);
         	}
 
         } else {
