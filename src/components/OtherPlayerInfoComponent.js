@@ -16,7 +16,7 @@ function OtherPlayerInfo(props) {
 							<Container style={{ width: "20em" }}>
 								<Row>
 									<Col xs={6}>
-										{(props.data.cards.length >= 1) ? <PlayCard cardName={"back"}/> : <div/>}
+										{(props.data.cards.length >= 1) ? <PlayCard cardName={"back"}/> : <div>Out Of game!</div>}
 									</Col>
 									<Col xs={6}>
 										{(props.data.cards.length == 2) ? <PlayCard cardName={"back"}/> : <div/>}
