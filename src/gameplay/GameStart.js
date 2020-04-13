@@ -44,11 +44,19 @@ function GameStart(props) {
 
   function JoinGame(props) {
     if (props.isHost) {
+      let waitingMsg = null;
+      if (isDisabled) {
+        waitingMsg = <div><i>Need 2 or more players to begin the game</i></div>
+      }
       return (
-        <button
-          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }} disabled = {isDisabled}>
-          Start Game!
-        </button>)
+          <div>
+            <button
+              type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 10 }} disabled = {isDisabled}>
+              Start Game!
+            </button>
+            {waitingMsg}
+          </div>
+        )
     } else {
       console.log(props.playerID);
       return (
