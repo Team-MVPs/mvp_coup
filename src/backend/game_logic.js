@@ -5,7 +5,7 @@ export const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador
 
 const num_of_each_card = 3;
 
-export function distributeCards(roomName) {
+export async function distributeCards(roomName) {
 	// helper functions
 	function shuffle(a) {
 		for (let i = a.length - 1; i > 0; i--) {
@@ -25,7 +25,7 @@ export function distributeCards(roomName) {
 	
 	const roomRef = firestore.collection(root).doc(roomName);
 	const playerCollection = roomRef.collection("players");
-	playerCollection.get().then((players) => {
+	await playerCollection.get().then((players) => {
 		// give each player 2 cards and 2 coins
 		players.forEach(function(doc) {
 			let playerCards = [cards.pop(), cards.pop()];

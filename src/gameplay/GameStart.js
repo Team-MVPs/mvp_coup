@@ -37,7 +37,6 @@ function GameStart(props) {
   }else if(players.length<2 && !isDisabled){
     setDisabled(true);
   }
-  console.log(players.length);
 
   if(redirect){
     return (<Redirect to="/start" />);
@@ -47,7 +46,7 @@ function GameStart(props) {
     if (props.isHost) {
       return (
         <button
-          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }}> //disabled = {isDisabled}
+          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }} disabled = {isDisabled}>
           Start Game!
         </button>)
     } else {
