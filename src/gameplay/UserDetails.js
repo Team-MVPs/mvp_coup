@@ -35,19 +35,35 @@ function UserDetails(props) {
 
     function OwnCards(props) {
         if (playerDetails[props.playerID] !== undefined) {
-            return (
-                <div>
-                    <Container style={{width:"20em"}}>
-                        <Row>
-                            <Col xs={6}>
-                                <PlayCard cardName={playerDetails[props.playerID].cards[0]} />
-                            </Col>
-                            <Col xs={6}>
-                                <PlayCard cardName={playerDetails[props.playerID].cards[1]} />
-                            </Col>
-                        </Row>
-                    </Container>
-                </div>);
+        	let numCards = playerDetails[props.playerID].cards.length;
+        	if(numCards === 2){
+	        	return (
+	                <div>
+	                    <Container style={{width:"20em"}}>
+	                        <Row>
+	                            <Col xs={6}>
+	                                <PlayCard cardName={playerDetails[props.playerID].cards[0]} />
+	                            </Col>
+	                            <Col xs={6}>
+	                                <PlayCard cardName={playerDetails[props.playerID].cards[1]} />
+	                            </Col>
+	                        </Row>
+	                    </Container>
+	                </div>);
+
+        	} else if (numCards === 1){
+	        	return (
+	                <div>
+	                    <Container style={{width:"20em"}}>
+	                        <Row>
+	                            <Col xs={6}>
+	                                <PlayCard cardName={playerDetails[props.playerID].cards[0]} />
+	                            </Col>
+	                        </Row>
+	                    </Container>
+	                </div>);        		
+        	}
+
         } else {
             return (<div></div>);
         }

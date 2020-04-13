@@ -33,6 +33,11 @@ function PlayCard(props) {
                 width: "8em",
             }}> <img src={ambassador} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} /></div >);
         }
+        case "undefined":{
+            return (<div style={{
+                width: "8em",
+            }}> <img src={ambassador} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} /></div >);
+        }
     }
     return (<div style={{
         width: "8em",
