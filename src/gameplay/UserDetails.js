@@ -33,10 +33,25 @@ function UserDetails(props) {
     }, [])
     console.log(props.playerID);
 
+    function OwnCoins(props){
+    	if (playerDetails[props.playerID] !== undefined && playerDetails[props.playerID].cards.length !== 0){
+    		let numofCoins = playerDetails[props.playerID].coins;
+    		return (
+    			<div align ="center" style = {{paddingTop:"1em", paddingBottom:"1em"}}>
+    				{numofCoins}
+    			</div>)
+    	} else {
+            return (
+    			<div align ="center" style = {{paddingTop:"1em", paddingBottom:"1em"}}>
+    				0
+    			</div>)
+        };
+    };
+    
     function OwnCards(props) {
         if (playerDetails[props.playerID] !== undefined) {
         	let numCards = playerDetails[props.playerID].cards.length;
-        	if(numCards === 2){
+        	if (numCards === 2){
 	        	return (
 	                <div>
 	                    <Container style={{width:"20em"}}>
@@ -62,14 +77,15 @@ function UserDetails(props) {
 	                        </Row>
 	                    </Container>
 	                </div>);        		
-        	}else{
+        	}else {
         		return (<div>You are out of the game!</div>);
         	}
 
         } else {
             return (<div></div>);
-        }
-    }
+        };
+    };
+
     return (
         <div align="center">
             <h3>Player Information</h3>
@@ -79,6 +95,12 @@ function UserDetails(props) {
                     <Card.Body>
                     <OwnCards playerID={props.playerID} />
                     </Card.Body>
+                </Card>
+            </div>
+            <div align="left" style={{paddingBottom: "1em"}}>
+                <Card>
+                    <Card.Header><h4>Your Currency</h4></Card.Header>
+                    <OwnCoins playerID ={props.playerID}/>
                 </Card>
             </div>
             <div align="left">

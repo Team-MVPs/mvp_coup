@@ -16,13 +16,16 @@ function OtherPlayerInfo(props) {
 							<Container style={{ width: "20em" }}>
 								<Row>
 									<Col xs={6}>
-										{(props.data.cards.length >= 1) ? <PlayCard cardName={"back"}/> : <div>Out Of game!</div>}
+										{(props.data.cards.length >= 1) ? <PlayCard cardName={"back"}/> : <div>Out Of game, what a loser!</div>}
 									</Col>
 									<Col xs={6}>
 										{(props.data.cards.length == 2) ? <PlayCard cardName={"back"}/> : <div/>}
 									</Col>
 								</Row>
 							</Container>
+						</div>
+						<div align = "center" style = {{marginTop:10}}>
+							{(props.data.cards.length !== 0) ? <div>Coins: {props.data.coins}</div> : <div/>}
 						</div>
 					</Card.Body>
 				</Accordion.Collapse>

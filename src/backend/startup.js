@@ -36,7 +36,7 @@ export async function createRoomName(roomName) {
 
 export async function startGame(roomName){
     await distributeCards(roomName).then(() => {
-        firestore.collection(root).doc(roomName).set({
+        firestore.collection(root).doc(roomName).update({
             startGame: true
         });
     })
