@@ -30,10 +30,10 @@ function MainGameScreen(props) {
     return (
         <div style={{margin:"3em", minWidth: "900px"}}>
             <Row>
-                <Col xs={5}>
+                <Col xs={4}>
                    <UserDetails playerID = {playerID} roomName = {roomName}/>
                 </Col>
-                <Col xs={4}>
+                <Col xs={5}>
                     <PlayerScreen />
                 </Col>
                 <Col xs={3}>
