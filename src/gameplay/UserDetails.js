@@ -5,7 +5,8 @@ import Character from '../characters/Character.js';
 import OtherPlayerInfo from '../components/OtherPlayerInfoComponent.js';
 import PlayCard from '../components/PlayCard.js';
 import { firestore } from '../config/firebase';
-import { playerStateCallback } from '../backend/game_logic.js'
+import { playerStateCallback } from '../backend/game_logic.js';
+import coins from '../images/coins.jpg'
 
 
 /*const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador"];
@@ -33,21 +34,6 @@ function UserDetails(props) {
     }, [])
     console.log(props.playerID);
 
-    function OwnCoins(props){
-    	if (playerDetails[props.playerID] !== undefined && playerDetails[props.playerID].cards.length !== 0){
-    		let numofCoins = playerDetails[props.playerID].coins;
-    		return (
-    			<div align ="center" style = {{paddingTop:"1em", paddingBottom:"1em"}}>
-    				{numofCoins}
-    			</div>)
-    	} else {
-            return (
-    			<div align ="center" style = {{paddingTop:"1em", paddingBottom:"1em"}}>
-    				0
-    			</div>)
-        };
-    };
-    
     function OwnCards(props) {
         if (playerDetails[props.playerID] !== undefined) {
         	let numCards = playerDetails[props.playerID].cards.length;
@@ -64,6 +50,10 @@ function UserDetails(props) {
 	                            </Col>
 	                        </Row>
 	                    </Container>
+                        <div align = "center" style = {{fontSize: "x-large", paddingTop: "1em"}}>
+                          <img src ={coins} alt="coins" style={{maxWidth: "10%", borderRadius: "2em", paddingRight: "0.5em"}}/>
+                          {playerDetails[props.playerID].coins}
+                        </div>
 	                </div>);
 
         	} else if (numCards === 1){
@@ -89,18 +79,12 @@ function UserDetails(props) {
     return (
         <div align="center">
             <h3>Player Information</h3>
-            <div align="left" style={{paddingBottom: "1em"}}>
+            <div align="left" style={{paddingBottom: "1em", paddingTop:"1em"}}>
                 <Card>
-                    <Card.Header><h4>Your Cards</h4></Card.Header>
+                    <Card.Header><h4>Your Cards and Currency</h4></Card.Header>
                     <Card.Body>
                     <OwnCards playerID={props.playerID} />
                     </Card.Body>
-                </Card>
-            </div>
-            <div align="left" style={{paddingBottom: "1em"}}>
-                <Card>
-                    <Card.Header><h4>Your Currency</h4></Card.Header>
-                    <OwnCoins playerID ={props.playerID}/>
                 </Card>
             </div>
             <div align="left">
