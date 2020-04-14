@@ -1,12 +1,11 @@
 import React from 'react';
-import { firestore } from '../config/firebase';
+import { firestore, root } from '../config/firebase';
 import { Button } from 'react-bootstrap';
 import CountTesting from "../backend/countTesting.js";
 import { startGame } from '../backend/startup';
 import { Redirect } from 'react-router-dom';
 import WaitForHost from "./WaitForHost.js";
 
-var root = 'root';
 //var testRoom = "New Test";
 function GameStart(props) {
   const [players, setPlayers] = React.useState([]);
@@ -27,7 +26,6 @@ function GameStart(props) {
         newPlayers.push(playerName);
       });
       setPlayers(newPlayers);
-
     })
     return () => unsubscribe();
   }, []);
@@ -44,11 +42,19 @@ function GameStart(props) {
 
   function JoinGame(props) {
     if (props.isHost) {
+      let waitingMsg = null;
+      if (isDisabled) {
+        waitingMsg = <div><i>Need 2 or more players to begin the game</i></div>
+      }
       return (
-        <button
-          type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 50 }} disabled = {isDisabled}>
-          Start Game!
-        </button>)
+          <div>
+            <button
+              type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 10 }} disabled = {isDisabled}>
+              Start Game!
+            </button>
+            {waitingMsg}
+          </div>
+        )
     } else {
       console.log(props.playerID);
       return (
@@ -61,7 +67,7 @@ function GameStart(props) {
     <div>
 	    <ol className="list-group list-group-flush" style = {{marginBottom: 50, marginTop: 20}}>
 	      {players.map(name => (
-	        <li className="list-group-item" key={name}>{name} has joined the lobby</li>
+	        <li className="list-group-item" key={name}>{name} is in the lobby</li>
 	      ))}
 	    </ol>
 	    <JoinGame isHost={props.isHost} roomName={props.roomName} playerID = {props.playerID}/>
