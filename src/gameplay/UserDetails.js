@@ -5,7 +5,8 @@ import Character from '../characters/Character.js';
 import OtherPlayerInfo from '../components/OtherPlayerInfoComponent.js';
 import PlayCard from '../components/PlayCard.js';
 import { firestore } from '../config/firebase';
-import { playerStateCallback } from '../backend/game_logic.js'
+import { playerStateCallback } from '../backend/game_logic.js';
+import coins from '../images/coins.jpg';
 
 
 /*const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador"];
@@ -35,29 +36,56 @@ function UserDetails(props) {
 
     function OwnCards(props) {
         if (playerDetails[props.playerID] !== undefined) {
-            return (
-                <div>
-                    <Container style={{width:"20em"}}>
-                        <Row>
-                            <Col xs={6}>
-                                <PlayCard cardName={playerDetails[props.playerID].cards[0]} />
-                            </Col>
-                            <Col xs={6}>
-                                <PlayCard cardName={playerDetails[props.playerID].cards[1]} />
-                            </Col>
-                        </Row>
-                    </Container>
-                </div>);
+        	let numCards = playerDetails[props.playerID].cards.length;
+        	if (numCards === 2){
+	        	return (
+	                <div>
+	                    <Container style={{width:"20em"}}>
+	                        <Row>
+	                            <Col xs={6}>
+	                                <PlayCard cardName={playerDetails[props.playerID].cards[0]} />
+	                            </Col>
+	                            <Col xs={6}>
+	                                <PlayCard cardName={playerDetails[props.playerID].cards[1]} />
+	                            </Col>
+	                        </Row>
+	                    </Container>
+                        <div align = "center" style = {{fontSize: "x-large", paddingTop: "1em"}}>
+                          <img src ={coins} alt="coins" style={{maxWidth: "10%", borderRadius: "2em", paddingRight: "0.5em"}}/>
+                          {playerDetails[props.playerID].coins}
+                        </div>
+	                </div>);
+
+        	} else if (numCards === 1){
+	        	return (
+	                <div>
+	                    <Container style={{width:"20em"}}>
+	                        <Row>
+	                            <Col xs={6}>
+	                                <PlayCard cardName={playerDetails[props.playerID].cards[0]} />
+	                            </Col>
+	                        </Row>
+	                    </Container>
+                        <div align = "center" style = {{fontSize: "x-large", paddingTop: "1em"}}>
+                          <img src ={coins} alt="coins" style={{maxWidth: "10%", borderRadius: "2em", paddingRight: "0.5em"}}/>
+                          {playerDetails[props.playerID].coins}
+                        </div>
+	                </div>);        		
+        	}else {
+        		return (<div>You are out of the game!</div>);
+        	}
+
         } else {
             return (<div></div>);
-        }
-    }
+        };
+    };
+
     return (
         <div align="center">
             <h3>Player Information</h3>
-            <div align="left" style={{paddingBottom: "1em"}}>
+            <div align="left" style={{paddingBottom: "1em", paddingTop:"1em"}}>
                 <Card>
-                    <Card.Header><h4>Your Cards</h4></Card.Header>
+                    <Card.Header><h4>Your Cards and Currency</h4></Card.Header>
                     <Card.Body>
                     <OwnCards playerID={props.playerID} />
                     </Card.Body>

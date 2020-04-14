@@ -2,6 +2,7 @@ import React from 'react';
 import { firestore } from '../config/firebase';
 import { Container, Row, Col, Accordion, Card } from 'react-bootstrap';
 import PlayCard from '../components/PlayCard.js';
+import coins from '../images/coins.jpg';
 
 function OtherPlayerInfo(props) {
 	function AccordianBody(props) {
@@ -16,13 +17,20 @@ function OtherPlayerInfo(props) {
 							<Container style={{ width: "20em" }}>
 								<Row>
 									<Col xs={6}>
-										{(props.data.cards.length >= 1) ? <PlayCard cardName={"back"}/> : <div/>}
+										{(props.data.cards.length >= 1) ? <PlayCard cardName={"back"}/> : <div>Out Of game, what a loser!</div>}
 									</Col>
 									<Col xs={6}>
 										{(props.data.cards.length == 2) ? <PlayCard cardName={"back"}/> : <div/>}
 									</Col>
 								</Row>
 							</Container>
+						</div>
+						<div align = "center" style = {{ marginTop: "1em", fontSize: "large" }}>
+							{(props.data.cards.length !== 0) ? 
+								<div>  
+								<img src ={coins} alt="coins" style={{maxWidth: "10%", borderRadius: "2em", paddingRight: "0.5em"}}/>{props.data.coins}
+								</div> 
+								: <div/>}
 						</div>
 					</Card.Body>
 				</Accordion.Collapse>
