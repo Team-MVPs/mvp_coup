@@ -67,7 +67,7 @@ function GameStart(props) {
     <div>
 	    <ol className="list-group list-group-flush" style = {{marginBottom: 50, marginTop: 20}}>
 	      {players.map(name => (
-	        <li className="list-group-item" key={name}>{name} has joined the lobby</li>
+	        <li className="list-group-item" key={name}>{name} is in the lobby</li>
 	      ))}
 	    </ol>
 	    <JoinGame isHost={props.isHost} roomName={props.roomName} playerID = {props.playerID}/>

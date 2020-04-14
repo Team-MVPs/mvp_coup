@@ -28,15 +28,15 @@ function MainGameScreen(props) {
     playerStateCallback(roomName, playerID);
 
     return (
-        <div style={{margin:"3em"}}>
+        <div style={{margin:"3em", minWidth: "900px"}}>
             <Row>
-                <Col xs={4}>
+                <Col xs={5}>
                    <UserDetails playerID = {playerID} roomName = {roomName}/>
                 </Col>
                 <Col xs={4}>
                     <PlayerScreen />
                 </Col>
-                <Col xs={4}>
+                <Col xs={3}>
                     <PastMoves />
                 </Col>
             </Row>
