@@ -6,7 +6,7 @@ import OtherPlayerInfo from '../components/OtherPlayerInfoComponent.js';
 import PlayCard from '../components/PlayCard.js';
 import { firestore } from '../config/firebase';
 import { playerStateCallback } from '../backend/game_logic.js';
-import coins from '../images/coins.jpg'
+import coins from '../images/coins.jpg';
 
 
 /*const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador"];
@@ -66,6 +66,10 @@ function UserDetails(props) {
 	                            </Col>
 	                        </Row>
 	                    </Container>
+                        <div align = "center" style = {{fontSize: "x-large", paddingTop: "1em"}}>
+                          <img src ={coins} alt="coins" style={{maxWidth: "10%", borderRadius: "2em", paddingRight: "0.5em"}}/>
+                          {playerDetails[props.playerID].coins}
+                        </div>
 	                </div>);        		
         	}else {
         		return (<div>You are out of the game!</div>);
