@@ -68,7 +68,7 @@ function GameStart(props) {
             </button>
             {waitingMsg}
           </div>
-        )
+        );
     } else {
       console.log(props.playerID);
       return (
@@ -84,6 +84,7 @@ function GameStart(props) {
 	        <li className="list-group-item" key={name}>{name} is in the lobby</li>
 	      ))}
 	    </ol>
+      <div align="center"> <h4>Current Room: {props.roomName}</h4> </div>
 	    <JoinGame isHost={props.isHost} roomName={props.roomName} playerID = {props.playerID}/>
       {/* <div>
         <CountTesting id={props.playerID} accepted={accepted} />
