@@ -43,7 +43,7 @@ function GameStart(props) {
   function WaitMsg(props) {
     return (
       <div>
-        <div align="middle">
+        <div align="middle" style = {{paddingTop:"1em"}}>
           <Spinner animation="border" as="span"/>
           <span className="sr-only">Loading...</span>
         </div>
@@ -61,7 +61,7 @@ function GameStart(props) {
         waitingMsg = <WaitMsg />
       }
       return (
-          <div>
+          <div style = {{paddingTop: "1em"}}>
             <button
               type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 10 }} disabled = {isDisabled}>
               Start Game!
