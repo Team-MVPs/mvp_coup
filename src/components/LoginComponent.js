@@ -1,5 +1,5 @@
 import React from 'react';
-import { register, checkRoomNameExists, createRoomName } from '../backend/startup';
+import { register, checkRoomNameExists, checkPlayerNameExists, createRoomName } from '../backend/startup';
 import { Redirect } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 
@@ -52,9 +52,19 @@ function LoginComponent(props) {
 					alert('Room name does not exist');
 					return (<Redirect to="/" />);
 				} else {
-					register(props.setPlayerID, playerName, roomName).then(() => {
-						props.setRoomName(roomName);
-						setRedirect(true);
+					
+					checkPlayerNameExists(roomName, playerName).then((exists) =>{
+						if (exists) {
+							alert("This player name already exists, choose another one.");
+							return (<Redirect to="/" />);
+						}
+						else {
+							register(props.setPlayerID, playerName, roomName).then(() => {
+								props.setRoomName(roomName);
+								setRedirect(true);
+							})
+						}
+
 					})
 				}
 			})
