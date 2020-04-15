@@ -1,6 +1,6 @@
 import React from 'react';
 import { firestore, root } from '../config/firebase';
-import { Button } from 'react-bootstrap';
+import { Button, Spinner } from 'react-bootstrap';
 import CountTesting from "../backend/countTesting.js";
 import { startGame } from '../backend/startup';
 import { Redirect } from 'react-router-dom';
@@ -40,11 +40,25 @@ function GameStart(props) {
     return (<Redirect to="/start" />);
   }
 
+  function WaitMsg(props) {
+    return (
+      <div>
+        <div align="middle">
+          <Spinner animation="border" as="span"/>
+          <span className="sr-only">Loading...</span>
+        </div>
+        <div class="col-xs-6" align="middle">
+          <i>Waiting for 2 or more players to begin the game</i>
+        </div>
+      </div>
+    );
+  }
+
   function JoinGame(props) {
     if (props.isHost) {
       let waitingMsg = null;
       if (isDisabled) {
-        waitingMsg = <div><i>Need 2 or more players to begin the game</i></div>
+        waitingMsg = <WaitMsg />
       }
       return (
           <div>
