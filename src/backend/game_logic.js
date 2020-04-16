@@ -54,3 +54,9 @@ export async function playerStateCallback(roomName, playerId) {
 			}, (error) => console.error(error));
 }
 
+export async function incrementTurn(roomName, currentTurn){
+	await firestore.collection(root).doc(roomName).update({
+            turn: currentTurn+1
+        });
+}
+
