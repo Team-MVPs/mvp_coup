@@ -14,6 +14,11 @@ function GameStart(props) {
 
   const handleClick = (event) => {
     startGame(props.roomName).then(() => {
+      if (props.isHost){
+        firestore.collection(root).doc(props.roomName).collection("players").doc(props.playerID).update({
+          isTurn: true
+        });
+      };
       setRedirect(true);
     })
   };

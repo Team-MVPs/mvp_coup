@@ -29,7 +29,7 @@ export async function distributeCards(roomName) {
 		// give each player 2 cards and 2 coins
 		players.forEach(function(doc) {
 			let playerCards = [cards.pop(), cards.pop()];
-			playerCollection.doc(doc.id).update({cards: playerCards, coins: 2, inGame: true})
+			playerCollection.doc(doc.id).update({cards: playerCards, coins: 2, inGame: true, isTurn: false})
 				.then(r => console.log("Successfully distributed cards"))
 				.catch(e => console.log(e));
 		});
