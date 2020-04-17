@@ -5,8 +5,6 @@ import {all_chars} from '../backend/game_logic.js';
 import ShowMoveList from '../backend/MoveList.js';
 import { firestore, root } from '../config/firebase';
 
-const [turnCount, setTurnCount]= React.useState(-1);
-
 function PlayerScreen(props) {
     const[isTurn, setIsTurn] = React.useState(props.playerIndex === 0);
     const[currentTurn, setCurrentTurn] = React.useState(0);
