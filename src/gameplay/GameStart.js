@@ -34,9 +34,6 @@ function GameStart(props) {
       let newPlayers = [];
       let newIDs = [];
       snapshot.docs.forEach((doc) => {
-        if (props.playerID === doc.id){
-          setPlayerName(doc.data().name);
-        }
         let playerName = doc.data().name;
         newPlayers.push(playerName);
         newIDs.push(doc.id);
