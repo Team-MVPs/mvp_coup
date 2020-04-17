@@ -48,7 +48,7 @@ function App() {
           </Route>
           <Route exact path="/GameStart">
             <div align="center">
-              <GameStart playerID={playerID} isHost={isHost} roomName={roomName} />
+              <GameStart playerID={playerID} isHost={isHost} roomName={roomName}/>
             </div>
           </Route>
         </Switch>

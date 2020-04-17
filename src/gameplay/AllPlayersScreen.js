@@ -1,19 +1,17 @@
 // @flow 
 
 import React from 'react';
-//import Character from '../characters/Character.js';
 import {all_chars} from '../backend/game_logic.js';
 import ShowMoveList from '../backend/MoveList.js';
+import { firestore, root } from '../config/firebase';
 
 
-/*const chars = all_chars.map((name, inx) => (
-    <Character name={name} key={inx} show_card={false}/>
-));*/
 
-let isTurn = true;
+const [turnCount, setTurnCount]= React.useState(-1);
+
+
 
 function PlayerScreen(props) {
-	if (isTurn){
 		return(
 			<div>
 				<h3>Make A Move!</h3>

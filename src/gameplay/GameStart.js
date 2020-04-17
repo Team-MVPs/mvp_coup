@@ -27,6 +27,9 @@ function GameStart(props) {
     const unsubscribe = firestore.collection(root).doc(props.roomName).collection("players").onSnapshot((snapshot) => {
       let newPlayers = [];
       snapshot.docs.forEach((doc) => {
+        if (props.playerID === doc.id){
+          setPlayerName(doc.data().name);
+        }
         let playerName = doc.data().name;
         newPlayers.push(playerName);
       });
@@ -35,6 +38,7 @@ function GameStart(props) {
     return () => unsubscribe();
   }, []);
 
+  
   if (players.length>=2 && isDisabled){
     setDisabled(false);
   }else if(players.length<2 && !isDisabled){
@@ -90,10 +94,7 @@ function GameStart(props) {
 	      ))}
 	    </ol>
       <div align="center"> <h4>Current Room: {props.roomName}</h4> </div>
-	    <JoinGame isHost={props.isHost} roomName={props.roomName} playerID = {props.playerID}/>
-      {/* <div>
-        <CountTesting id={props.playerID} accepted={accepted} />
-      </div> */}
+	    <JoinGame isHost={props.isHost} roomName={props.roomName} playerID = {props.playerID} setTurn = {props.setTurn}/>
     </div>
   );
 }

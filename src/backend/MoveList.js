@@ -19,7 +19,7 @@ function showMoveList(props){
 						<Button type="button" className="btn btn-lg btn-primary" style = {{width:"20em"}}>{move}</Button>
 					</div>
 					))}
-				<Button type="button" className="btn btn-lg btn-primary" style = {{width:"20em"}}>End Turn</Button>
+				<Button type="button" className="btn btn-lg btn-primary" style = {{width:"20em"}} onClick ={handleClick}>End Turn</Button>
 			</div>)
 }
 
