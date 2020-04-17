@@ -10,6 +10,7 @@ function WaitForHost(props) {
   };
 
   const [gameStarted, setStart] = React.useState(false);
+
   React.useEffect(() => {
     const subscribe = firestore.collection(root).doc(props.roomName).onSnapshot((doc) => {
       if (doc.data().startGame) {
@@ -28,6 +29,13 @@ function WaitForHost(props) {
   }
 
   if (gameStarted) {
+    let i = 0;
+    for(i = 0; i < props.playerArray.length; i++){
+      if(props.playerArray[i] === props.id) break;
+    }
+    console.log("Setting player index" + i);
+    props.setPlayerNames(props.playerNames);
+    props.setPlayerIndex(i);
     return (<Redirect to="/start" />);
   } else {
     return (
