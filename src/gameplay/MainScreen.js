@@ -5,28 +5,16 @@ import {Row, Col} from 'react-bootstrap';
 import PlayerScreen from './AllPlayersScreen.js';
 import PastMoves from './PastMoves.js';
 import UserDetails from './UserDetails.js';
-import {playerStateCallback} from "../backend/game_logic.js"
 import {cleanupRoom} from "../backend/callbacks.js"
-
-
 
 function MainGameScreen(props) {
     let roomName = props.roomName;
     let playerID = props.playerID;
     let isHost = props.isHost || false;
     
-    // TODO: remove this later
-    if (!roomName) {
-        console.log("Room name not provided, using test roomname mvp");
-        roomName = "mvp";
+    if (isHost) {
+        cleanupRoom(roomName);
     }
-    if (!playerID) {
-        playerID = "3gTERuRmmTOJwmVTeIgj";
-        isHost = true;
-    }
-    
-    cleanupRoom(roomName);
-    playerStateCallback(roomName, playerID);
 
     return (
         <div style={{margin:"3em", minWidth: "900px"}}>

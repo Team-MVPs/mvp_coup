@@ -1,5 +1,4 @@
 import { firestore, root } from '../config/firebase';
-import React from 'react';
 
 export const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador"];
 
@@ -29,7 +28,7 @@ export async function distributeCards(roomName) {
 		// give each player 2 cards and 2 coins
 		players.forEach(function(doc) {
 			let playerCards = [cards.pop(), cards.pop()];
-			playerCollection.doc(doc.id).update({cards: playerCards, coins: 2, inGame: true, isTurn: false})
+			playerCollection.doc(doc.id).update({cards: playerCards, coins: 2, inGame: true})
 				.then(r => console.log("Successfully distributed cards"))
 				.catch(e => console.log(e));
 		});
@@ -39,21 +38,5 @@ export async function distributeCards(roomName) {
 		// TODO: report error to user
 		console.log("Error getting document:", error);
 	});
-}
-
-export async function playerStateCallback(roomName, playerId) {
-	console.log(roomName, playerId);
-	const roomRef = firestore.collection(root).doc(roomName);
-	const playerCollection = roomRef.collection("players");
-	const playerRef = playerCollection.doc(playerId);
-	playerRef.onSnapshot(
-		() => {},
-		(error) => console.error(error));
-}
-
-export async function incrementTurn(roomName, currentTurn){
-	await firestore.collection(root).doc(roomName).update({
-            turn: currentTurn+1
-        });
 }
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { firestore } from '../config/firebase';
 import { Container, Row, Col, Accordion, Card } from 'react-bootstrap';
 import PlayCard from '../components/PlayCard.js';
 import coins from '../images/coins.jpg';

@@ -1,6 +1,6 @@
 import React from 'react';
 import ambassador from '../images/ambassador.JPG';
-import assasin from '../images/assasin.JPG';
+import assassin from '../images/assasin.JPG';
 import back from '../images/back.JPG';
 import captain from '../images/captain.JPG';
 import contessa from '../images/contessa.JPG';
@@ -16,7 +16,7 @@ function PlayCard(props) {
         case "Assassin": {
             return (<div style={{
                 width: "8em",
-            }}> <img src={assasin} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} /></div >);
+            }}> <img src={assassin} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} /></div >);
         }
         case "Contessa": {
             return (<div style={{
