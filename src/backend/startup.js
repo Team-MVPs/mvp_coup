@@ -1,14 +1,11 @@
 import { firestore, root } from '../config/firebase';
 import { distributeCards } from "../backend/game_logic.js"
 
-//Default Room Name can change this later
-let playerID = "";
-
 export async function register(setPlayerID, name, roomName) {
     await firestore.collection(root).doc(roomName).collection("players").add({
         name: name
     }).then((docRef) => {
-        playerID = docRef.id;
+        const playerID = docRef.id;
         setPlayerID(playerID);
         console.log("Document written with ID: ", playerID);
     })

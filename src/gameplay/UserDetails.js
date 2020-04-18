@@ -9,7 +9,6 @@ import coins from '../images/coins.jpg';
 function UserDetails(props) {
     const [playerDetails, setDetails] = React.useState({});
 
-
     React.useEffect(() => {
         const unsubscribe = firestore.collection(root).doc(props.roomName).collection("players").onSnapshot((docs) => {
             let dict = {};
@@ -21,7 +20,6 @@ function UserDetails(props) {
         });
         return () => unsubscribe;
     }, []);
-    console.log(props.playerID);
 
     function OwnCards(props) {
         if (playerDetails[props.playerID] !== undefined) {
@@ -65,9 +63,9 @@ function UserDetails(props) {
         	}
 
         } else {
-            return (<div></div>);
-        };
-    };
+            return (<div/>);
+        }
+    }
 
     return (
         <div align="center">

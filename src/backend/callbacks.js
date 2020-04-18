@@ -4,7 +4,8 @@ import { Redirect } from 'react-router-dom';
 
 
 export function cleanupRoom(roomName) {
-    window.addEventListener("beforeunload", () => {
+    window.addEventListener("beforeunload", (ev) => {
+        ev.preventDefault();
         firestore.collection(root).doc(roomName).collection("players").delete().then(
             firestore.collection(root).doc(roomName).delete().then(
                 () => {

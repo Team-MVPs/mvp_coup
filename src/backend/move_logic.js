@@ -9,11 +9,16 @@ function Move(type, player, to) {
 	}
 }
 
-async function updateTurnInDB(roomName, turn, playerName, move) {
-	await firestore.collection(root).doc(roomName).collection("turns").add({
+function registerMoveCallback(roomName, playerId) {
+
+}
+
+function updateTurnInDB(roomName, turn, playerName, move) {
+	firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).set({
 		turn: turn,
 		playerName: playerName,
-		move: move
+		move: move,
+		blocks: []
 	}).then(() => {
 		console.log("Added turn to db");
 	}).catch(() => handleDBException());
