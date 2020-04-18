@@ -34,8 +34,6 @@ export async function distributeCards(roomName) {
 				.catch(e => console.log(e));
 		});
 		// put remaining cards in room
-		console.log(cards);
-		console.log("Cards");
 		roomRef.update({cards: cards});
 	}).catch((error) => {
 		// TODO: report error to user
@@ -48,10 +46,9 @@ export async function playerStateCallback(roomName, playerId) {
 	const roomRef = firestore.collection(root).doc(roomName);
 	const playerCollection = roomRef.collection("players");
 	const playerRef = playerCollection.doc(playerId);
-	playerRef.onSnapshot((doc) => {
-			console.log("Player State Updated");
-			//alert(JSON.stringify(doc.data()));
-			}, (error) => console.error(error));
+	playerRef.onSnapshot(
+		() => {},
+		(error) => console.error(error));
 }
 
 export async function incrementTurn(roomName, currentTurn){

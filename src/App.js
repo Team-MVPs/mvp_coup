@@ -61,9 +61,8 @@ function App() {
           title={popupTitle}
           content={popupContent}
           onHide={() => {
-            console.log("Hiding Now");
-            setPopupShow(false)
-          }
+              setPopupShow(false)
+            }
           }
         />
       </div>

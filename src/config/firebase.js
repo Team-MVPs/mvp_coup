@@ -15,4 +15,7 @@ firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 
 export const firestore = firebase.firestore();
+// TODO: firestore room deletion still keeps data when same room name is reused
+// firestore.enablePersistence(false);
+
 export const root = "root";

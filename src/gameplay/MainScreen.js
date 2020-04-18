@@ -1,11 +1,12 @@
 // @flow
 
 import React from 'react';
-import {Container, Row, Col} from 'react-bootstrap';
+import {Row, Col} from 'react-bootstrap';
 import PlayerScreen from './AllPlayersScreen.js';
 import PastMoves from './PastMoves.js';
 import UserDetails from './UserDetails.js';
-import {distributeCards, playerStateCallback} from "../backend/game_logic.js"
+import {playerStateCallback} from "../backend/game_logic.js"
+import {cleanupRoom} from "../backend/callbacks.js"
 
 
 
@@ -15,7 +16,6 @@ function MainGameScreen(props) {
     let isHost = props.isHost || false;
     
     // TODO: remove this later
-    // keeping this here as it becomes hard to test without having to create a new room each time
     if (!roomName) {
         console.log("Room name not provided, using test roomname mvp");
         roomName = "mvp";
@@ -25,6 +25,7 @@ function MainGameScreen(props) {
         isHost = true;
     }
     
+    cleanupRoom(roomName);
     playerStateCallback(roomName, playerID);
 
     return (

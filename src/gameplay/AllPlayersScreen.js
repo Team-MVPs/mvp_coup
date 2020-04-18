@@ -1,7 +1,6 @@
 // @flow 
 
 import React from 'react';
-import {all_chars} from '../backend/game_logic.js';
 import ShowMoveList from '../backend/MoveList.js';
 import { firestore, root } from '../config/firebase';
 

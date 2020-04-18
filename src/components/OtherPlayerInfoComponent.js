@@ -20,7 +20,7 @@ function OtherPlayerInfo(props) {
 										{(props.data.cards.length >= 1) ? <PlayCard cardName={"back"}/> : <div>Out Of game, what a loser!</div>}
 									</Col>
 									<Col xs={6}>
-										{(props.data.cards.length == 2) ? <PlayCard cardName={"back"}/> : <div/>}
+										{(props.data.cards.length === 2) ? <PlayCard cardName={"back"}/> : <div/>}
 									</Col>
 								</Row>
 							</Container>

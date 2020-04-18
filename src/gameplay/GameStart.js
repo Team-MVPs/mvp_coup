@@ -1,7 +1,6 @@
 import React from 'react';
 import { firestore, root } from '../config/firebase';
-import { Button, Spinner } from 'react-bootstrap';
-import CountTesting from "../backend/countTesting.js";
+import { Spinner } from 'react-bootstrap';
 import { startGame } from '../backend/startup';
 import { Redirect } from 'react-router-dom';
 import WaitForHost from "./WaitForHost.js";
@@ -14,7 +13,9 @@ function GameStart(props) {
   const [isDisabled, setDisabled] = React.useState(true);
 
   const handleClick = (event) => {
-    startGame(props.roomName).then(() => {
+    // TODO: implement more robust solution later
+    const roomName = props.roomName || "fake";
+    startGame(roomName).then(() => {
       props.setPlayerNames(players);
       let i = 0;
       for(i = 0; i < playerIDs.length; i++){
@@ -30,7 +31,9 @@ function GameStart(props) {
   };
 
   React.useEffect(() => {
-    const unsubscribe = firestore.collection(root).doc(props.roomName).collection("players").onSnapshot((snapshot) => {
+    // TODO: implement more robust solution later
+    const roomName = props.roomName || "fake";
+    const unsubscribe = firestore.collection(root).doc(roomName).collection("players").onSnapshot((snapshot) => {
       let newPlayers = [];
       let newIDs = [];
       snapshot.docs.forEach((doc) => {
@@ -40,7 +43,7 @@ function GameStart(props) {
       });
       setPlayers(newPlayers);
       setPlayerIDs(newIDs);
-    })
+    });
     return () => unsubscribe();
   }, []);
 
@@ -62,7 +65,7 @@ function GameStart(props) {
           <Spinner animation="border" as="span"/>
           <span className="sr-only">Loading...</span>
         </div>
-        <div class="col-xs-6" align="middle">
+        <div className="col-xs-6" align="middle">
           <i>Waiting for 2 or more players to begin the game</i>
         </div>
       </div>
