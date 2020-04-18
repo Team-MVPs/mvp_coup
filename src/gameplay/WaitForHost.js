@@ -1,18 +1,19 @@
 import React from 'react';
 import { firestore, root } from '../config/firebase';
 import { Redirect } from 'react-router-dom';
+import {handleDBException} from "../backend/callbacks";
 
 function WaitForHost(props) {
   const [leave, setLeave] = React.useState(false);
-
-  const handleLeaveRoom = (event) => {
-    setLeave(true);
-  };
-
   const [gameStarted, setStart] = React.useState(false);
 
   React.useEffect(() => {
-    const subscribe = firestore.collection(root).doc(props.roomName).onSnapshot((doc) => {
+    // TODO: implement more robust solution later
+    const roomName = props.roomName || "fake";
+    const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
+      if (!doc.exists) {
+        return handleDBException();
+      }
       if (doc.data().startGame) {
         console.log("Game started");
         setStart(true);
@@ -20,6 +21,14 @@ function WaitForHost(props) {
     });
     return () => subscribe();
   }, []);
+  
+  const handleLeaveRoom = (event) => {
+    setLeave(true);
+  };
+  
+  if (props.roomName === "") {
+    return handleDBException();
+  }
 
   if (leave) {
     firestore.collection(root).doc(props.roomName).collection("players").doc(props.id).delete().then(() => {
@@ -29,13 +38,14 @@ function WaitForHost(props) {
   }
 
   if (gameStarted) {
-    let i = 0;
-    for(i = 0; i < props.playerArray.length; i++){
-      if(props.playerArray[i] === props.id) break;
+    for(let i = 0; i < props.playerArray.length; i++){
+      if (props.playerArray[i] === props.id) {
+        console.log("Setting player index" + i);
+        props.setPlayerNames(props.playerNames);
+        props.setPlayerIndex(i);
+        break;
+      }
     }
-    console.log("Setting player index" + i);
-    props.setPlayerNames(props.playerNames);
-    props.setPlayerIndex(i);
     return (<Redirect to="/start" />);
   } else {
     return (

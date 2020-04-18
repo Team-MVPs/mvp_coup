@@ -20,7 +20,7 @@ function UserDetails(props) {
 
     React.useEffect(() => {
         const unsubscribe = firestore.collection(root).doc(props.roomName).collection("players").onSnapshot((docs) => {
-            var dict = {};
+            let dict = {};
             docs.forEach(function (doc) {
                 dict[doc.id] = doc.data();
             });

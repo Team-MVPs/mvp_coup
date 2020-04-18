@@ -38,7 +38,6 @@ function LoginComponent(props) {
 	}
 
 	const existingRoom = (event) => {
-		console.log("In Existing Room");
 		event.preventDefault();
 		if (playerName.trim().length === 0) {
 			alert('Please input a Player Name');
