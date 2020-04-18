@@ -24,16 +24,16 @@ export async function distributeCards(roomName) {
 	
 	const roomRef = firestore.collection(root).doc(roomName);
 	const playerCollection = roomRef.collection("players");
-	await playerCollection.get().then((players) => {
+	await playerCollection.get().then(async (players) => {
 		// give each player 2 cards and 2 coins
-		players.forEach(function(doc) {
+		await players.forEach(async function(doc) {
 			let playerCards = [cards.pop(), cards.pop()];
-			playerCollection.doc(doc.id).update({cards: playerCards, coins: 2, inGame: true})
+			await playerCollection.doc(doc.id).update({cards: playerCards, coins: 2, inGame: true})
 				.then(r => console.log("Successfully distributed cards"))
 				.catch(e => console.log(e));
 		});
 		// put remaining cards in room
-		roomRef.update({cards: cards});
+		await roomRef.update({cards: cards});
 	}).catch((error) => {
 		// TODO: report error to user
 		console.log("Error getting document:", error);
