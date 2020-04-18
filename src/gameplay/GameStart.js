@@ -5,7 +5,6 @@ import { startGame } from '../backend/startup';
 import { Redirect } from 'react-router-dom';
 import WaitForHost from "./WaitForHost.js";
 
-//var testRoom = "New Test";
 function GameStart(props) {
   const [players, setPlayers] = React.useState([]);
   const [playerIDs, setPlayerIDs] = React.useState([]);

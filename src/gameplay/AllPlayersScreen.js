@@ -3,6 +3,7 @@
 import React from 'react';
 import ShowMoveList from '../backend/MoveList.js';
 import { firestore, root } from '../config/firebase';
+import {handleDBException} from "../backend/callbacks";
 
 function PlayerScreen(props) {
     const[isTurn, setIsTurn] = React.useState(props.playerIndex === 0);
@@ -21,15 +22,19 @@ function PlayerScreen(props) {
         });
         return () => subscribe();
       }, []);
+    
+    if (props.roomName === "") {
+    	return handleDBException();
+	}
 
-	if (isTurn){
+	if (isTurn) {
 		return(
 			<div>
 				<h3>Make A Move!</h3>
-				<ShowMoveList currentTurn = {currentTurn} roomName = {props.roomName}/>
+				<ShowMoveList currentTurn = {currentTurn} roomName = {props.roomName} playerName = {props.playerNames[currentTurn]}/>
 			</div>
 			)
-	} else{
+	} else {
 		return(
 		<div>
 			<h3>{props.playerNames[currentTurn]}'s Turn</h3> 

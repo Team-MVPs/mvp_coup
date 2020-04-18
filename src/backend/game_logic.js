@@ -1,5 +1,4 @@
 import { firestore, root } from '../config/firebase';
-import React from 'react';
 
 export const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador"];
 
@@ -39,21 +38,5 @@ export async function distributeCards(roomName) {
 		// TODO: report error to user
 		console.log("Error getting document:", error);
 	});
-}
-
-export async function playerStateCallback(roomName, playerId) {
-	console.log(roomName, playerId);
-	const roomRef = firestore.collection(root).doc(roomName);
-	const playerCollection = roomRef.collection("players");
-	const playerRef = playerCollection.doc(playerId);
-	playerRef.onSnapshot(
-		() => {},
-		(error) => console.error(error));
-}
-
-export async function incrementTurn(roomName, currentTurn){
-	await firestore.collection(root).doc(roomName).update({
-            turn: currentTurn+1
-        });
 }
 

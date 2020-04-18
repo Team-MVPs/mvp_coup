@@ -45,7 +45,7 @@ export async function startGame(roomName) {
     await distributeCards(roomName).then(() => {
         firestore.collection(root).doc(roomName).update({
             startGame: true,
-            turnCount: 0
+            turn: 0
         });
     })
 }
