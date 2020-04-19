@@ -21,11 +21,11 @@ function App() {
   const [popupContent, setPopupContent] = React.useState("Sample Content");
 
   const [playerID, setPlayerID] = React.useState(() => {
-    const localID = localStorage.getItem("playerID");
+    const localID = sessionStorage.getItem("playerID");
     return localID ? localID : ""
   });
   const [roomName, setRoomName] = React.useState(() => {
-    const roomName = localStorage.getItem("roomName");
+    const roomName = sessionStorage.getItem("roomName");
     return roomName ? roomName : ""
   });
 
@@ -34,8 +34,8 @@ function App() {
   const [isHost, setHost]  = React.useState(false);
   
   useEffect(() => {
-    localStorage.setItem("playerID", playerID);
-    localStorage.setItem("roomName", roomName);
+    sessionStorage.setItem("playerID", playerID);
+    sessionStorage.setItem("roomName", roomName);
   }, [playerID, roomName]);
 
 
