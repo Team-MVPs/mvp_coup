@@ -79,7 +79,7 @@ function LoginComponent(props) {
 	}
 
 	return (
-		<Container style={{ marginTop: "22%", width: "50%" }}>
+		<Container style={{ marginTop: "5em", width: "50%" }}>
 			<h1 style={{ marginBottom: "3%" }}>Welcome to MVP Coup</h1>
 			<Row style={{ marginBottom: "3%" }}>
 				<input className="form-control" type="text" value={playerName} onChange={handlePlayerNameChange} placeholder="Player Name" />

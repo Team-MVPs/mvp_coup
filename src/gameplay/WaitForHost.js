@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { firestore, root } from '../config/firebase';
 import { Redirect } from 'react-router-dom';
-import {handleDBException} from "../backend/callbacks";
+import { handleDBException } from "../backend/callbacks";
 import { RoomContext } from '../contexts/RoomContext.js';
 
 function WaitForHost(props) {
@@ -11,8 +11,6 @@ function WaitForHost(props) {
   const { roomName } = useContext(RoomContext);
 
   React.useEffect(() => {
-    // TODO: implement more robust solution later
-    // const roomName = props.roomName || "fake";
     const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
       if (!doc.exists) {
         return handleDBException();
@@ -25,13 +23,9 @@ function WaitForHost(props) {
     return () => subscribe();
   }, []);
   
-  const handleLeaveRoom = (event) => {
+  const handleLeaveRoom = () => {
     setLeave(true);
   };
-  
-  if (roomName === "") {
-    return handleDBException();
-  }
 
   if (leave) {
     firestore.collection(root).doc(roomName).collection("players").doc(props.id).delete().then(() => {

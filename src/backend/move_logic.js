@@ -10,23 +10,29 @@ function Move(type, player, to) {
 	}
 }
 
+let registeredTurn = -1;
 export function registerMoveCallback(roomName, turn, playerID) {
-	firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
-		(doc) => {
-			console.log("turns callback");
-			console.log(turn);
-		if (!doc.exists) {
-			console.log("Turn hasn't been made yet");
-		} else {
-			console.log("doc exists");
-			if (doc.data().playerID !== playerID) {
-				console.log(doc.data());
-				const playerName = doc.data().playerName;
-				const move = doc.data().move.type;
-				alert(`${playerName} performed ${move}`);
-			}
-		}
-	});
+	console.log(`register move callback: ${turn} ${registeredTurn}`);
+	if (turn >= 0 && turn !== registeredTurn) {
+		console.log(`turn: ${turn}`);
+		firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
+			(doc) => {
+				console.log("turns callback");
+				console.log(turn);
+				if (!doc.exists) {
+					console.log("Turn hasn't been made yet");
+				} else {
+					console.log("doc exists");
+					if (doc.data().playerID !== playerID) {
+						console.log(doc.data());
+						const playerName = doc.data().playerName;
+						const move = doc.data().move.type;
+						alert(`${playerName} performed ${move}`);
+					}
+				}
+			});
+		registeredTurn = turn;
+	}
 }
 
 function updateTurnInDB(roomName, turn, playerName, playerID, move) {
@@ -42,7 +48,7 @@ function updateTurnInDB(roomName, turn, playerName, playerID, move) {
 }
 
 function move(type) {
-	return function(roomName, turn, playerName, playerID) {
+	return function (roomName, turn, playerName, playerID) {
 		return () => {
 			const move = Move(type, playerName, playerID, "");
 			switch (type) {
@@ -72,13 +78,14 @@ function move(type) {
 					alert("Invalid move type");
 					break;
 			}
-      updateTurnInDB(roomName, turn, playerName, playerID, move);
+			updateTurnInDB(roomName, turn, playerName, playerID, move);
 			incrementTurn(roomName);
 		}
 	}
 }
 
-export const all_moves = {"Take General Income": move("general_income"),
+export const all_moves = {
+	"Take General Income": move("general_income"),
 	"Take Foreign Aid": move("foreign_aid"),
 	"Take 3 as Duke": move("duke"),
 	"Exchange your cards as Ambassador": move("exchange_cards"),
@@ -87,7 +94,7 @@ export const all_moves = {"Take General Income": move("general_income"),
 	"Coup a scrub": move("coup")
 };
 
-export async function incrementTurn(roomName){
+export async function incrementTurn(roomName) {
 	await firestore.collection(root).doc(roomName).update({
 		turn: firebase.firestore.FieldValue.increment(1)
 	}).then(() => console.log("incremented turn"));
