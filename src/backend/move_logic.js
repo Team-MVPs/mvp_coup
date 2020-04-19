@@ -10,14 +10,30 @@ function Move(type, player, to) {
 	}
 }
 
-function registerMoveCallback(roomName, playerId) {
-
+export function registerMoveCallback(roomName, turn, playerID) {
+	firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
+		(doc) => {
+			console.log("turns callback");
+			console.log(turn);
+		if (!doc.exists) {
+			console.log("Turn hasn't been made yet");
+		} else {
+			console.log("doc exists");
+			if (doc.data().playerID !== playerID) {
+				console.log(doc.data());
+				const playerName = doc.data().playerName;
+				const move = doc.data().move.type;
+				alert(`${playerName} performed ${move}`);
+			}
+		}
+	});
 }
 
-function updateTurnInDB(roomName, turn, playerName, move) {
+function updateTurnInDB(roomName, turn, playerName, playerID, move) {
 	firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).set({
 		turn: turn,
 		playerName: playerName,
+		playerID: playerID,
 		move: move,
 		blocks: []
 	}).then(() => {
@@ -26,9 +42,9 @@ function updateTurnInDB(roomName, turn, playerName, move) {
 }
 
 function move(type) {
-	return function(roomName, turn, playerName) {
+	return function(roomName, turn, playerName, playerID) {
 		return () => {
-			const move = Move(type, playerName, "");
+			const move = Move(type, playerName, playerID, "");
 			switch (type) {
 				case "general_income":
 					// get income
@@ -56,7 +72,7 @@ function move(type) {
 					alert("Invalid move type");
 					break;
 			}
-			updateTurnInDB(roomName, turn, playerName, move);
+      updateTurnInDB(roomName, turn, playerName, playerID, move);
 			incrementTurn(roomName);
 		}
 	}
@@ -74,5 +90,5 @@ export const all_moves = {"Take General Income": move("general_income"),
 export async function incrementTurn(roomName){
 	await firestore.collection(root).doc(roomName).update({
 		turn: firebase.firestore.FieldValue.increment(1)
-	});
+	}).then(() => console.log("incremented turn"));
 }
