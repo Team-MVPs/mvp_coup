@@ -13,6 +13,7 @@ import LoginComponent from "./components/LoginComponent";
 import MainGameScreen from './gameplay/MainScreen.js';
 import Popup from "./components/PopupComponent";
 import GameStart from './gameplay/GameStart.js'
+import RoomContextProvider from './contexts/RoomContext.js'
 
 
 function App() {
@@ -24,10 +25,6 @@ function App() {
     const localID = sessionStorage.getItem("playerID");
     return localID ? localID : ""
   });
-  const [roomName, setRoomName] = React.useState(() => {
-    const roomName = sessionStorage.getItem("roomName");
-    return roomName ? roomName : ""
-  });
 
   const [playerNames, setPlayerNames] = React.useState([]);
   const [playerIndex, setPlayerIndex] = React.useState(-1);
@@ -35,8 +32,7 @@ function App() {
   
   useEffect(() => {
     sessionStorage.setItem("playerID", playerID);
-    sessionStorage.setItem("roomName", roomName);
-  }, [playerID, roomName]);
+  }, [playerID]);
 
 
   function showPopup(title, content) {
@@ -47,27 +43,30 @@ function App() {
   console.log("Player Index: " + playerIndex);
   console.log(playerNames);
   return (
+    
     <Router>
       <div>
         {/* A <Switch> looks through its children <Route>s and
           renders the first one that matches the current URL. */}
-        <Switch>
-          <Route exact path="/">
-            <div align="center" style={{ position: "absolute", top: "0", bottom: "0", left: "0", right: "0", margin: "auto" }}>
-              <LoginComponent setPlayerID={setPlayerID} setHost={setHost} setRoomName={setRoomName} />
-            </div>
-          </Route>
-          <Route exact path="/start">
-            <div align="center">
-              <MainGameScreen playerID={playerID} isHost={isHost} roomName={roomName} playerIndex={playerIndex} playerNames = {playerNames}/>
-            </div>
-          </Route>
-          <Route exact path="/GameStart">
-            <div align="center">
-              <GameStart playerID={playerID} isHost={isHost} roomName={roomName} setPlayerIndex={setPlayerIndex} setPlayerNames = {setPlayerNames}/>
-            </div>
-          </Route>
-        </Switch>
+        <RoomContextProvider>
+          <Switch>
+            <Route exact path="/">
+              <div align="center" style={{ position: "absolute", top: "0", bottom: "0", left: "0", right: "0", margin: "auto" }}>
+                <LoginComponent setPlayerID={setPlayerID} setHost={setHost} />
+              </div>
+            </Route>
+            <Route exact path="/start">
+              <div align="center">
+                <MainGameScreen playerID={playerID} isHost={isHost} playerIndex={playerIndex} playerNames = {playerNames}/>
+              </div>
+            </Route>
+            <Route exact path="/GameStart">
+              <div align="center">
+                <GameStart playerID={playerID} isHost={isHost} setPlayerIndex={setPlayerIndex} setPlayerNames = {setPlayerNames}/>
+              </div>
+            </Route>
+          </Switch>
+        </RoomContextProvider>
         <Popup
           show={popupShow}
           title={popupTitle}

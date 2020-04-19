@@ -1,16 +1,19 @@
 // @flow
-import React from 'react';
+import React, { useContext } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import OtherPlayerInfo from '../components/OtherPlayerInfoComponent.js';
 import PlayCard from '../components/PlayCard.js';
 import { firestore, root } from '../config/firebase';
 import coins from '../images/coins.jpg';
+import { RoomContext } from '../contexts/RoomContext.js';
 
 function UserDetails(props) {
     const [playerDetails, setDetails] = React.useState({});
 
+    const { roomName } = useContext(RoomContext);
+
     React.useEffect(() => {
-        const unsubscribe = firestore.collection(root).doc(props.roomName).collection("players").onSnapshot((docs) => {
+        const unsubscribe = firestore.collection(root).doc(roomName).collection("players").onSnapshot((docs) => {
             let dict = {};
             docs.forEach(function (doc) {
                 dict[doc.id] = doc.data();

@@ -12,6 +12,7 @@ const RoomContextProvider = (props) => {
 
       useEffect(() => {
         sessionStorage.setItem("roomName", roomName);
+        console.log("roomName changed to: ", roomName);
       }, [roomName]);
 
 
