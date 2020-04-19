@@ -19,7 +19,7 @@ function PlayerScreen(props) {
           }else{
               setIsTurn(false);
           }
-          setCurrentTurn(doc.data().turn % totalPlayers);
+          setCurrentTurn(doc.data().turn);
         });
         return () => subscribe();
       }, []);
@@ -34,13 +34,13 @@ function PlayerScreen(props) {
 		return(
 			<div>
 				<h3>Make A Move!</h3>
-				<ShowMoveList currentTurn={currentTurn} roomName={props.roomName} playerID={props.playerID} playerName={props.playerNames[currentTurn]}/>
+				<ShowMoveList currentTurn = {currentTurn} roomName = {props.roomName} playerID={props.playerID} playerName = {props.playerNames[currentTurn % totalPlayers]}/>
 			</div>
 		);
 	} else {
 		return(
 			<div>
-				<h3>{props.playerNames[currentTurn]}'s Turn</h3>
+				<h3>{props.playerNames[currentTurn % totalPlayers]}'s Turn</h3>
 			</div>
 		);
 	}

@@ -1,5 +1,6 @@
 import {firestore, root} from "../config/firebase";
 import {handleDBException} from "./callbacks";
+import firebase from 'firebase';
 
 function Move(type, player, to) {
 	return {
@@ -71,8 +72,8 @@ function move(type) {
 					alert("Invalid move type");
 					break;
 			}
-			updateTurnInDB(roomName, turn, playerName, playerID, move);
-			incrementTurn(roomName, turn);
+      updateTurnInDB(roomName, turn, playerName, playerID, move);
+			incrementTurn(roomName);
 		}
 	}
 }
@@ -86,8 +87,8 @@ export const all_moves = {"Take General Income": move("general_income"),
 	"Coup a scrub": move("coup")
 };
 
-export function incrementTurn(roomName, currentTurn){
-	firestore.collection(root).doc(roomName).update({
-		turn: currentTurn+1
+export async function incrementTurn(roomName){
+	await firestore.collection(root).doc(roomName).update({
+		turn: firebase.firestore.FieldValue.increment(1)
 	}).then(() => console.log("incremented turn"));
 }
