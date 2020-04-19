@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { firestore, root } from '../config/firebase';
 import { Spinner } from 'react-bootstrap';
 import { startGame } from '../backend/startup';
 import { Redirect } from 'react-router-dom';
 import WaitForHost from "./WaitForHost.js";
+import { RoomContext } from '../contexts/RoomContext.js';
 
 function GameStart(props) {
   const [players, setPlayers] = React.useState([]);
@@ -11,9 +12,12 @@ function GameStart(props) {
   const [redirect, setRedirect] = React.useState(false);
   const [isDisabled, setDisabled] = React.useState(true);
 
+  const { roomName } = useContext(RoomContext);
+
+
   const handleClick = (event) => {
     // TODO: implement more robust solution later
-    const roomName = props.roomName || "fake";
+    // const roomName = props.roomName || "fake";
     startGame(roomName).then(() => {
       props.setPlayerNames(players);
       let i = 0;
@@ -31,7 +35,7 @@ function GameStart(props) {
 
   React.useEffect(() => {
     // TODO: implement more robust solution later
-    const roomName = props.roomName || "fake";
+    // const roomName = props.roomName || "fake";
     const unsubscribe = firestore.collection(root).doc(roomName).collection("players").onSnapshot((snapshot) => {
       let newPlayers = [];
       let newIDs = [];
@@ -89,7 +93,7 @@ function GameStart(props) {
     } else {
       console.log(props.playerID);
       return (
-        <WaitForHost roomName={props.roomName} id = {props.playerID} playerArray = {playerIDs} playerNames = {players} setPlayerIndex = {props.setPlayerIndex} setPlayerNames = {props.setPlayerNames}/>
+        <WaitForHost id = {props.playerID} playerArray = {playerIDs} playerNames = {players} setPlayerIndex = {props.setPlayerIndex} setPlayerNames = {props.setPlayerNames}/>
       );
     }
   }
@@ -101,8 +105,8 @@ function GameStart(props) {
 	        <li className="list-group-item" key={name}>{name} is in the lobby</li>
 	      ))}
 	    </ol>
-      <div align="center"> <h4>Current Room: {props.roomName}</h4> </div>
-	    <JoinGame isHost={props.isHost} roomName={props.roomName} playerID = {props.playerID} setPlayerIndex = {props.setPlayerIndex} setPlayerNames = {props.setPlayerNames}/>
+      <div align="center"> <h4>Current Room: {roomName}</h4> </div>
+	    <JoinGame isHost={props.isHost} roomName={roomName} playerID = {props.playerID} setPlayerIndex = {props.setPlayerIndex} setPlayerNames = {props.setPlayerNames}/>
     </div>
   );
 }

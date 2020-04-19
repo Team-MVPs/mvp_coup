@@ -20,10 +20,10 @@ function MainGameScreen(props) {
         <div style={{margin:"3em", minWidth: "900px"}}>
             <Row>
                 <Col xs={4}>
-                   <UserDetails playerID = {playerID} roomName = {roomName}/>
+                   <UserDetails playerID = {playerID} />
                 </Col>
                 <Col xs={5}>
-                    <PlayerScreen playerID = {playerID} roomName = {roomName}  playerIndex={props.playerIndex} playerNames = {props.playerNames} />
+                    <PlayerScreen playerID = {playerID}  playerIndex={props.playerIndex} playerNames = {props.playerNames} />
                 </Col>
                 <Col xs={3}>
                     <PastMoves />

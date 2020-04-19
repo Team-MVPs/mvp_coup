@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { firestore, root } from '../config/firebase';
 import { Redirect } from 'react-router-dom';
 import {handleDBException} from "../backend/callbacks";
+import { RoomContext } from '../contexts/RoomContext.js';
 
 function WaitForHost(props) {
   const [leave, setLeave] = React.useState(false);
   const [gameStarted, setStart] = React.useState(false);
 
+  const { roomName } = useContext(RoomContext);
+
   React.useEffect(() => {
     // TODO: implement more robust solution later
-    const roomName = props.roomName || "fake";
+    // const roomName = props.roomName || "fake";
     const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
       if (!doc.exists) {
         return handleDBException();
@@ -26,13 +29,13 @@ function WaitForHost(props) {
     setLeave(true);
   };
   
-  if (props.roomName === "") {
+  if (roomName === "") {
     return handleDBException();
   }
 
   if (leave) {
-    firestore.collection(root).doc(props.roomName).collection("players").doc(props.id).delete().then(() => {
-      console.log('A player left ' + props.roomName);
+    firestore.collection(root).doc(roomName).collection("players").doc(props.id).delete().then(() => {
+      console.log('A player left ' + roomName);
     });
     return (<Redirect to="/" />);
   }
