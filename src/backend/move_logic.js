@@ -1,6 +1,8 @@
 import {firestore, root} from "../config/firebase";
 import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
+// import { confirmAlert } from 'react-confirm-alert';
+// import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 function Move(type, player, to) {
 	return {
@@ -11,8 +13,7 @@ function Move(type, player, to) {
 }
 
 let registeredTurn = -1;
-export function registerMoveCallback(roomName, turn, playerID) {
-	console.log(`register move callback: ${turn} ${registeredTurn}`);
+export function registerMoveCallback(roomName, turn, playerID, setMove) {
 	if (turn >= 0 && turn !== registeredTurn) {
 		console.log(`turn: ${turn}`);
 		firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
@@ -27,7 +28,24 @@ export function registerMoveCallback(roomName, turn, playerID) {
 						console.log(doc.data());
 						const playerName = doc.data().playerName;
 						const move = doc.data().move.type;
-						alert(`${playerName} performed ${move}`);
+						setMove(`${playerName} performed ${move}`);
+						// confirmAlert({
+						// 	message: `${playerName} performed ${move}`,
+						// 	buttons: [
+						// 		{
+						// 			label: 'Confirm',
+						// 			onClick: () => alert('Click Yes')
+						// 		},
+						// 		{
+						// 			label: 'Block',
+						// 			onClick: () => alert('Click No')
+						// 		},
+						// 		{
+						// 			label: 'Bluff',
+						// 			onClick: () => alert('Click No')
+						// 		},
+						// 	]
+						// });
 					}
 				}
 			});
@@ -79,7 +97,7 @@ function move(type) {
 					break;
 			}
 			updateTurnInDB(roomName, turn, playerName, playerID, move);
-			incrementTurn(roomName);
+			// incrementTurn(roomName);
 		}
 	}
 }
@@ -92,6 +110,12 @@ export const all_moves = {
 	"Steal 2 from a player as Captain": move("steal"),
 	"Assassinate someone you dislike!": move("assassinate"),
 	"Coup a scrub": move("coup")
+};
+
+export const responses = {
+	"Confirm": console.log("confirm"),
+	"Call Bluff": console.log("bluff"),
+	"Block": console.log("block"),
 };
 
 export async function incrementTurn(roomName) {
