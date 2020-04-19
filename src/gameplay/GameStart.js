@@ -13,29 +13,22 @@ function GameStart(props) {
   const [isDisabled, setDisabled] = React.useState(true);
 
   const { roomName } = useContext(RoomContext);
-
-
-  const handleClick = (event) => {
-    // TODO: implement more robust solution later
-    // const roomName = props.roomName || "fake";
+  
+  const handleClick = () => {
     startGame(roomName).then(() => {
       props.setPlayerNames(players);
       let i = 0;
-      for(i = 0; i < playerIDs.length; i++){
-        if(playerIDs[i] === props.playerID) break;
+      for(let i = 0; i < playerIDs.length; i++){
+        if(playerIDs[i] === props.playerID) {
+          props.setPlayerIndex(i);
+          break;
+        }
       }
-      console.log(playerIDs);
-      console.log(props.id);
-      console.log("Setting player index" + i);
-      props.setPlayerIndex(i);
-      console.log("Redirecting to Start");
       setRedirect(true);
     })
   };
 
   React.useEffect(() => {
-    // TODO: implement more robust solution later
-    // const roomName = props.roomName || "fake";
     const unsubscribe = firestore.collection(root).doc(roomName).collection("players").onSnapshot((snapshot) => {
       let newPlayers = [];
       let newIDs = [];
@@ -61,7 +54,7 @@ function GameStart(props) {
     return (<Redirect to="/start" />);
   }
 
-  function WaitMsg(props) {
+  function WaitMsg() {
     return (
       <div>
         <div align="middle" style = {{paddingTop:"1em"}}>
