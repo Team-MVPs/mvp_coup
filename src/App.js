@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   BrowserRouter as Router,
   Switch,
@@ -20,12 +20,24 @@ function App() {
   const [popupTitle, setPopupTitle] = React.useState("Sample Title");
   const [popupContent, setPopupContent] = React.useState("Sample Content");
 
+  const [playerID, setPlayerID] = React.useState(() => {
+    const localID = sessionStorage.getItem("playerID");
+    return localID ? localID : ""
+  });
+  const [roomName, setRoomName] = React.useState(() => {
+    const roomName = sessionStorage.getItem("roomName");
+    return roomName ? roomName : ""
+  });
 
-  const [playerID, setPlayerID] = React.useState("");
   const [playerNames, setPlayerNames] = React.useState([]);
   const [playerIndex, setPlayerIndex] = React.useState(-1);
   const [isHost, setHost]  = React.useState(false);
-  const [roomName, setRoomName] = React.useState("");
+  
+  useEffect(() => {
+    sessionStorage.setItem("playerID", playerID);
+    sessionStorage.setItem("roomName", roomName);
+  }, [playerID, roomName]);
+
 
   function showPopup(title, content) {
     setPopupTitle(title);
