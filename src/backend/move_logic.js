@@ -14,6 +14,21 @@ function Move(type, player, to) {
 let registeredTurn = -1;
 // TODO: get actual number of players
 
+function Ambassador(roomName, playerID){
+	firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((doc)=>{
+		let numCards = doc.data().cards.length;
+		if (numCards > 1){
+			let card1 = doc.data().cards[0];
+			let card2 = doc.data().cards[1];
+			firestore.collection(root).doc(roomName).get().then((room)=>{
+				let exchangeCard1 = room.data().cards[0];
+				let exchangeCard2 = room.data().cards[1];
+															
+				})
+		}
+	})
+}
+
 
 export function RegisterMoveCallback(roomName, turn, playerID, setMove) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
@@ -26,15 +41,65 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove) {
 						const playerName = doc.data().playerName;
 						if (doc.data().playerID !== playerID) {
 							setMove(`${playerName} performed ${move}`);
-						} else if (doc.data().confirmations+1 === numPlayers) {
-							move(move);
-							incrementTurn(roomName).then(() => console.log("turn incremented"));
-						}
-					}
-				});
+
+						} else {
+							if (move === "general_income"){
+								firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+									coins: firebase.firestore.FieldValue.increment(1)
+								})
+								incrementTurn(roomName).then(() => console.log("turn incremented"));
+							
+							} else if (move === 'coup'){
+								firestore.collection(root).doc(roomName).collection('players').doc(playerID).get().then((doc)=>{
+									let currentCoins = doc.data().coins
+									if (currentCoins < 7){
+											alert("Not Enough Coins")
+									} else {
+										firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+											coins: currentCoins - 7
+										})
+										
+										//call Coup function
+										incrementTurn(roomName).then(() => console.log("turn incremented"));
+									}
+								})
+							} else {
+								if (doc.data().confirmations+1 === numPlayers) {
+										switch (move) {
+											case "foreign_aid":
+												firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+													coins: firebase.firestore.FieldValue.increment(2)
+													})
+												break;
+											case "duke":
+												// duke
+												firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+													coins: firebase.firestore.FieldValue.increment(3)
+													})
+												break;
+											case "exchange_cards":
+												// exchange cards
+												Ambassador(roomName,playerID)
+												break;
+											case "assassinate":
+												//assassinate someone
+												move.to = "Vandit";
+											case "steal":
+												// somehow figure out how to get the `to`
+												move.to = "Vandit";
+												break;
+											default:
+												alert("Invalid move type");
+												break;
+										}
+										incrementTurn(roomName).then(() => console.log("turn incremented"));
+								}	
+							}
+						}	
+				};
 			registeredTurn = turn;
-		}
-	})
+		})
+	}})
 }
 
 export function updateTurnInDB(roomName, turn, playerName, playerID, move) {
@@ -54,36 +119,7 @@ function move(type) {
 	return function (roomName, turn, playerName, playerID) {
 		return () => {
 			const move = Move(type, playerName, playerID, "");
-			switch (type) {
-				case "general_income":
-					firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-						coins: firebase.firestore.FieldValue.increment(1)
-					})
-					break;
-				case "foreign_aid":
-					// get aid
-					break;
-				case "duke":
-					// duke
-					break;
-				case "exchange_cards":
-					// get income
-					break;
-				case "steal":
-					// somehow figure out how to get the `to`
-					move.to = "Vandit";
-					break;
-				case "assassinate":
-					move.to = "Vandit";
-					break;
-				case "coup":
-					move.to = "Vandit";
-					break;
-				default:
-					alert("Invalid move type");
-					break;
-			}
-			//updateTurnInDB(roomName, turn, playerName, playerID, move);
+			updateTurnInDB(roomName, turn, playerName, playerID, move);	
 		}
 	}
 }
