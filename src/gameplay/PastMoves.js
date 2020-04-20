@@ -11,9 +11,10 @@ function PastMoves() {
     
     React.useEffect(() => {
         const unsubscribe = firestore.collection(root).doc(roomName).collection("turns").onSnapshot((docs) => {
-            let moves = [];
+            let moves = Array(docs.length);
             docs.forEach(function (doc) {
                 const turn = doc.data();
+                const turn_num = parseInt(doc.id);
                 const move = turn.move;
                 let move_msg = "";
                 switch (turn.move.type) {
@@ -42,8 +43,9 @@ function PastMoves() {
                         alert("Invalid move type");
                         break;
                 }
-                moves.push(move_msg);
+                moves[turn_num] = move_msg;
             });
+            console.log(moves);
             setMoves(moves);
         });
         return () => unsubscribe;
