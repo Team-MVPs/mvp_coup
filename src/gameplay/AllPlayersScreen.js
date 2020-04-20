@@ -17,7 +17,10 @@ function PlayerScreen(props) {
 	
 	useEffect(() => {
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
-			console.log("ROOM SNAPSHOT");
+			if (doc.data().turn !== currentTurn) {
+				// reset move variable
+				setMove("");
+			}
 			if (doc.data().turn % totalPlayers === props.playerIndex) {
 				setIsTurn(true);
 			} else {
@@ -41,8 +44,9 @@ function PlayerScreen(props) {
 	} else if (move !== "") {
 		return (
 			<div>
-				<h3>move</h3>
-				<ResponseList/>
+				<h3>{move}</h3>
+				<ResponseList currentTurn={currentTurn} roomName={roomName} playerID={props.playerID}
+							  playerName={props.playerNames[currentTurn % totalPlayers]}/>
 			</div>
 		);
 	} else {

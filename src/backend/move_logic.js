@@ -1,8 +1,6 @@
 import {firestore, root} from "../config/firebase";
 import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
-// import { confirmAlert } from 'react-confirm-alert';
-// import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 function Move(type, player, to) {
 	return {
@@ -13,39 +11,19 @@ function Move(type, player, to) {
 }
 
 let registeredTurn = -1;
+// TODO: get actual number of players
+let numPlayers = 2;
 export function registerMoveCallback(roomName, turn, playerID, setMove) {
 	if (turn >= 0 && turn !== registeredTurn) {
-		console.log(`turn: ${turn}`);
 		firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
 			(doc) => {
-				console.log("turns callback");
-				console.log(turn);
-				if (!doc.exists) {
-					console.log("Turn hasn't been made yet");
-				} else {
-					console.log("doc exists");
+				if (doc.exists) {
 					if (doc.data().playerID !== playerID) {
-						console.log(doc.data());
 						const playerName = doc.data().playerName;
 						const move = doc.data().move.type;
 						setMove(`${playerName} performed ${move}`);
-						// confirmAlert({
-						// 	message: `${playerName} performed ${move}`,
-						// 	buttons: [
-						// 		{
-						// 			label: 'Confirm',
-						// 			onClick: () => alert('Click Yes')
-						// 		},
-						// 		{
-						// 			label: 'Block',
-						// 			onClick: () => alert('Click No')
-						// 		},
-						// 		{
-						// 			label: 'Bluff',
-						// 			onClick: () => alert('Click No')
-						// 		},
-						// 	]
-						// });
+					} else if (doc.data().confirmations+1 === numPlayers) {
+						incrementTurn(roomName).then(() => console.log("turn incremented"));
 					}
 				}
 			});
@@ -59,6 +37,7 @@ function updateTurnInDB(roomName, turn, playerName, playerID, move) {
 		playerName: playerName,
 		playerID: playerID,
 		move: move,
+		confirmations: 0,
 		blocks: []
 	}).then(() => {
 		console.log("Added turn to db");
@@ -97,7 +76,6 @@ function move(type) {
 					break;
 			}
 			updateTurnInDB(roomName, turn, playerName, playerID, move);
-			// incrementTurn(roomName);
 		}
 	}
 }
@@ -112,10 +90,33 @@ export const all_moves = {
 	"Coup a scrub": move("coup")
 };
 
+function respond(type) {
+	return function (roomName, turn, playerName, playerID) {
+		return () => {
+			switch (type) {
+				case "confirm":
+					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+						confirmations: firebase.firestore.FieldValue.increment(1)
+					}).then(() => console.log("incremented confirmations"));
+					break;
+				case "call_bluff":
+					// get aid
+					break;
+				case "block":
+					// duke
+					break;
+				default:
+					alert("Invalid response");
+					break;
+			}
+		}
+	}
+}
+
 export const responses = {
-	"Confirm": console.log("confirm"),
-	"Call Bluff": console.log("bluff"),
-	"Block": console.log("block"),
+	"Confirm": respond("confirm"),
+	"Call Bluff": respond("bluff"),
+	"Block": respond("block"),
 };
 
 export async function incrementTurn(roomName) {
