@@ -3,7 +3,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {MoveList} from '../backend/MoveList.js';
 import {firestore, root} from '../config/firebase';
-import {registerMoveCallback} from "../backend/move_logic";
+import {RegisterMoveCallback} from "../backend/move_logic";
 import {RoomContext} from '../contexts/RoomContext.js';
 import {ResponseList} from "../backend/MoveList";
 
@@ -27,7 +27,7 @@ function PlayerScreen(props) {
 				setIsTurn(false);
 			}
 			setCurrentTurn(doc.data().turn);
-			registerMoveCallback(roomName, doc.data().turn, props.playerID, setMove);
+			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove);
 		});
 		return () => subscribe();
 	}, []);

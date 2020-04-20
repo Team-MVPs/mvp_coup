@@ -1,6 +1,7 @@
 import {firestore, root} from "../config/firebase";
 import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
+import React, {useContext, useEffect, useState} from 'react';
 
 function Move(type, player, to) {
 	return {
@@ -12,26 +13,31 @@ function Move(type, player, to) {
 
 let registeredTurn = -1;
 // TODO: get actual number of players
-let numPlayers = 2;
-export function registerMoveCallback(roomName, turn, playerID, setMove) {
-	if (turn >= 0 && turn !== registeredTurn) {
-		firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
-			(doc) => {
-				if (doc.exists) {
-					if (doc.data().playerID !== playerID) {
-						const playerName = doc.data().playerName;
+
+
+export function RegisterMoveCallback(roomName, turn, playerID, setMove) {
+	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
+		const numPlayers = snap.docs.length;
+		if (turn >= 0 && turn !== registeredTurn) {
+			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
+				(doc) => {
+					if (doc.exists) {
 						const move = doc.data().move.type;
-						setMove(`${playerName} performed ${move}`);
-					} else if (doc.data().confirmations+1 === numPlayers) {
-						incrementTurn(roomName).then(() => console.log("turn incremented"));
+						const playerName = doc.data().playerName;
+						if (doc.data().playerID !== playerID) {
+							setMove(`${playerName} performed ${move}`);
+						} else if (doc.data().confirmations+1 === numPlayers) {
+							move(move);
+							incrementTurn(roomName).then(() => console.log("turn incremented"));
+						}
 					}
-				}
-			});
-		registeredTurn = turn;
-	}
+				});
+			registeredTurn = turn;
+		}
+	})
 }
 
-function updateTurnInDB(roomName, turn, playerName, playerID, move) {
+export function updateTurnInDB(roomName, turn, playerName, playerID, move) {
 	firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).set({
 		turn: turn,
 		playerName: playerName,
@@ -50,7 +56,9 @@ function move(type) {
 			const move = Move(type, playerName, playerID, "");
 			switch (type) {
 				case "general_income":
-					// get income
+					firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+						coins: firebase.firestore.FieldValue.increment(1)
+					})
 					break;
 				case "foreign_aid":
 					// get aid
@@ -75,7 +83,7 @@ function move(type) {
 					alert("Invalid move type");
 					break;
 			}
-			updateTurnInDB(roomName, turn, playerName, playerID, move);
+			//updateTurnInDB(roomName, turn, playerName, playerID, move);
 		}
 	}
 }
@@ -115,7 +123,7 @@ function respond(type) {
 
 export const responses = {
 	"Confirm": respond("confirm"),
-	"Call Bluff": respond("bluff"),
+	"Call Bluff": respond("call_bluff"),
 	"Block": respond("block"),
 };
 
