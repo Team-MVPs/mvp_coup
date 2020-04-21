@@ -37,7 +37,7 @@ function PlayerScreen(props) {
 		return (
 			<div>
 				<h3>Make A Move!</h3>
-				<MoveList currentTurn={currentTurn} roomName={roomName} playerID={props.playerID}
+				<MoveList currentTurn={currentTurn} roomName={roomName} activePlayerID={props.playerID}
 						  playerName={props.playerNames[currentTurn % totalPlayers]}/>
 			</div>
 		);
@@ -45,7 +45,7 @@ function PlayerScreen(props) {
 		return (
 			<div>
 				<h3>{move}</h3>
-				<ResponseList currentTurn={currentTurn} roomName={roomName} playerID={props.playerID}
+				<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
 							  playerName={props.playerNames[currentTurn % totalPlayers]}/>
 			</div>
 		);

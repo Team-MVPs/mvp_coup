@@ -2,6 +2,7 @@ import {firestore, root} from "../config/firebase";
 import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
+import { generalIncome, Coup, foreignAid, Duke, Ambassador } from "./PerformMoves";
 
 function Move(type, player, to) {
 	return {
@@ -13,22 +14,6 @@ function Move(type, player, to) {
 
 let registeredTurn = -1;
 // TODO: get actual number of players
-
-function Ambassador(roomName, playerID){
-	firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((doc)=>{
-		let numCards = doc.data().cards.length;
-		if (numCards > 1){
-			let card1 = doc.data().cards[0];
-			let card2 = doc.data().cards[1];
-			firestore.collection(root).doc(roomName).get().then((room)=>{
-				let exchangeCard1 = room.data().cards[0];
-				let exchangeCard2 = room.data().cards[1];
-															
-				})
-		}
-	})
-}
-
 
 export function RegisterMoveCallback(roomName, turn, playerID, setMove) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
@@ -44,38 +29,21 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove) {
 
 						} else {
 							if (move === "general_income"){
-								firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-									coins: firebase.firestore.FieldValue.increment(1)
-								})
+								generalIncome(roomName,playerID);
 								incrementTurn(roomName).then(() => console.log("turn incremented"));
 							
 							} else if (move === 'coup'){
-								firestore.collection(root).doc(roomName).collection('players').doc(playerID).get().then((doc)=>{
-									let currentCoins = doc.data().coins
-									if (currentCoins < 7){
-											alert("Not Enough Coins")
-									} else {
-										firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-											coins: currentCoins - 7
-										})
-										
-										//call Coup function
-										incrementTurn(roomName).then(() => console.log("turn incremented"));
-									}
-								})
+								Coup(roomName, playerID);								
+								incrementTurn(roomName).then(() => console.log("turn incremented"));
 							} else {
 								if (doc.data().confirmations+1 === numPlayers) {
 										switch (move) {
 											case "foreign_aid":
-												firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-													coins: firebase.firestore.FieldValue.increment(2)
-													})
+												foreignAid(roomName, playerID);
 												break;
 											case "duke":
 												// duke
-												firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-													coins: firebase.firestore.FieldValue.increment(3)
-													})
+												Duke(roomName, playerID);
 												break;
 											case "exchange_cards":
 												// exchange cards
@@ -116,10 +84,10 @@ export function updateTurnInDB(roomName, turn, playerName, playerID, move) {
 }
 
 function move(type) {
-	return function (roomName, turn, playerName, playerID) {
+	return function (roomName, turn, playerName, activePlayerID) {
 		return () => {
-			const move = Move(type, playerName, playerID, "");
-			updateTurnInDB(roomName, turn, playerName, playerID, move);	
+			const move = Move(type, playerName, activePlayerID, "");
+			updateTurnInDB(roomName, turn, playerName, activePlayerID, move);	
 		}
 	}
 }
@@ -135,7 +103,7 @@ export const all_moves = {
 };
 
 function respond(type) {
-	return function (roomName, turn, playerName, playerID) {
+	return function (roomName, turn, playerName, notActivePlayerID) {
 		return () => {
 			switch (type) {
 				case "confirm":
