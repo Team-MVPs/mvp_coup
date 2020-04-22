@@ -1,8 +1,5 @@
 import {firestore, root} from "../config/firebase";
-import {handleDBException} from "./callbacks";
-import firebase from 'firebase';
-import React, {useContext, useEffect, useState} from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import React, {useEffect, useState} from 'react';
 import { incrementTurn } from './move_logic';
 
 
@@ -15,7 +12,7 @@ function Ambassador(roomName, playerID, setChangeTurn){
 	let chosenKeys = [];
 
 	useEffect(()=>{
-		const subscribe = firestore.collection(root).doc(roomName).get().then(async (room)=>{
+		const subscribe = firestore.collection(root).doc(roomName).get().then((room) => {
 			let viewCards = [];
 			viewCards.push([room.data().cards[0], 1], [room.data().cards[1], 2]);
 			let allCards = room.data().cards;
@@ -23,17 +20,16 @@ function Ambassador(roomName, playerID, setChangeTurn){
 			allCards.shift();
 			setCardDeck(allCards);
 
-			await firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((player)=>{
+			firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((player)=>{
 				if (player.data().cards.length >1){
 					viewCards.push([player.data().cards[0], 3], [player.data().cards[1], 4]);
 				} else{
 					viewCards.push([player.data().cards[0], 3]);
 				}
-			})
-		//console.log(viewCards);
-		setCards(viewCards);
-		})
-		return () => subscribe();
+				setCards(viewCards);
+			});
+		});
+		return () => subscribe;
 	}, []);
 
 	const handleClick = (card) => {
@@ -52,7 +48,7 @@ function Ambassador(roomName, playerID, setChangeTurn){
 					alert("You have already selected that card, pick another one")
 				}
 				if (chosenCards.length > 1){
-					setDisabled(true)
+					setDisabled(true);
 					await firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
 						cards: chosenCards
 					});
@@ -73,7 +69,7 @@ function Ambassador(roomName, playerID, setChangeTurn){
 					await firestore.collection(root).doc(roomName).update({
 						cards: cardDeck
 					});
-					setChangeTurn(true);
+					await incrementTurn(roomName);
 				}
 			}
 					
@@ -103,10 +99,6 @@ export default function OtherMoves(props){
 	const [changeTurn, setChangeTurn] = useState(false);
 
 	if (move === 'Ambassador'){
-		if (changeTurn){
-			incrementTurn(roomName);
-		}
-
 		return (
 			<div>
 				{Ambassador(roomName, playerID, setChangeTurn)}
