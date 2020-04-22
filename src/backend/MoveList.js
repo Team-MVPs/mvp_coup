@@ -5,64 +5,56 @@ import {firestore, root} from "../config/firebase";
 import firebase from 'firebase';
 
 
-export async function MoveList(props){
+export function MoveList(props){
 	const [assassinEnabled, setAssassin] = useState(true);
 	const [coupEnabled, setCoup] = useState(true);
 	const [theRest, setTheRest] = useState(false);
+	const [coins, setCoins] = useState(0);
 
-	await firestore.collection(root).doc(props.roomName).collection("players").doc(props.activePlayerID).get().then((player)=>{
-		if (player.data().coins >= 3){
-			setAssassin(false)
-		};
-		if (player.data().coins >= 7){
-			setCoup(false)
-		};
-		if (player.data().coins >= 10){
-			setTheRest(true)
-		};
+	useEffect( () => {
+		firestore.collection(root).doc(props.roomName).collection("players").doc(props.activePlayerID).get().then((player)=>{
+			console.log("HEEEEEEEEEEEEEEEEE");
+			setCoins(player.data().coins);
+			console.log("REEEEEEEEEEEEEEEEE")
+		});
+	}
 
-	})
+	);
 	return (<div>
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Take General Income"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID)}
-					disabled = {theRest}>Take General Income</Button>
+					disabled={false}>Take General Income</Button>
 				</div>
 
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Take Foreign Aid"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID)}
-					disabled = {theRest}>Take Foreign Aid</Button>
+					disabled = {false}>Take Foreign Aid</Button>
 				</div>
 
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Take 3 as Duke"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID)}
-					disabled = {theRest}>Take 3 as Duke</Button>
+					disabled = {false}>Take 3 as Duke</Button>
 				</div>
 
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Exchange your cards as Ambassador"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID)}
-					disabled = {theRest}>Exchange your cards as Ambassador</Button>
+					disabled = {false}>Exchange your cards as Ambassador</Button>
 				</div>
 
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Steal 2 from a player as Captain"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID)}
-					disabled = {theRest}>Steal 2 from a player as Captain</Button>
+					disabled = {false}>Steal 2 from a player as Captain</Button>
 				</div>
 
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Assassinate someone you dislike!"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID)}
-					disabled = {assassinEnabled}>Assassinate someone you dislike!</Button>
+					disabled = {false ? coins < 3 : true}>Assassinate someone you dislike!</Button>
 				</div>
 
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Coup a scrub"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID)}
-					disabled = {coupEnabled}>Coup a scrub</Button>
+					disabled = {false ? coins < 3 : true}>Coup a scrub</Button>
 				</div>
-
-		{Object.keys(all_moves).map(move => (
-			<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
-				<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves[move](props.roomName, props.currentTurn, props.playerName, props.activePlayerID)}>{move}</Button>
-			</div>
-		))}
 	</div>);
 }
 
@@ -75,4 +67,3 @@ export function ResponseList(props){
 		))}
 	</div>);
 }
-
