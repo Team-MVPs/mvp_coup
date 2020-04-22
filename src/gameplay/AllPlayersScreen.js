@@ -14,7 +14,7 @@ function PlayerScreen(props) {
 	const [move, setMove] = useState("");
 	const [currentMove, setCurrentMove] = useState("");
 	let totalPlayers = props.playerNames.length;
-	
+	console.log(props.playerNames);
 	const {roomName} = useContext(RoomContext);
 	
 	useEffect(() => {

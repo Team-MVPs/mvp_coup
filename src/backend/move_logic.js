@@ -40,7 +40,6 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 									setCurrentMove("Ambassador");
 								}
 							} 
-
 							else {
 								if (doc.data().confirmations+1 === numPlayers) {
 										switch (move) {
@@ -77,8 +76,8 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 	}})
 }
 
-export function updateTurnInDB(roomName, turn, playerName, playerID, move) {
-	firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).set({
+export async function updateTurnInDB(roomName, turn, playerName, playerID, move) {
+	await firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).set({
 		turn: turn,
 		playerName: playerName,
 		playerID: playerID,
@@ -91,7 +90,7 @@ export function updateTurnInDB(roomName, turn, playerName, playerID, move) {
 }
 
 function move(type) {
-	return function (roomName, turn, playerName, activePlayerID) {
+	return (roomName, turn, playerName, activePlayerID) => {
 		return () => {
 			const move = Move(type, playerName, activePlayerID, "");
 			updateTurnInDB(roomName, turn, playerName, activePlayerID, move);	
