@@ -22,6 +22,7 @@ function PlayerScreen(props) {
 			if (doc.data().turn !== currentTurn) {
 				// reset move variable
 				setMove("");
+				setCurrentMove("");
 			}
 			if (doc.data().turn % totalPlayers === props.playerIndex) {
 				setIsTurn(true);
@@ -37,8 +38,6 @@ function PlayerScreen(props) {
 	
 	if (isTurn) {
 		if (currentMove !== ""){
-				console.log(roomName + ' roomName');
-				console.log(props.playerID + ' playerID');
 			return(
 				<div>
 					<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID}/>

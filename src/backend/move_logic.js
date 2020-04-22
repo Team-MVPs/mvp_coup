@@ -36,7 +36,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 								Coup(roomName, playerID);								
 								incrementTurn(roomName).then(() => console.log("turn incremented"));
 							} else if (move === 'exchange_cards'){
-								if(doc.data().confirmations+1 === numPlayers){
+								if (doc.data().confirmations+1 === numPlayers){
 									setCurrentMove("Ambassador");
 								}
 							} 
