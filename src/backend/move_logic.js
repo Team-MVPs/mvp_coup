@@ -15,7 +15,7 @@ function Move(type, player, to) {
 let registeredTurn = -1;
 // TODO: get actual number of players
 
-export function RegisterMoveCallback(roomName, turn, playerID, setMove) {
+export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurrentMove) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
 		if (turn >= 0 && turn !== registeredTurn) {
@@ -35,7 +35,13 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove) {
 							} else if (move === 'coup'){
 								Coup(roomName, playerID);								
 								incrementTurn(roomName).then(() => console.log("turn incremented"));
-							} else {
+							} else if (move === 'exchange_cards'){
+								if(doc.data().confirmations+1 === numPlayers){
+									setCurrentMove("Ambassador");
+								}
+							} 
+
+							else {
 								if (doc.data().confirmations+1 === numPlayers) {
 										switch (move) {
 											case "foreign_aid":
@@ -45,10 +51,11 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove) {
 												// duke
 												Duke(roomName, playerID);
 												break;
-											case "exchange_cards":
+											//case "exchange_cards":
 												// exchange cards
-												Ambassador(roomName,playerID)
-												break;
+												//Ambassador(roomName,playerID)
+											//	setAmbassador(true);
+											//	break;
 											case "assassinate":
 												//assassinate someone
 												move.to = "Vandit";

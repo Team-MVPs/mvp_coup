@@ -6,11 +6,13 @@ import {firestore, root} from '../config/firebase';
 import {RegisterMoveCallback} from "../backend/move_logic";
 import {RoomContext} from '../contexts/RoomContext.js';
 import {ResponseList} from "../backend/MoveList";
+import OtherMoves from '../backend/OtherMoves.js';
 
 function PlayerScreen(props) {
 	const [isTurn, setIsTurn] = useState(props.playerIndex === 0);
 	const [currentTurn, setCurrentTurn] = useState(0);
 	const [move, setMove] = useState("");
+	const [currentMove, setCurrentMove] = useState("");
 	let totalPlayers = props.playerNames.length;
 	
 	const {roomName} = useContext(RoomContext);
@@ -27,14 +29,21 @@ function PlayerScreen(props) {
 				setIsTurn(false);
 			}
 			setCurrentTurn(doc.data().turn);
-			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove);
+			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove);
 		});
 		return () => subscribe();
 	}, []);
 
 	
 	if (isTurn) {
-		return (
+		if (currentMove !== ""){
+				console.log(roomName + ' roomName');
+				console.log(props.playerID + ' playerID');
+			return(
+				<div>
+					<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID}/>
+				</div>)
+		}else return (
 			<div>
 				<h3>Make A Move!</h3>
 				<MoveList currentTurn={currentTurn} roomName={roomName} activePlayerID={props.playerID}
