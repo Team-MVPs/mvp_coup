@@ -16,6 +16,35 @@ function updateCardDeck(cards, chosenKeys, oldCards){
 	return oldCards;
 }
 
+export async function hasCard(roomName, playerID, move){
+	let result = false;
+	await firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((player)=>{
+		let cardSet = new Set();
+		player.data().cards.forEach(card => cardSet.add(card));
+		console.log(cardSet);
+		console.log("Checking: " + move);
+		switch (move) {
+			case "foreign_aid":
+			case "duke":
+				result = cardSet.has("Duke");
+				break;
+			case "exchange_cards":
+				result = cardSet.has("Ambassador");
+				break;
+			case "assassinate":
+				result = cardSet.has("Assassin");
+				break;
+			case "steal":
+				result = cardSet.has("Captain");
+				break;
+			default:
+				alert("Invalid move type");
+				break;
+		}
+	});
+	console.log("Result: " + result);
+	return result;
+}
 export function generalIncome(roomName, playerID){
 	firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
 		coins: firebase.firestore.FieldValue.increment(1)

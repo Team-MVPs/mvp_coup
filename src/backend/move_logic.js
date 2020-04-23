@@ -2,7 +2,7 @@ import {firestore, root} from "../config/firebase";
 import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
-import { generalIncome, Coup, foreignAid, Duke, Ambassador } from "./PerformMoves";
+import { generalIncome, Coup, foreignAid, Duke, hasCard } from "./PerformMoves";
 
 function Move(type, player, to) {
 	return {
@@ -15,10 +15,11 @@ function Move(type, player, to) {
 let registeredTurn = -1;
 // TODO: get actual number of players
 
-export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurrentMove, setConfirmed) {
+export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurrentMove, setConfirmed, setWaitingMessage) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
 		var alreadyInvoked = false;
+		var bluffDecided = false;
 		if (turn >= 0 && turn !== registeredTurn) {
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
 				(doc) => {
@@ -29,9 +30,37 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 							if(!alreadyInvoked && move !== "general_income" && move !== 'coup'){
 								setMove(`${playerName} performed ${move}`);
 								alreadyInvoked = true;
+							}else{
+								if(doc.data().bluffLoser !== undefined){
+									if(doc.data().bluffLoser.playerID == playerID){
+										setWaitingMessage("You are loosing a card");
+										setConfirmed(true);
+										setMove("");
+									}else{
+										const bluffer = doc.data().bluffs[0].playerName;
+										const loser = doc.data().bluffLoser.playerName;
+										setWaitingMessage(bluffer + " bluffed " + playerName + " 's move." + loser + " is loosing a card");
+										setConfirmed(true);
+										setMove("");
+									}
+								}
 							}
 						} else {
-							if (move === "general_income"){
+							if(doc.data().bluffs.length != 0 && !bluffDecided){
+								hasCard(roomName, playerID, move).then((result) => {
+									bluffDecided = true;
+									console.log("Bluff Result " + result);
+									if(result){
+										firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+											bluffLoser : doc.data().bluffs[0]
+										});
+									}else{
+										firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+											bluffLoser : {playerID: playerID, playerName: playerName}
+										});
+									}
+								})
+							}else if (move === "general_income"){
 								setConfirmed(false);
 								generalIncome(roomName,playerID);
 								incrementTurn(roomName).then(() => console.log("turn incremented"));
@@ -90,7 +119,8 @@ export async function updateTurnInDB(roomName, turn, playerName, playerID, move)
 		playerID: playerID,
 		move: move,
 		confirmations: 0,
-		blocks: []
+		blocks: [],
+		bluffs: []
 	}).then(() => {
 		console.log("Added turn to db");
 	}).catch(() => handleDBException());
@@ -131,7 +161,13 @@ function respond(type) {
 						});
 					break;
 				case "call_bluff":
-					// get aid
+					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+						bluffs: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName}),
+					}).then(() => {
+						setConfirmed(true);
+						setMove("");
+						console.log("incremented confirmations");
+					});
 					break;
 				case "block":
 					// duke

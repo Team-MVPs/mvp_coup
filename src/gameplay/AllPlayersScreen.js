@@ -15,6 +15,7 @@ function PlayerScreen(props) {
 	const [move, setMove] = useState("");
 	const [currentMove, setCurrentMove] = useState("");
 	const [confirmed, setConfirmed] = useState(false);
+	const [waitingMessage, setWaitingMessage] = useState("Waiting for others");
 
 	const {roomName, playerNames} = useContext(RoomContext);
 	console.log(`Current Player Names ${playerNames}`);
@@ -34,7 +35,7 @@ function PlayerScreen(props) {
 				setIsTurn(false);
 			}
 			setCurrentTurn(doc.data().turn);
-			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove, setConfirmed);
+			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove, setConfirmed, setWaitingMessage);
 		});
 		return () => subscribe();
 	}, []);
@@ -72,7 +73,7 @@ function PlayerScreen(props) {
 				<Spinner animation="border" as="span"/>
 			  </div>
 			  <div className="col-xs-6" align="middle">
-				Waiting for others
+				{waitingMessage}
 			  </div>
 			</div>
 		  );
@@ -81,7 +82,7 @@ function PlayerScreen(props) {
 			<div>
 				<h3>{move}</h3>
 				<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-							  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+							  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 			</div>
 		);
 	} else {
