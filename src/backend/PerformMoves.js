@@ -2,9 +2,10 @@ import {firestore, root} from "../config/firebase";
 import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Col, Row, Container } from 'react-bootstrap';
 import { incrementTurn } from './move_logic';
-
+import PlayCard from '../components/PlayCard.js';
+import '../styles/Card.css';
 
 function updateCardDeck(cards, chosenKeys, oldCards){
 	for(let i=0; i<cards.length;i++){
@@ -51,9 +52,9 @@ export function Ambassador(roomName, playerID){
 	const [cards, setCards] = useState([]);
 	const [cardDeck, setCardDeck] = useState([]);
 	const [isDisabled, setDisabled] = useState(false);
-
-	let chosenCards = [];
-	let chosenKeys = new Set();
+	const [cardsToChoose, setCardsToChoose] = useState(0);
+	const [chosenKeys, setChosenKeys] = useState(new Set());
+	//let chosenKeys = new Set();
 
 	useEffect(()=>{
 		const subscribe = firestore.collection(root).doc(roomName).get().then((room) => {
@@ -66,8 +67,10 @@ export function Ambassador(roomName, playerID){
 
 			firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((player)=>{
 				if (player.data().cards.length >1){
+					setCardsToChoose(2);
 					viewCards.push([player.data().cards[0], 3], [player.data().cards[1], 4]);
 				} else{
+					setCardsToChoose(1);
 					viewCards.push([player.data().cards[0], 3]);
 				}
 				setCards(viewCards);
@@ -76,54 +79,59 @@ export function Ambassador(roomName, playerID){
 		return () => subscribe;
 	}, []);
 
-	const handleClick = (card) => {
+	const handleClick = () => {
 		return async () => {
-			if(chosenCards.length === 0){
-				chosenCards.push(card[0]);
-				chosenKeys.add(card[1]);
-				if (cards.length === 3){
-					setDisabled(true);
-					await firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-						cards: chosenCards
-					});
-					const updatedCards = updateCardDeck(cards, chosenKeys, cardDeck);
-					await firestore.collection(root).doc(roomName).update({
-						cards: updatedCards
-					});
-					await incrementTurn(roomName);
-				};
-			} else{
-				if (!chosenKeys.has(card[1])){
-					chosenCards.push(card[0]);
-					chosenKeys.add(card[1]);
-				} else{
-					alert("You have already selected that card, pick another one");
-					return;
+			setDisabled(true);
+			let chosenCards = [];
+			cards.forEach(card => {
+				if(chosenKeys.has(card[1])) chosenCards.push(card[0]);
+			});
+
+			await firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+				cards: chosenCards
+			});
+			const updatedCards = updateCardDeck(cards, chosenKeys, cardDeck);
+			await firestore.collection(root).doc(roomName).update({
+				cards: updatedCards
+			});
+			await incrementTurn(roomName);		
+		}
+	}
+
+	const selectCard = (card) => {
+		return async() =>{
+			if(chosenKeys.has(card[1])){
+				chosenKeys.delete(card[1]);
+			}else{
+				if(chosenKeys.size === cardsToChoose){
+					const iterator1 = chosenKeys.values();
+					chosenKeys.delete(iterator1.next().value);
 				}
-				setDisabled(true);
-				await firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-					cards: chosenCards
-				});
-				const updatedCards = updateCardDeck(cards, chosenKeys, cardDeck);
-				await firestore.collection(root).doc(roomName).update({
-					cards: updatedCards
-				});
-				await incrementTurn(roomName);
+				chosenKeys.add(card[1]);
 			}
-					
+			setChosenKeys(new Set(chosenKeys));
 		}
 	}
 
 	return (
 		<div>
-			<ul>
-				{cards.map(card =>(
-					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
-						<button type="button" className="btn btn-lg btn-primary" key = {card} style = {{width:"20em"}} 
-						onClick = {handleClick(card)} disabled = {isDisabled}>{card[0]} </button>
-					</div>))}
-			</ul>
-
-		</div>)
+		<h3 style={{paddingBottom: "5%"}}>Choose {cardsToChoose}</h3>
+		<Container style={{paddingBottom: "5%"}}>
+			<Row>
+				{cards.map(card =>{
+					return(
+					<Col>
+						<div className={chosenKeys.has(card[1]) ? "Selected" : "Highlight"} onClick = {selectCard(card)}>
+							<PlayCard cardName={card[0]} />
+						</div>
+					</Col>
+					);
+					})}
+			</Row>
+		</Container>
+		<button type="button" className="btn btn-lg btn-success" style = {{width:"20em"}} 
+					 	disabled = {isDisabled || cardsToChoose!==chosenKeys.size} 	onClick = {handleClick()}>Confirm</button>
+		</div>
+		)
 }
 
