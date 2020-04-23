@@ -6,18 +6,18 @@ import firebase from 'firebase';
 
 
 export function MoveList(props){
-	const [assassinEnabled, setAssassin] = useState(true);
-	const [coupEnabled, setCoup] = useState(true);
+	const [assassinDisabled, setAssassinDisabled] = useState(true);
+	const [coupDisabled, setCoupDisabled] = useState(true);
 	const [theRest, setTheRest] = useState(false);
 
 	useEffect( () => {
 		const subscribe = firestore.collection(root).doc(props.roomName).collection("players").doc(props.activePlayerID).get().then((player)=>{
 			let coins = player.data().coins;
 			if (coins >= 3 && coins < 10){
-				setAssassin(false);
+				setAssassinDisabled(false);
 			} 
 			if (coins >= 7){
-				setCoup(false);
+				setCoupDisabled(false);
 			}
 			if (coins >= 10){
 				setTheRest(true);
@@ -54,12 +54,12 @@ export function MoveList(props){
 
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Assassinate someone you dislike!"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID)}
-					disabled = {assassinEnabled}>Assassinate someone you dislike!</Button>
+					disabled = {assassinDisabled}>Assassinate someone you dislike!</Button>
 				</div>
 
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Coup a scrub"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID)}
-					disabled = {coupEnabled}>Coup a scrub</Button>
+					disabled = {coupDisabled}>Coup a scrub</Button>
 				</div>
 	</div>);
 }
