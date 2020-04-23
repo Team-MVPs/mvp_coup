@@ -1,0 +1,12 @@
+.Highlight:hover{
+    transform: scale(1.1);
+}
+
+.Selected{
+    box-shadow: 0 0 0 6px black;
+    border-radius: 1em;
+}
+
+.Selected:hover{
+    transform: scale(1.1);
+}
