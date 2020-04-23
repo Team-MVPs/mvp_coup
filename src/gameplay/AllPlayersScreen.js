@@ -29,8 +29,8 @@ function PlayerScreen(props) {
 				setMove("");
 				setCurrentMove("");
 				setPlayerChosen("");
-				setConfirmed(false);
 			}
+			setConfirmed(false);
 			if (doc.data().turn % totalPlayers === props.playerIndex) {
 				setIsTurn(true);
 			} else {
