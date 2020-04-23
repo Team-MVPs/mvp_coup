@@ -121,7 +121,7 @@ export function Ambassador(roomName, playerID){
 				{cards.map(card =>{
 					return(
 					<Col>
-						<div className={chosenKeys.has(card[1]) ? "Selected" : "Highlight"} onClick = {selectCard(card)}>
+						<div className={chosenKeys.has(card[1]) ? "Selected" : "Highlight"} onClick = {selectCard(card)} style={{display:"inline-block"}}>
 							<PlayCard cardName={card[0]} />
 						</div>
 					</Col>
