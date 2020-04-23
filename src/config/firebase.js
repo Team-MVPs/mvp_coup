@@ -12,6 +12,10 @@ const firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+firebase.auth().signInAnonymously().catch(function(error) {
+    // Handle Errors here.
+    console.error(error);
+});
 firebase.analytics();
 
 export const firestore = firebase.firestore();
