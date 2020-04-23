@@ -12,11 +12,11 @@ function GameStart(props) {
   const [redirect, setRedirect] = React.useState(false);
   const [isDisabled, setDisabled] = React.useState(true);
 
-  const { roomName } = useContext(RoomContext);
+  const { roomName, setPlayerNames } = useContext(RoomContext);
   
   const handleClick = () => {
     startGame(roomName).then(() => {
-      props.setPlayerNames(players);
+      setPlayerNames(players);
       let i = 0;
       for(let i = 0; i < playerIDs.length; i++){
         if(playerIDs[i] === props.playerID) {
@@ -86,7 +86,7 @@ function GameStart(props) {
     } else {
       console.log(props.playerID);
       return (
-        <WaitForHost id = {props.playerID} playerArray = {playerIDs} playerNames = {players} setPlayerIndex = {props.setPlayerIndex} setPlayerNames = {props.setPlayerNames}/>
+        <WaitForHost id = {props.playerID} playerArray = {playerIDs} playerNames = {players} setPlayerIndex = {props.setPlayerIndex}/>
       );
     }
   }
@@ -99,7 +99,7 @@ function GameStart(props) {
 	      ))}
 	    </ol>
       <div align="center"> <h4>Current Room: {roomName}</h4> </div>
-	    <JoinGame isHost={props.isHost} roomName={roomName} playerID = {props.playerID} setPlayerIndex = {props.setPlayerIndex} setPlayerNames = {props.setPlayerNames}/>
+	    <JoinGame isHost={props.isHost} roomName={roomName} playerID = {props.playerID} setPlayerIndex = {props.setPlayerIndex}/>
     </div>
   );
 }

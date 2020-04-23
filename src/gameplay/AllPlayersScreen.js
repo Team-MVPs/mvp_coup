@@ -16,9 +16,9 @@ function PlayerScreen(props) {
 	const [currentMove, setCurrentMove] = useState("");
 	const [confirmed, setConfirmed] = useState(false);
 
-	let totalPlayers = props.playerNames.length;
-	console.log(props.playerNames);
-	const {roomName} = useContext(RoomContext);
+	const {roomName, playerNames} = useContext(RoomContext);
+	console.log(`Current Player Names ${playerNames}`);
+	let totalPlayers = playerNames.length;	
 	
 	useEffect(() => {
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
@@ -62,7 +62,7 @@ function PlayerScreen(props) {
 			<div>
 				<h3>Make A Move!</h3>
 				<MoveList currentTurn={currentTurn} roomName={roomName} activePlayerID={props.playerID}
-						  playerName={props.playerNames[currentTurn % totalPlayers]} setConfirmed={setConfirmed}/>
+						  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed={setConfirmed}/>
 			</div>
 		);
 	}else if(confirmed){
@@ -81,17 +81,17 @@ function PlayerScreen(props) {
 			<div>
 				<h3>{move}</h3>
 				<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-							  playerName={props.playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+							  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 			</div>
 		);
 	} else {
 		return (
 			<div>
-				<h3>{props.playerNames[currentTurn % totalPlayers]}'s Turn</h3>
+				<h3>{playerNames[currentTurn % totalPlayers]}'s Turn</h3>
 			</div>
 		);
 	}
-	
+ 
 }
 
 export default PlayerScreen;

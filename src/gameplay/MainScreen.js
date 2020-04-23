@@ -23,7 +23,7 @@ function MainGameScreen(props) {
                    <UserDetails playerID = {playerID} />
                 </Col>
                 <Col xs={5}>
-                    <PlayerScreen playerID = {playerID}  playerIndex={props.playerIndex} playerNames = {props.playerNames} />
+                    <PlayerScreen playerID = {playerID}  playerIndex={props.playerIndex} />
                 </Col>
                 <Col xs={3}>
                     <PastMoves/>
