@@ -14,6 +14,7 @@ function PlayerScreen(props) {
 	const [currentTurn, setCurrentTurn] = useState(0);
 	const [move, setMove] = useState("");
 	const [currentMove, setCurrentMove] = useState("");
+	const [playerChosen, setPlayerChosen] = useState("");
 	const [confirmed, setConfirmed] = useState(false);
 	const [waitingMessage, setWaitingMessage] = useState("Waiting for others");
 
@@ -27,21 +28,24 @@ function PlayerScreen(props) {
 				// reset move variable
 				setMove("");
 				setCurrentMove("");
+				setPlayerChosen("");
+				setConfirmed(false);
 			}
-			setConfirmed(false);
 			if (doc.data().turn % totalPlayers === props.playerIndex) {
 				setIsTurn(true);
 			} else {
 				setIsTurn(false);
 			}
 			setCurrentTurn(doc.data().turn);
-			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove, setConfirmed, setWaitingMessage);
+			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove, setConfirmed, setWaitingMessage, setPlayerChosen);
 		});
 		return () => subscribe();
 	}, []);
 
 	
 	if (isTurn) {
+		console.log(confirmed);
+		console.log("above");
 		if(confirmed){
 			return (
 				<div>
@@ -57,7 +61,8 @@ function PlayerScreen(props) {
 		if (currentMove !== ""){
 			return(
 				<div>
-					<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID}/>
+					<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} 
+					playerList = {playerNames} playerIndex = {props.playerIndex}/>
 				</div>)
 		}else return (
 			<div>
@@ -78,13 +83,37 @@ function PlayerScreen(props) {
 			</div>
 		  );
 	} else if (move !== "") {
-		return (
-			<div>
-				<h3>{move}</h3>
-				<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-							  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
-			</div>
-		);
+		if (currentMove !== "AttemptAssassin"){
+			return (
+				<div>
+					<h3>{move}</h3>
+					<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+								  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+				</div>
+			); 
+		} else {
+			if (playerNames[props.playerIndex] === playerChosen){
+				return (
+					<div>
+						<h3>{move}</h3>
+						<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+									  playerName={props.playerNames[currentTurn % totalPlayers]}/>
+					</div>
+				);
+			} else {
+				return (
+					<div>
+					  <div align="middle" style = {{paddingTop:"1em"}}>
+						<Spinner animation="border" as="span"/>
+					  </div>
+					  <div className="col-xs-6" align="middle">
+						{waitingMessage}
+					  </div>
+					</div>
+				  );
+			}
+		}
+
 	} else {
 		return (
 			<div>

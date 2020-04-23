@@ -4,7 +4,7 @@ import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
 import { generalIncome, Coup, foreignAid, Duke, hasCard } from "./PerformMoves";
 
-function Move(type, player, to) {
+export function Move(type, player, to) {
 	return {
 		type: type,
 		player: player,
@@ -15,7 +15,7 @@ function Move(type, player, to) {
 let registeredTurn = -1;
 // TODO: get actual number of players
 
-export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurrentMove, setConfirmed, setWaitingMessage) {
+export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurrentMove, setConfirmed, setWaitingMessage, setPlayerChosen) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
 		var alreadyInvoked = false;
@@ -26,10 +26,19 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 					if (doc.exists) {
 						const move = doc.data().move.type;
 						const playerName = doc.data().playerName;
+						const targetPlayer = doc.data().move.to;
 						if (doc.data().playerID !== playerID) {
 							if(!alreadyInvoked && move !== "general_income" && move !== 'coup'){
 								setMove(`${playerName} performed ${move}`);
 								alreadyInvoked = true;
+								if (move === 'assassinate'){
+									setCurrentMove("AttemptAssassin");
+									setWaitingMessage("Waiting for assassin to strike!");
+									if (targetPlayer !== null){
+										setPlayerChosen(targetPlayer);
+									}
+								}
+
 							}else{
 								if(doc.data().bluffLoser !== undefined){
 									if(doc.data().bluffLoser.playerID == playerID){
@@ -74,8 +83,14 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 									setConfirmed(false);
 									setCurrentMove("Ambassador");
 								}
-							} 
-							else {
+							} else if (move === 'assassinate'){
+								setConfirmed(false);
+								firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+									coins: firebase.firestore.FieldValue.increment(-3)
+								});
+								setCurrentMove("AttemptAssassin");
+								
+							} else {
 								if (doc.data().confirmations+1 === numPlayers) {
 										setConfirmed(false);
 										switch (move) {
@@ -129,7 +144,7 @@ export async function updateTurnInDB(roomName, turn, playerName, playerID, move)
 function move(type) {
 	return (roomName, turn, playerName, activePlayerID, setConfirmed) => {
 		return () => {
-			const move = Move(type, playerName, activePlayerID, "");
+			const move = Move(type, playerName, null, "");
 			updateTurnInDB(roomName, turn, playerName, activePlayerID, move).then(() =>{
 				if(setConfirmed !== null) setConfirmed(true);
 			});	
