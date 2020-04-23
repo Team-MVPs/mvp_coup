@@ -15,7 +15,7 @@ function Move(type, player, to) {
 let registeredTurn = -1;
 // TODO: get actual number of players
 
-export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurrentMove) {
+export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurrentMove, setConfirmed) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
 		var alreadyInvoked = false;
@@ -26,25 +26,29 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 						const move = doc.data().move.type;
 						const playerName = doc.data().playerName;
 						if (doc.data().playerID !== playerID) {
-							if(!alreadyInvoked){
+							if(!alreadyInvoked && move !== "general_income" && move !== 'coup'){
 								setMove(`${playerName} performed ${move}`);
 								alreadyInvoked = true;
 							}
 						} else {
 							if (move === "general_income"){
+								setConfirmed(false);
 								generalIncome(roomName,playerID);
 								incrementTurn(roomName).then(() => console.log("turn incremented"));
 							
 							} else if (move === 'coup'){
+								setConfirmed(false);
 								Coup(roomName, playerID);								
 								incrementTurn(roomName).then(() => console.log("turn incremented"));
 							} else if (move === 'exchange_cards'){
 								if (doc.data().confirmations+1 === numPlayers){
+									setConfirmed(false);
 									setCurrentMove("Ambassador");
 								}
 							} 
 							else {
 								if (doc.data().confirmations+1 === numPlayers) {
+										setConfirmed(false);
 										switch (move) {
 											case "foreign_aid":
 												foreignAid(roomName, playerID);
@@ -93,10 +97,12 @@ export async function updateTurnInDB(roomName, turn, playerName, playerID, move)
 }
 
 function move(type) {
-	return (roomName, turn, playerName, activePlayerID) => {
+	return (roomName, turn, playerName, activePlayerID, setConfirmed) => {
 		return () => {
 			const move = Move(type, playerName, activePlayerID, "");
-			updateTurnInDB(roomName, turn, playerName, activePlayerID, move);	
+			updateTurnInDB(roomName, turn, playerName, activePlayerID, move).then(() =>{
+				if(setConfirmed !== null) setConfirmed(true);
+			});	
 		}
 	}
 }

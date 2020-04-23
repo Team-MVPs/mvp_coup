@@ -34,13 +34,25 @@ function PlayerScreen(props) {
 				setIsTurn(false);
 			}
 			setCurrentTurn(doc.data().turn);
-			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove);
+			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove, setConfirmed);
 		});
 		return () => subscribe();
 	}, []);
 
 	
 	if (isTurn) {
+		if(confirmed){
+			return (
+				<div>
+				  <div align="middle" style = {{paddingTop:"1em"}}>
+					<Spinner animation="border" as="span"/>
+				  </div>
+				  <div className="col-xs-6" align="middle">
+					Waiting for others to confirm
+				  </div>
+				</div>
+			  );
+		}
 		if (currentMove !== ""){
 			return(
 				<div>
@@ -50,7 +62,7 @@ function PlayerScreen(props) {
 			<div>
 				<h3>Make A Move!</h3>
 				<MoveList currentTurn={currentTurn} roomName={roomName} activePlayerID={props.playerID}
-						  playerName={props.playerNames[currentTurn % totalPlayers]}/>
+						  playerName={props.playerNames[currentTurn % totalPlayers]} setConfirmed={setConfirmed}/>
 			</div>
 		);
 	}else if(confirmed){
@@ -60,7 +72,7 @@ function PlayerScreen(props) {
 				<Spinner animation="border" as="span"/>
 			  </div>
 			  <div className="col-xs-6" align="middle">
-				Waiting for others to confirm the turn
+				Waiting for others
 			  </div>
 			</div>
 		  );
