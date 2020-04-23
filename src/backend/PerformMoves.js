@@ -3,7 +3,7 @@ import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { incrementTurn } from './move_logic';
+import { incrementTurn, Move } from './move_logic';
 
 
 function updateCardDeck(roomName, cards, chosenKeys, oldCards, setCardDeck){
@@ -134,6 +134,7 @@ export function Ambassador(roomName, playerID){
 
 	return (
 		<div>
+			<h3>Choose the cards you want</h3>
 			<ul>
 				{cards.map(card =>(
 					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
@@ -142,6 +143,39 @@ export function Ambassador(roomName, playerID){
 					</div>))}
 			</ul>
 
+		</div>)
+}
+
+export function attemptAssassin(roomName, playerID, playerList, playerIndex, turn, setPlayerChosen){
+	let newPlayerList = playerList;
+	newPlayerList.splice(playerIndex, 1);
+
+	const handlePlayerClick = (playerChosen) => {
+		return async () =>{
+			console.log(playerChosen);
+			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).get().then(async (turn)=>{
+				let oldMove = turn.data().move
+				const newMove = Move(oldMove.type, oldMove.player, playerChosen);
+				console.log(newMove);
+				console.log("above");
+				await turn.update({
+					playerName: 'changed'
+				})
+				}
+			)
+		}
+	}
+
+	return (
+		<div>
+			<h3>Choose a player to assasinate!</h3>
+			<ul>
+				{newPlayerList.map(player =>(
+					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
+						<button type="button" className="btn btn-lg btn-dark" key = {player} style = {{width:"20em"}} 
+						onClick = {handlePlayerClick(player)}> {player} </button>
+					</div>))}
+			</ul>
 		</div>)
 }
 

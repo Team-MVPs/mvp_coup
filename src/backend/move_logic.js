@@ -4,7 +4,7 @@ import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
 import { generalIncome, Coup, foreignAid, Duke, Ambassador } from "./PerformMoves";
 
-function Move(type, player, to) {
+export function Move(type, player, to) {
 	return {
 		type: type,
 		player: player,
@@ -26,6 +26,9 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 						const playerName = doc.data().playerName;
 						if (doc.data().playerID !== playerID) {
 							setMove(`${playerName} performed ${move}`);
+							if (move === 'assassinate'){
+								setCurrentMove("AttemptAssassin");
+							}
 
 						} else {
 							if (move === "general_income"){
@@ -39,7 +42,14 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 								if (doc.data().confirmations+1 === numPlayers){
 									setCurrentMove("Ambassador");
 								}
-							} 
+							} else if (move === 'assassinate'){
+								firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+									coins: firebase.firestore.FieldValue.increment(-3)
+								});
+								//if (doc.data().confirmations+1 === numPlayers){
+								setCurrentMove("AttemptAssassin");
+								//}
+							}
 							else {
 								if (doc.data().confirmations+1 === numPlayers) {
 										switch (move) {
@@ -50,14 +60,9 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 												// duke
 												Duke(roomName, playerID);
 												break;
-											//case "exchange_cards":
-												// exchange cards
-												//Ambassador(roomName,playerID)
-											//	setAmbassador(true);
-											//	break;
-											case "assassinate":
+											//case "assassinate":
 												//assassinate someone
-												move.to = "Vandit";
+											//	move.to = "Vandit";
 											case "steal":
 												// somehow figure out how to get the `to`
 												move.to = "Vandit";

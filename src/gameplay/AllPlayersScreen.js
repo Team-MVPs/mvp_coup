@@ -13,8 +13,8 @@ function PlayerScreen(props) {
 	const [currentTurn, setCurrentTurn] = useState(0);
 	const [move, setMove] = useState("");
 	const [currentMove, setCurrentMove] = useState("");
+	const [playerChosen, setPlayerChosen] = useState("");
 	let totalPlayers = props.playerNames.length;
-	console.log(props.playerNames);
 	const {roomName} = useContext(RoomContext);
 	
 	useEffect(() => {
@@ -23,6 +23,7 @@ function PlayerScreen(props) {
 				// reset move variable
 				setMove("");
 				setCurrentMove("");
+				setPlayerChosen("");
 			}
 			if (doc.data().turn % totalPlayers === props.playerIndex) {
 				setIsTurn(true);
@@ -35,12 +36,15 @@ function PlayerScreen(props) {
 		return () => subscribe();
 	}, []);
 
+
+
 	
 	if (isTurn) {
 		if (currentMove !== ""){
 			return(
 				<div>
-					<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID}/>
+					<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} setPlayerChosen = {setPlayerChosen} 
+					playerList = {props.playerNames} playerIndex = {props.playerIndex} turn = {currentTurn}/>
 				</div>)
 		}else return (
 			<div>
@@ -50,13 +54,31 @@ function PlayerScreen(props) {
 			</div>
 		);
 	} else if (move !== "") {
-		return (
-			<div>
-				<h3>{move}</h3>
-				<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-							  playerName={props.playerNames[currentTurn % totalPlayers]}/>
-			</div>
-		);
+		if (currentMove !== "AttemptAssassin"){
+			return (
+				<div>
+					<h3>{move}</h3>
+					<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+								  playerName={props.playerNames[currentTurn % totalPlayers]}/>
+				</div>
+			);
+		} else {
+			if (props.playerNames[props.playerIndex] === playerChosen){
+				return (
+					<div>
+						<h3>{move}</h3>
+						<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+									  playerName={props.playerNames[currentTurn % totalPlayers]}/>
+					</div>
+				);
+			} else {
+				return (
+					<div>
+						<h3>An Assasniation attempt has been made on {playerChosen}</h3>
+					</div>)
+			}
+
+		}
 	} else {
 		return (
 			<div>
