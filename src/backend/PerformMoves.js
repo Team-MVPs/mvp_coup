@@ -6,20 +6,13 @@ import { Modal, Button } from 'react-bootstrap';
 import { incrementTurn } from './move_logic';
 
 
-function updateCardDeck(roomName, cards, chosenKeys, oldCards, setCardDeck){
+function updateCardDeck(cards, chosenKeys, oldCards){
 	for(let i=0; i<cards.length;i++){
-		let found = false;
-		for(let j=0; j<chosenKeys.length;j++){
-			if (chosenKeys[j] === cards[i][1]){
-				found = true;
-			}
-		}
-		if(!found){
+		if(!chosenKeys.has(cards[i][1])){
 			oldCards.push(cards[i][0]);
 		}
 	}
 	return oldCards;
-
 }
 
 export function generalIncome(roomName, playerID){
@@ -60,7 +53,7 @@ export function Ambassador(roomName, playerID){
 	const [isDisabled, setDisabled] = useState(false);
 
 	let chosenCards = [];
-	let chosenKeys = [];
+	let chosenKeys = new Set();
 
 	useEffect(()=>{
 		const subscribe = firestore.collection(root).doc(roomName).get().then((room) => {
@@ -85,48 +78,37 @@ export function Ambassador(roomName, playerID){
 
 	const handleClick = (card) => {
 		return async () => {
-			console.log(card);
 			if(chosenCards.length === 0){
 				chosenCards.push(card[0]);
-				chosenKeys.push(card[1]);
-
+				chosenKeys.add(card[1]);
 				if (cards.length === 3){
-					setDisabled(true);
-					await firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-							cards: chosenCards
-						});
-					let oldCards = cardDeck;
-					const updatedCards = updateCardDeck(roomName, cards, chosenKeys, oldCards);
-					setCardDeck(updatedCards);
-					await firestore.collection(root).doc(roomName).update({
-							cards: cardDeck
-					});
-				await incrementTurn(roomName);
-				};
-			} 
-
-			else{
-				if (chosenKeys[0] !== card[1]){
-					chosenCards.push(card[0]);
-					chosenKeys.push(card[1]);
-					
-
-				} else{
-					alert("You have already selected that card, pick another one")
-				}
-				if (chosenCards.length > 1){
 					setDisabled(true);
 					await firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
 						cards: chosenCards
 					});
-					let oldCards = cardDeck;
-					const updatedCards = updateCardDeck(roomName, cards, chosenKeys, oldCards);
-					setCardDeck(updatedCards);
+					const updatedCards = updateCardDeck(cards, chosenKeys, cardDeck);
 					await firestore.collection(root).doc(roomName).update({
-						cards: cardDeck
+						cards: updatedCards
 					});
 					await incrementTurn(roomName);
+				};
+			} else{
+				if (!chosenKeys.has(card[1])){
+					chosenCards.push(card[0]);
+					chosenKeys.add(card[1]);
+				} else{
+					alert("You have already selected that card, pick another one");
+					return;
 				}
+				setDisabled(true);
+				await firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+					cards: chosenCards
+				});
+				const updatedCards = updateCardDeck(cards, chosenKeys, cardDeck);
+				await firestore.collection(root).doc(roomName).update({
+					cards: updatedCards
+				});
+				await incrementTurn(roomName);
 			}
 					
 		}
