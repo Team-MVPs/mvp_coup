@@ -158,9 +158,9 @@ export function attemptAssassin(roomName, playerID, playerList, playerIndex, tur
 				const newMove = Move(oldMove.type, oldMove.player, playerChosen);
 				console.log(newMove);
 				console.log("above");
-				await turn.update({
-					playerName: 'changed'
-				})
+				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
+					move: newMove
+					});
 				}
 			)
 		}

@@ -36,7 +36,15 @@ function PlayerScreen(props) {
 		return () => subscribe();
 	}, []);
 
-
+	//problem right now is that since the turn doesnt exist in the beginning, it returns an error saying move.to doesnt work 
+	useEffect(()=>{
+		const subscribe = firestore.collection(root).doc(roomName).collection("turns").doc(currentTurn.toString()).onSnapshot((snapshot)=>{
+			let name = snapshot.data().move.to;
+			setPlayerChosen(name);
+			
+		})
+		return () => subscribe();
+	}, []);
 
 	
 	if (isTurn) {

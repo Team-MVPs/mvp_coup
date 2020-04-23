@@ -97,7 +97,7 @@ export async function updateTurnInDB(roomName, turn, playerName, playerID, move)
 function move(type) {
 	return (roomName, turn, playerName, activePlayerID) => {
 		return () => {
-			const move = Move(type, playerName, activePlayerID, "");
+			const move = Move(type, playerName, "", "");
 			updateTurnInDB(roomName, turn, playerName, activePlayerID, move);	
 		}
 	}
