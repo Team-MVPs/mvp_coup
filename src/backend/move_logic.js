@@ -33,6 +33,7 @@ function Ambassador(roomName, playerID){
 export function RegisterMoveCallback(roomName, turn, playerID, setMove) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
+		var alreadyInvoked = false;
 		if (turn >= 0 && turn !== registeredTurn) {
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
 				(doc) => {
@@ -40,8 +41,14 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove) {
 						const move = doc.data().move.type;
 						const playerName = doc.data().playerName;
 						if (doc.data().playerID !== playerID) {
-							setMove(`${playerName} performed ${move}`);
-
+							if(!alreadyInvoked){
+								setMove(`${playerName} performed ${move}`);
+								alreadyInvoked = true;
+							}else{
+								if(doc.data().bluffs.length != 0){
+									
+								}
+							}
 						} else {
 							if (move === "general_income"){
 								firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
@@ -109,7 +116,8 @@ export function updateTurnInDB(roomName, turn, playerName, playerID, move) {
 		playerID: playerID,
 		move: move,
 		confirmations: 0,
-		blocks: []
+		blocks: [],
+		bluffs: []
 	}).then(() => {
 		console.log("Added turn to db");
 	}).catch(() => handleDBException());
@@ -135,7 +143,7 @@ export const all_moves = {
 };
 
 function respond(type) {
-	return function (roomName, turn, playerName, playerID) {
+	return function (roomName, turn, playerName, playerID, setConfirmed, setMove) {
 		return () => {
 			switch (type) {
 				case "confirm":
@@ -144,7 +152,10 @@ function respond(type) {
 					}).then(() => console.log("incremented confirmations"));
 					break;
 				case "call_bluff":
-					// get aid
+					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+						bluffs: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName}),
+						confirmations: firebase.firestore.FieldValue.increment(1)
+					}).then(() => console.log("incremented confirmations"));
 					break;
 				case "block":
 					// duke
@@ -153,6 +164,8 @@ function respond(type) {
 					alert("Invalid response");
 					break;
 			}
+			setConfirmed(true);
+			setMove("");
 		}
 	}
 }
