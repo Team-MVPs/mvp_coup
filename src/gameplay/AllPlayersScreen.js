@@ -3,11 +3,12 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {MoveList} from '../backend/MoveList.js';
 import {firestore, root} from '../config/firebase';
-import {RegisterMoveCallback} from "../backend/move_logic";
+import {RegisterMoveCallback, incrementTurn, confirmTurn} from "../backend/move_logic";
 import {RoomContext} from '../contexts/RoomContext.js';
 import {ResponseList} from "../backend/MoveList";
 import OtherMoves from '../backend/OtherMoves.js';
 import { Spinner } from 'react-bootstrap';
+import {LoseCard} from '../backend/PerformMoves.js';
 
 function PlayerScreen(props) {
 	const [isTurn, setIsTurn] = useState(props.playerIndex === 0);
@@ -27,6 +28,7 @@ function PlayerScreen(props) {
 				// reset move variable
 				setMove("");
 				setCurrentMove("");
+				setWaitingMessage("Waiting for others");
 			}
 			setConfirmed(false);
 			if (doc.data().turn % totalPlayers === props.playerIndex) {
@@ -41,7 +43,27 @@ function PlayerScreen(props) {
 	}, []);
 
 	
-	if (isTurn) {
+	if(move === "bluff"){
+		function confirmFunction(){
+			if(isTurn){
+				return () => {
+					incrementTurn(roomName);
+				}
+			}else{
+				return() => {
+					setConfirmed(true);
+					setWaitingMessage("Waiting for others");
+					setMove("");
+					confirmTurn(roomName, currentTurn);
+				}
+			}
+		}
+		return(
+			<div>
+				<LoseCard title={waitingMessage} roomName = {roomName} playerID = {props.playerID} confirmFunction={confirmFunction()}/>
+			</div>
+		);
+	}else if (isTurn) {
 		if(confirmed){
 			return (
 				<div>
@@ -49,7 +71,7 @@ function PlayerScreen(props) {
 					<Spinner animation="border" as="span"/>
 				  </div>
 				  <div className="col-xs-6" align="middle">
-					Waiting for others to confirm
+					{waitingMessage}
 				  </div>
 				</div>
 			  );
