@@ -1,6 +1,6 @@
 import {firestore, root} from "../config/firebase";
 import React, {useEffect, useState} from 'react';
-import { Ambassador, attemptAssassin } from './PerformMoves';
+import { Ambassador, AttemptAssassin } from './PerformMoves';
 
 
 export default function OtherMoves(props){
@@ -16,7 +16,7 @@ export default function OtherMoves(props){
 	} else if(move === "AttemptAssassin"){
 		return (
 			<div>
-				{attemptAssassin(roomName, playerID, props.playerList, props.playerIndex, props.turn)}
+				{AttemptAssassin(roomName, playerID, props.playerList, props.playerIndex, props.turn)}
 			</div>
 		)
 	}

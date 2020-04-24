@@ -16,11 +16,12 @@ function PlayerScreen(props) {
 	const [currentMove, setCurrentMove] = useState("");
 	const [playerChosen, setPlayerChosen] = useState("");
 	const [confirmed, setConfirmed] = useState(false);
+	const [loseACard, setLoseACard] = useState(false);
 	const [waitingMessage, setWaitingMessage] = useState("Waiting for others");
 
 	const {roomName, playerNames} = useContext(RoomContext);
 	console.log(`Current Player Names ${playerNames}`);
-	let totalPlayers = playerNames.length;	
+	let totalPlayers = playerNames.length;
 	
 	useEffect(() => {
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
@@ -37,15 +38,13 @@ function PlayerScreen(props) {
 				setIsTurn(false);
 			}
 			setCurrentTurn(doc.data().turn);
-			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove, setConfirmed, setWaitingMessage, setPlayerChosen);
+			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove, setConfirmed, 
+								 setWaitingMessage, setPlayerChosen, setLoseACard);
 		});
 		return () => subscribe();
 	}, []);
 
-	
 	if (isTurn) {
-		console.log(confirmed);
-		console.log("above");
 		if(confirmed){
 			return (
 				<div>
@@ -59,11 +58,18 @@ function PlayerScreen(props) {
 			  );
 		}
 		if (currentMove !== ""){
-			return(
-				<div>
-					<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} 
-					playerList = {playerNames} playerIndex = {props.playerIndex}/>
-				</div>)
+			if (!loseACard){
+				return(
+					<div>
+						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} 
+						playerList = {playerNames} playerIndex = {props.playerIndex}/>
+					</div>)
+				} else {
+					return (
+							<div>
+								<h3> Your move was a success! {playerChosen} will now lose a card!</h3>
+							</div>)
+				}
 		}else return (
 			<div>
 				<h3>Make A Move!</h3>
@@ -93,13 +99,20 @@ function PlayerScreen(props) {
 			); 
 		} else {
 			if (playerNames[props.playerIndex] === playerChosen){
-				return (
-					<div>
-						<h3>{move}</h3>
-						<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-									  playerName={props.playerNames[currentTurn % totalPlayers]}/>
-					</div>
-				);
+				if(!loseACard){
+					return (
+						<div>
+							<h3>{move}</h3>
+							<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+										  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+						</div>
+					);
+				} else {
+					return (
+							<div>
+								<h3>You will lose a card</h3>
+							</div>)
+				}
 			} else {
 				return (
 					<div>

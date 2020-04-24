@@ -164,9 +164,8 @@ export function Ambassador(roomName, playerID){
 		)
 }
 
-export function attemptAssassin(roomName, playerID, playerList, playerIndex, turn){
+export function AttemptAssassin(roomName, playerID, playerList, playerIndex, turn){
 	let newPlayerList = playerList;
-
 	newPlayerList.splice(playerIndex, 1);
 
 	const handlePlayerClick = (playerChosen) =>{
@@ -175,8 +174,6 @@ export function attemptAssassin(roomName, playerID, playerList, playerIndex, tur
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).get().then(async (turn)=>{
 				let oldMove = turn.data().move
 				const newMove = Move(oldMove.type, oldMove.player, playerChosen);
-				console.log(newMove);
-				console.log("above");
 				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
 					move: newMove
 					});
