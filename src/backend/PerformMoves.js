@@ -77,6 +77,78 @@ export function Duke(roomName, playerID){
 		})
 }
 
+export function LoseCard(props){
+	const [cards, setCards] = useState([]);
+	const [isDisabled, setDisabled] = useState(false);
+	const [chosenKeys, setChosenKeys] = useState(new Set());
+	let cardsToChoose = 1;
+
+	useEffect(()=>{
+		const subscribe = firestore.collection(root).doc(props.roomName).collection("players").doc(props.playerID).get().then((player)=>{
+			let viewCards = [];
+			if (player.data().cards.length >1){
+				viewCards.push([player.data().cards[0], 1], [player.data().cards[1], 2]);
+			} else{
+				viewCards.push([player.data().cards[0], 1]);
+			}
+			setCards(viewCards);
+		});
+		return () => subscribe;
+	}, []);
+
+	const handleClick = () => {
+		return async () => {
+			setDisabled(true);
+			let chosenCards = [];
+			cards.forEach(card => {
+				if(!chosenKeys.has(card[1])) chosenCards.push(card[0]);
+			});
+
+			await firestore.collection(root).doc(props.roomName).collection("players").doc(props.playerID).update({
+				cards: chosenCards
+			}).then(() => {
+				props.confirmFunction();
+			});
+		}
+	}
+
+	const selectCard = (card) => {
+		return async() =>{
+			if(chosenKeys.has(card[1])){
+				chosenKeys.delete(card[1]);
+			}else{
+				if(chosenKeys.size === cardsToChoose){
+					const iterator1 = chosenKeys.values();
+					chosenKeys.delete(iterator1.next().value);
+				}
+				chosenKeys.add(card[1]);
+			}
+			setChosenKeys(new Set(chosenKeys));
+		}
+	}
+
+	return (
+		<div>
+		<h3 style={{paddingBottom: "5%"}}>{props.title}</h3>
+		<Container style={{paddingBottom: "5%"}}>
+			<Row>
+				{cards.map(card =>{
+					return(
+					<Col>
+						<div className={chosenKeys.has(card[1]) ? "Selected" : "Highlight"} onClick = {selectCard(card)} style={{display:"inline-block"}}>
+							<PlayCard cardName={card[0]} />
+						</div>
+					</Col>
+					);
+					})}
+			</Row>
+		</Container>
+		<button type="button" className="btn btn-lg btn-success" style = {{width:"20em"}} 
+					 	disabled = {isDisabled || cardsToChoose!==chosenKeys.size} 	onClick = {handleClick()}>Confirm</button>
+		</div>
+		)
+}
+
 export function Ambassador(roomName, playerID){
 	const [cards, setCards] = useState([]);
 	const [cardDeck, setCardDeck] = useState([]);
