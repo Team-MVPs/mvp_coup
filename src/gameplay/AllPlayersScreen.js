@@ -51,10 +51,7 @@ function PlayerScreen(props) {
 				}
 			}else{
 				return() => {
-					setConfirmed(true);
-					setWaitingMessage("Waiting for others");
-					setMove("");
-					confirmTurn(roomName, currentTurn);
+					confirmTurn(roomName, currentTurn, setConfirmed, setWaitingMessage, setMove);
 				}
 			}
 		}

@@ -31,14 +31,15 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 								setMove(`${playerName} performed ${move}`);
 								alreadyInvoked = true;
 							}else{
-								if(doc.data().bluffLoser !== undefined){
+								if(doc.data().bluffLoser !== undefined && !bluffDecided){
+									bluffDecided = true;
 									if(doc.data().bluffLoser.playerID == playerID){
 										setWaitingMessage("Unsuccessful Bluff. Pick 1 card to loose");
 										setMove("bluff");
 									}else{
 										const bluffer = doc.data().bluffs[0].playerName;
 										const loser = doc.data().bluffLoser.playerName;
-										confirmTurn(roomName, turn);
+										confirmTurn(roomName, turn, null, null, null);
 										if(doc.data().bluffs[0].playerID === playerID){
 											setWaitingMessage("Successful Bluff!" + loser + " is loosing a card.")
 										}else{
@@ -204,8 +205,11 @@ export async function incrementTurn(roomName) {
 	}).then(() => console.log("incremented turn"));
 }
 
-export async function confirmTurn(roomName, turn){
+export async function confirmTurn(roomName, turn, setConfirmed, setWaitingMessage, setMove){
 	console.log("Incrementing Confiramtions");
+	if(setConfirmed !== null) setConfirmed(true);
+	if(setWaitingMessage !== null) setWaitingMessage("Waiting for others");
+	if(setMove !== null) setMove("");
 	await firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 		confirmations: firebase.firestore.FieldValue.increment(1)
 	});
