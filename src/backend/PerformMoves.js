@@ -3,7 +3,7 @@ import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
 import { Modal, Button, Col, Row, Container } from 'react-bootstrap';
-import { incrementTurn } from './move_logic';
+import { incrementTurn, Move } from './move_logic';
 import PlayCard from '../components/PlayCard.js';
 import '../styles/Card.css';
 
@@ -236,3 +236,33 @@ export function Ambassador(roomName, playerID){
 		)
 }
 
+export function AttemptAssassin(roomName, playerID, playerList, playerIndex, turn){
+	let newPlayerList = playerList;
+	newPlayerList.splice(playerIndex, 1);
+
+	const handlePlayerClick = (playerChosen) =>{
+		return async () => {
+			console.log(playerChosen);
+			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).get().then(async (turn)=>{
+				let oldMove = turn.data().move
+				const newMove = Move(oldMove.type, oldMove.player, playerChosen);
+				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
+					move: newMove
+					});
+				}
+			)
+		}
+	}
+
+	return (
+		<div>
+			<h3>Choose a player to assasinate!</h3>
+			<ul>
+				{newPlayerList.map(player =>(
+					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
+						<button type="button" className="btn btn-lg btn-dark" key = {player} style = {{width:"20em"}} 
+						onClick = {handlePlayerClick(player)}> {player} </button>
+					</div>))}
+			</ul>
+		</div>)
+}

@@ -15,12 +15,14 @@ function PlayerScreen(props) {
 	const [currentTurn, setCurrentTurn] = useState(0);
 	const [move, setMove] = useState("");
 	const [currentMove, setCurrentMove] = useState("");
+	const [playerChosen, setPlayerChosen] = useState("");
 	const [confirmed, setConfirmed] = useState(false);
+	const [loseACard, setLoseACard] = useState(false);
 	const [waitingMessage, setWaitingMessage] = useState("Waiting for others");
 
 	const {roomName, playerNames} = useContext(RoomContext);
 	console.log(`Current Player Names ${playerNames}`);
-	let totalPlayers = playerNames.length;	
+	let totalPlayers = playerNames.length;
 	
 	useEffect(() => {
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
@@ -29,6 +31,8 @@ function PlayerScreen(props) {
 				setMove("");
 				setCurrentMove("");
 				setWaitingMessage("Waiting for others");
+				setPlayerChosen("");
+
 			}
 			setConfirmed(false);
 			if (doc.data().turn % totalPlayers === props.playerIndex) {
@@ -37,12 +41,13 @@ function PlayerScreen(props) {
 				setIsTurn(false);
 			}
 			setCurrentTurn(doc.data().turn);
-			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove, setConfirmed, setWaitingMessage);
+			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove, setConfirmed, 
+								 setWaitingMessage, setPlayerChosen, setLoseACard);
 		});
 		return () => subscribe();
 	}, []);
 
-	
+
 	if(move === "bluff"){
 		function confirmFunction(){
 			if(isTurn){
@@ -74,10 +79,18 @@ function PlayerScreen(props) {
 			  );
 		}
 		if (currentMove !== ""){
-			return(
-				<div>
-					<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID}/>
-				</div>)
+			if (!loseACard){
+				return(
+					<div>
+						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} 
+						playerList = {playerNames} playerIndex = {props.playerIndex}/>
+					</div>)
+				} else {
+					return (
+							<div>
+								<h3> Your move was a success! {playerChosen} will now lose a card!</h3>
+							</div>)
+				}
 		}else return (
 			<div>
 				<h3>Make A Move!</h3>
@@ -97,13 +110,44 @@ function PlayerScreen(props) {
 			</div>
 		  );
 	} else if (move !== "") {
-		return (
-			<div>
-				<h3>{move}</h3>
-				<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-							  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
-			</div>
-		);
+		if (currentMove !== "AttemptAssassin"){
+			return (
+				<div>
+					<h3>{move}</h3>
+					<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+								  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+				</div>
+			); 
+		} else {
+			if (playerNames[props.playerIndex] === playerChosen){
+				if(!loseACard){
+					return (
+						<div>
+							<h3>{move}</h3>
+							<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+										  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+						</div>
+					);
+				} else {
+					return (
+							<div>
+								<h3>You will lose a card</h3>
+							</div>)
+				}
+			} else {
+				return (
+					<div>
+					  <div align="middle" style = {{paddingTop:"1em"}}>
+						<Spinner animation="border" as="span"/>
+					  </div>
+					  <div className="col-xs-6" align="middle">
+						{waitingMessage}
+					  </div>
+					</div>
+				  );
+			}
+		}
+
 	} else {
 		return (
 			<div>
