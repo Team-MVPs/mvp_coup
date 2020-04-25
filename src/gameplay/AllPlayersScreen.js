@@ -40,6 +40,8 @@ function PlayerScreen(props) {
 			} else {
 				setIsTurn(false);
 			}
+			console.log(loseACard);
+			console.log("lose");
 			setCurrentTurn(doc.data().turn);
 			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, playerNames[props.playerIndex],setMove, setCurrentMove, setConfirmed, 
 								 setWaitingMessage, setPlayerChosen, setLoseACard);
@@ -125,9 +127,6 @@ function PlayerScreen(props) {
 				</div>
 			); 
 		} else {
-			console.log(playerNames);
-			console.log(props.playerIndex);
-			console.log('here');
 			if (playerNames[props.playerIndex] === playerChosen){
 				if(!loseACard){
 					return (

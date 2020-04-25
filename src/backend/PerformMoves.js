@@ -237,7 +237,7 @@ export function Ambassador(roomName, playerID){
 }
 
 export function AttemptAssassin(roomName, playerID, playerList, playerIndex, turn){
-	let newPlayerList = playerList;
+	let newPlayerList = [...playerList];
 	newPlayerList.splice(playerIndex, 1);
 
 	const handlePlayerClick = (playerChosen) =>{

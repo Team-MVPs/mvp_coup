@@ -19,7 +19,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									 setWaitingMessage, setPlayerChosen, setLoseACard, setTakeCoins) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
-		//var alreadyInvoked = false;
+		var alreadyInvoked = false;
 		var bluffDecided = false;
 		var takeCoins = false;
 		if (turn >= 0 && turn !== registeredTurn) {
@@ -30,20 +30,21 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 						const playerName = doc.data().playerName;
 						var targetPlayer = doc.data().move.to;
 						if (doc.data().playerID !== playerID) {
-							if(move !== "general_income" && move !== 'coup'){
+							if(!alreadyInvoked && move !== "general_income" && move !== 'coup'){
 								setMove(`${playerName} performed ${move}`);
-								//alreadyInvoked = true;
+								alreadyInvoked = true;
 								if (move === 'assassinate'){
 									setCurrentMove("AttemptAssassin");
-									setWaitingMessage("Waiting for assassin to strike!");
+									setWaitingMessage("Waiting for assassin to strike!");									
+								}
+
+							} else {
+								if (move === "assassinate"){
 									if (targetPlayer !== null){
 										setPlayerChosen(targetPlayer);
 									}
 									if (doc.data().confirmations === 1){
 										setLoseACard(true);
-										console.log(targetPlayer);
-										console.log(playerName);
-										console.log("above");
 										if (targetPlayer === playerName){
 											setWaitingMessage("The Assassin was real! Choose one card to lose!")
 										} else{
@@ -52,7 +53,6 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									}
 								}
 
-							}else{
 								if(doc.data().bluffLoser !== undefined && !bluffDecided){
 									bluffDecided = true;
 									if(doc.data().bluffLoser.playerID == playerID){
