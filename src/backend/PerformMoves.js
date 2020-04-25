@@ -81,6 +81,7 @@ export function LoseCard(props){
 	const [cards, setCards] = useState([]);
 	const [isDisabled, setDisabled] = useState(false);
 	const [chosenKeys, setChosenKeys] = useState(new Set());
+	const [cardDeck, setCardDeck] = useState([]);
 	let cardsToChoose = 1;
 
 	useEffect(()=>{
@@ -92,6 +93,10 @@ export function LoseCard(props){
 				viewCards.push([player.data().cards[0], 1]);
 			}
 			setCards(viewCards);
+			firestore.collection(root).doc(props.roomName).get().then((room) =>{
+				let allCards = room.data().cards;
+				setCardDeck(allCards);
+			})
 		});
 		return () => subscribe;
 	}, []);
@@ -106,6 +111,10 @@ export function LoseCard(props){
 
 			await firestore.collection(root).doc(props.roomName).collection("players").doc(props.playerID).update({
 				cards: chosenCards
+			});
+			const updatedCards = updateCardDeck(cards, chosenKeys, cardDeck);
+			await firestore.collection(root).doc(props.roomName).update({
+				cards: updatedCards
 			}).then(() => {
 				props.confirmFunction();
 			});

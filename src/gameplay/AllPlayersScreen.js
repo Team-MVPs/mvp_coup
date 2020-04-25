@@ -52,16 +52,10 @@ function PlayerScreen(props) {
 
 	if(move === "bluff"){
 		function confirmFunction(){
-			if(isTurn){
-				return () => {
+			return () => {
 					incrementTurn(roomName);
 				}
-			}else{
-				return() => {
-					confirmTurn(roomName, currentTurn, setConfirmed, setWaitingMessage, setMove);
-				}
 			}
-		}
 		return(
 			<div>
 				<LoseCard title={waitingMessage} roomName = {roomName} playerID = {props.playerID} confirmFunction={confirmFunction()}/>

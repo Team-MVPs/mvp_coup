@@ -22,6 +22,8 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 		var alreadyInvoked = false;
 		var bluffDecided = false;
 		var takeCoins = false;
+		let makeMove = false;
+		let incrementTurnFromPlayer = true;
 		if (turn >= 0 && turn !== registeredTurn) {
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
 				(doc) => {
@@ -35,11 +37,11 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 								alreadyInvoked = true;
 								if (move === 'assassinate'){
 									setCurrentMove("AttemptAssassin");
-									setWaitingMessage("Waiting for assassin to strike!");									
+									setWaitingMessage("Waiting for assassin to strike!");																		
 								}
 
 							} else {
-								if (move === "assassinate"){
+								if (move === 'assassinate'){
 									if (targetPlayer !== null){
 										setPlayerChosen(targetPlayer);
 									}
@@ -51,7 +53,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 											setWaitingMessage("The Assassin has struck! " + targetPlayer + " will loose a card!");
 										}
 									}
-								}
+								}						
 
 								if(doc.data().bluffLoser !== undefined && !bluffDecided){
 									bluffDecided = true;
@@ -61,7 +63,6 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									}else{
 										const bluffer = doc.data().bluffs[0].playerName;
 										const loser = doc.data().bluffLoser.playerName;
-										confirmTurn(roomName, turn, null, null, null);
 										if(doc.data().bluffs[0].playerID === playerID){
 											setWaitingMessage("Successful Bluff!" + loser + " is loosing a card.")
 										}else{
@@ -84,6 +85,8 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 										firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 											bluffLoser : doc.data().bluffs[0]
 										});
+										makeMove = true;
+										incrementTurnFromPlayer = false;
 									}else{
 										firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 											bluffLoser : {playerID: playerID, playerName: playerName}
@@ -124,7 +127,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 
 								
 							} else {
-								if (doc.data().confirmations+1 === numPlayers) {
+								if (doc.data().confirmations+1 === numPlayers || makeMove) {
 										setConfirmed(false);
 										switch (move) {
 											case "foreign_aid":
@@ -133,6 +136,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 											case "duke":
 												// duke
 												Duke(roomName, playerID);
+												makeMove = false;
 												break;
 											case "steal":
 												// somehow figure out how to get the `to`
@@ -142,7 +146,9 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 												alert("Invalid move type");
 												break;
 										}
-										incrementTurn(roomName).then(() => console.log("turn incremented"));
+										if(incrementTurnFromPlayer){
+											incrementTurn(roomName).then(() => console.log("turn incremented"));
+										}
 								}	
 							}
 						}	
