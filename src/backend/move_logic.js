@@ -15,7 +15,7 @@ export function Move(type, player, to) {
 let registeredTurn = -1;
 // TODO: get actual number of players
 
-export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurrentMove, setConfirmed, 
+export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMove, setCurrentMove, setConfirmed, 
 									 setWaitingMessage, setPlayerChosen, setLoseACard, setTakeCoins) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
@@ -41,6 +41,14 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 									}
 									if (doc.data().confirmations === 1){
 										setLoseACard(true);
+										console.log(targetPlayer);
+										console.log(playerName);
+										console.log("above");
+										if (targetPlayer === playerName){
+											setWaitingMessage("The Assassin was real! Choose one card to lose!")
+										} else{
+											setWaitingMessage("The Assassin has struck! " + targetPlayer + " will loose a card!");
+										}
 									}
 								}
 
@@ -111,6 +119,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, setMove, setCurre
 								setCurrentMove("AttemptAssassin");
 								if(doc.data().confirmations === 1){
 									setLoseACard(true);
+									setWaitingMessage("Your Assassin has struck! " + targetPlayer + ' will loose a card!')
 								}
 
 								
@@ -188,7 +197,7 @@ function respond(type) {
 					}).then(() => {
 						console.log("incremented confirmations");
 						setConfirmed(true);
-						setMove("");
+						//setMove("");
 						});
 					break;
 				case "call_bluff":
@@ -196,7 +205,7 @@ function respond(type) {
 						bluffs: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName}),
 					}).then(() => {
 						setConfirmed(true);
-						setMove("");
+						//setMove("");
 						console.log("incremented confirmations");
 					});
 					break;

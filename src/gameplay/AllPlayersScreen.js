@@ -23,17 +23,17 @@ function PlayerScreen(props) {
 	const {roomName, playerNames} = useContext(RoomContext);
 	console.log(`Current Player Names ${playerNames}`);
 	let totalPlayers = playerNames.length;
+	console.log(playerNames);
+	console.log('players');
 	
 	useEffect(() => {
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
-			if (doc.data().turn !== currentTurn) {
-				// reset move variable
-				setMove("");
-				setCurrentMove("");
-				setWaitingMessage("Waiting for others");
-				setPlayerChosen("");
-
-			}
+			// reset move variable
+			setMove("");
+			setCurrentMove("");
+			setWaitingMessage("Waiting for others");
+			setPlayerChosen("");
+			setLoseACard(false);
 			setConfirmed(false);
 			if (doc.data().turn % totalPlayers === props.playerIndex) {
 				setIsTurn(true);
@@ -41,7 +41,7 @@ function PlayerScreen(props) {
 				setIsTurn(false);
 			}
 			setCurrentTurn(doc.data().turn);
-			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, setMove, setCurrentMove, setConfirmed, 
+			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, playerNames[props.playerIndex],setMove, setCurrentMove, setConfirmed, 
 								 setWaitingMessage, setPlayerChosen, setLoseACard);
 		});
 		return () => subscribe();
@@ -87,9 +87,15 @@ function PlayerScreen(props) {
 					</div>)
 				} else {
 					return (
-							<div>
-								<h3> Your move was a success! {playerChosen} will now lose a card!</h3>
-							</div>)
+						<div>
+						  <div align="middle" style = {{paddingTop:"1em"}}>
+							<Spinner animation="border" as="span"/>
+						  </div>
+						  <div className="col-xs-6" align="middle">
+							{waitingMessage}
+						  </div>
+						</div>
+					  );
 				}
 		}else return (
 			<div>
@@ -98,7 +104,7 @@ function PlayerScreen(props) {
 						  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed={setConfirmed}/>
 			</div>
 		);
-	}else if(confirmed){
+	}else if(confirmed && playerNames[props.playerIndex] !== playerChosen){
 		return (
 			<div>
 			  <div align="middle" style = {{paddingTop:"1em"}}>
@@ -119,6 +125,9 @@ function PlayerScreen(props) {
 				</div>
 			); 
 		} else {
+			console.log(playerNames);
+			console.log(props.playerIndex);
+			console.log('here');
 			if (playerNames[props.playerIndex] === playerChosen){
 				if(!loseACard){
 					return (
@@ -129,11 +138,17 @@ function PlayerScreen(props) {
 						</div>
 					);
 				} else {
+					function confirmFunction(){
+						return () => {
+								incrementTurn(roomName);
+							}
+						}	
 					return (
 							<div>
-								<h3>You will lose a card</h3>
+								<LoseCard title={waitingMessage} roomName = {roomName} playerID = {props.playerID} confirmFunction={confirmFunction()}/>
 							</div>)
 				}
+
 			} else {
 				return (
 					<div>
