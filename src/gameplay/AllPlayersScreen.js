@@ -23,32 +23,29 @@ function PlayerScreen(props) {
 	const {roomName, playerNames} = useContext(RoomContext);
 	console.log(`Current Player Names ${playerNames}`);
 	let totalPlayers = playerNames.length;
-	console.log(playerNames);
-	console.log('players');
-	
+		
 	useEffect(() => {
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
-			// reset move variable
-			setMove("");
-			setCurrentMove("");
-			setWaitingMessage("Waiting for others");
-			setPlayerChosen("");
-			setLoseACard(false);
+			if (doc.data().turn != currentTurn){
+				// reset move variable
+				setMove("");
+				setCurrentMove("");
+				setWaitingMessage("Waiting for others");
+				setPlayerChosen("");
+				setLoseACard(false);
+			}
 			setConfirmed(false);
 			if (doc.data().turn % totalPlayers === props.playerIndex) {
 				setIsTurn(true);
 			} else {
 				setIsTurn(false);
 			}
-			console.log(loseACard);
-			console.log("lose");
 			setCurrentTurn(doc.data().turn);
 			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, playerNames[props.playerIndex],setMove, setCurrentMove, setConfirmed, 
 								 setWaitingMessage, setPlayerChosen, setLoseACard);
 		});
 		return () => subscribe();
 	}, []);
-
 
 	if(move === "bluff"){
 		function confirmFunction(){
@@ -112,7 +109,7 @@ function PlayerScreen(props) {
 			</div>
 		  );
 	} else if (move !== "") {
-		if (currentMove !== "AttemptAssassin"){
+		if (currentMove !== "AttemptAssassin" && currentMove !== "Coup"){
 			return (
 				<div>
 					<h3>{move}</h3>

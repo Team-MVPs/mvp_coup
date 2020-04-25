@@ -2,7 +2,7 @@ import {firestore, root} from "../config/firebase";
 import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
-import { generalIncome, Coup, foreignAid, Duke, hasCard } from "./PerformMoves";
+import { generalIncome, Coup, foreignAid, Duke, HasCard } from "./PerformMoves";
 
 export function Move(type, player, to) {
 	return {
@@ -37,18 +37,26 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 								alreadyInvoked = true;
 								if (move === 'assassinate'){
 									setCurrentMove("AttemptAssassin");
-									setWaitingMessage("Waiting for assassin to strike!");																		
+									setWaitingMessage("Waiting for assassin to strike! Quick, try and hide!");																		
 								}
 
 							} else {
-								if (move === 'assassinate'){
+								if (move === 'coup'){
+									setMove(`${playerName} performed ${move}`);
+									setCurrentMove("Coup");
+									setWaitingMessage("A Coup has been launched! Start Praying!")
+									if (targetPlayer !== null){
+										setPlayerChosen(targetPlayer);
+										setLoseACard(true);
+									}								
+								} else if (move === 'assassinate'){
 									if (targetPlayer !== null){
 										setPlayerChosen(targetPlayer);
 									}
 									if (doc.data().confirmations === 1){
 										setLoseACard(true);
 										if (targetPlayer === playerName){
-											setWaitingMessage("The Assassin was real! Choose one card to lose!")
+											setWaitingMessage("You have been Assassinated! Choose one card to lose!")
 										} else{
 											setWaitingMessage("The Assassin has struck! " + targetPlayer + " will loose a card!");
 										}
@@ -75,7 +83,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 							}
 						} else {
 							if(doc.data().bluffs.length != 0 && !bluffDecided){
-								hasCard(roomName, playerID, move).then((result) => {
+								HasCard(roomName, playerID, move).then((result) => {
 									bluffDecided = true;
 									move = "";
 									console.log("Bluff Result " + result);
@@ -105,8 +113,17 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 								incrementTurn(roomName).then(() => console.log("turn incremented"));
 							} else if (move === 'coup'){
 								setConfirmed(false);
-								Coup(roomName, playerID);								
-								incrementTurn(roomName).then(() => console.log("turn incremented"));
+								if (!takeCoins){
+									firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+										coins: firebase.firestore.FieldValue.increment(-7)
+									});
+									takeCoins = true;
+								}	
+								setCurrentMove('Coup')
+								if (targetPlayer !== null){
+									setLoseACard(true);
+									setWaitingMessage('You have launched a Coup! '+ targetPlayer + ' will now lose a card!')
+								}								
 							} else if (move === 'exchange_cards'){
 								if (doc.data().confirmations+1 === numPlayers){
 									setConfirmed(false);

@@ -7,6 +7,31 @@ import { incrementTurn, Move } from './move_logic';
 import PlayCard from '../components/PlayCard.js';
 import '../styles/Card.css';
 
+
+
+function exchangeOneCard(roomName, playerID, card){
+	firestore.collection(root).doc(roomName).get().then((room)=>{
+		let allCards = room.data().cards;
+		let topCard = allCards[0];
+		allCards.shift();
+		allCards.push(card);
+		firestore.collection(root).doc(roomName).update({
+			cards: allCards
+		}).then(()=>{
+			firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((player)=>{
+				let playerCards = [...player.data().cards];
+				playerCards.splice(card, 1);
+				playerCards.push(topCard);
+				firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+					cards: playerCards
+				});
+			})
+		})
+
+	})
+
+}
+
 function updateCardDeck(cards, chosenKeys, oldCards){
 	for(let i=0; i<cards.length;i++){
 		if(!chosenKeys.has(cards[i][1])){
@@ -16,8 +41,9 @@ function updateCardDeck(cards, chosenKeys, oldCards){
 	return oldCards;
 }
 
-export async function hasCard(roomName, playerID, move){
+export async function HasCard(roomName, playerID, move){
 	let result = false;
+	let card = ""
 	await firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((player)=>{
 		let cardSet = new Set();
 		player.data().cards.forEach(card => cardSet.add(card));
@@ -27,15 +53,27 @@ export async function hasCard(roomName, playerID, move){
 			case "foreign_aid":
 			case "duke":
 				result = cardSet.has("Duke");
+				if (result){
+					card = "Duke"
+				}
 				break;
 			case "exchange_cards":
 				result = cardSet.has("Ambassador");
+				if (result){
+					card = "Ambassador"
+				}
 				break;
 			case "assassinate":
 				result = cardSet.has("Assassin");
+				if (result){
+					card = "Assassin"
+				}
 				break;
 			case "steal":
 				result = cardSet.has("Captain");
+				if (result){
+					card = "Captain";
+				}
 				break;
 			default:
 				alert("Invalid move type");
@@ -43,6 +81,9 @@ export async function hasCard(roomName, playerID, move){
 		}
 	});
 	console.log("Result: " + result);
+	if (result){
+		exchangeOneCard(roomName, playerID, card);
+	}
 	return result;
 }
 export function generalIncome(roomName, playerID){
@@ -51,18 +92,35 @@ export function generalIncome(roomName, playerID){
 		});
 } 
 
-export function Coup(roomName, playerID){
-	firestore.collection(root).doc(roomName).collection('players').doc(playerID).get().then((doc)=>{
-		let currentCoins = doc.data().coins
-		if (currentCoins < 7){
-				alert("Not Enough Coins")
-		} else {
-			firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-				coins: currentCoins - 7
-			})			
+export function Coup(roomName, playerID, playerList, playerIndex, turn){
+	let newPlayerList = [...playerList];
+	newPlayerList.splice(playerIndex, 1);
+
+	const handlePlayerClick = (playerChosen) =>{
+		return async () => {
+			console.log(playerChosen);
+			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).get().then(async (turn)=>{
+				let oldMove = turn.data().move
+				const newMove = Move(oldMove.type, oldMove.player, playerChosen);
+				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
+					move: newMove
+					});
+				}
+			)
 		}
-	//add Coup logic
-	})
+	}
+
+	return (
+		<div>
+			<h3>Choose a player to Coup!</h3>
+			<ul>
+				{newPlayerList.map(player =>(
+					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
+						<button type="button" className="btn btn-lg btn-danger" key = {player} style = {{width:"20em"}} 
+						onClick = {handlePlayerClick(player)}> {player} </button>
+					</div>))}
+			</ul>
+		</div>)
 }
 
 export function foreignAid(roomName, playerID){
