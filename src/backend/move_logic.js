@@ -2,7 +2,7 @@ import {firestore, root} from "../config/firebase";
 import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
-import { generalIncome, Coup, foreignAid, Duke, HasCard, exchangeOneCard } from "./PerformMoves";
+import { generalIncome, Coup, foreignAid, Duke, HasCard } from "./PerformMoves";
 
 export function Move(type, player, to) {
 	return {
@@ -16,17 +16,17 @@ let registeredTurn = -1;
 // TODO: get actual number of players
 
 export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard) {
+									 setWaitingMessage, setPlayerChosen, setLoseACard, setTakeCoins) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
 		var alreadyInvoked = false;
 		var bluffDecided = false;
 		var takeCoins = false;
+		let makeMove = false;
+		let incrementTurnFromPlayer = true;
 		if (turn >= 0 && turn !== registeredTurn) {
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
-				async (doc) => {
-					let makeMove = false;
-					let incrementTurnFromPlayer = true;
+				(doc) => {
 					if (doc.exists) {
 						let move = doc.data().move.type;
 						const playerName = doc.data().playerName;
@@ -83,8 +83,9 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 							}
 						} else {
 							if(doc.data().bluffs.length != 0 && !bluffDecided){
-								await HasCard(roomName, playerID, move).then((result) => {
+								HasCard(roomName, playerID, move).then((result) => {
 									bluffDecided = true;
+									move = "";
 									console.log("Bluff Result " + result);
 									if(result){
 										const bluffer = doc.data().bluffs[0].playerName;
@@ -93,12 +94,8 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 											bluffLoser : doc.data().bluffs[0]
 										});
 										makeMove = true;
-										console.log("got here");
-										console.log(makeMove);
 										incrementTurnFromPlayer = false;
-										setConfirmed(true);
 									}else{
-										move="";
 										firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 											bluffLoser : {playerID: playerID, playerName: playerName}
 										}).then(() => {
@@ -128,8 +125,8 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									setWaitingMessage('You have launched a Coup! '+ targetPlayer + ' will now lose a card!')
 								}								
 							} else if (move === 'exchange_cards'){
-								if (doc.data().confirmations+1 === numPlayers || makeMove){
-									if(!makeMove) setConfirmed(false);
+								if (doc.data().confirmations+1 === numPlayers){
+									setConfirmed(false);
 									setCurrentMove("Ambassador");
 								}
 							} else if (move === 'assassinate'){
@@ -144,19 +141,19 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									setLoseACard(true);
 									setWaitingMessage("Your Assassin has struck! " + targetPlayer + ' will loose a card!')
 								}
+
+								
 							} else {
-								console.log(makeMove);
-								console.log(move);
 								if (doc.data().confirmations+1 === numPlayers || makeMove) {
-										if(!makeMove) setConfirmed(false);
+										setConfirmed(false);
 										switch (move) {
 											case "foreign_aid":
 												foreignAid(roomName, playerID);
 												break;
 											case "duke":
 												// duke
-												console.log("calling duke");
 												Duke(roomName, playerID);
+												makeMove = false;
 												break;
 											case "steal":
 												// somehow figure out how to get the `to`
@@ -170,9 +167,6 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 											incrementTurn(roomName).then(() => console.log("turn incremented"));
 										}
 								}	
-							}
-							if(bluffDecided && move !== ""){
-								exchangeOneCard(roomName, playerID, move);
 							}
 						}	
 				};

@@ -10,10 +10,9 @@ import OtherMoves from '../backend/OtherMoves.js';
 import { Spinner } from 'react-bootstrap';
 import {LoseCard} from '../backend/PerformMoves.js';
 
-// let currentTurn = -1;
 function PlayerScreen(props) {
 	const [isTurn, setIsTurn] = useState(props.playerIndex === 0);
-	const [currentTurn, setCurrentTurn] = useState(-1);
+	const [currentTurn, setCurrentTurn] = useState(0);
 	const [move, setMove] = useState("");
 	const [currentMove, setCurrentMove] = useState("");
 	const [playerChosen, setPlayerChosen] = useState("");
@@ -27,29 +26,26 @@ function PlayerScreen(props) {
 		
 	useEffect(() => {
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
-			console.log("Snapshot Triggered");
-			console.log(doc.data().turn);
-			console.log(currentTurn);
-			if (doc.data().turn !== currentTurn){
+			if (doc.data().turn != currentTurn){
 				// reset move variable
 				setMove("");
 				setCurrentMove("");
 				setWaitingMessage("Waiting for others");
 				setPlayerChosen("");
 				setLoseACard(false);
-				setConfirmed(false);
-				if (doc.data().turn % totalPlayers === props.playerIndex) {
-					setIsTurn(true);
-				} else {
-					setIsTurn(false);
-				}
-				setCurrentTurn(doc.data().turn);
-				RegisterMoveCallback(roomName, doc.data().turn, props.playerID, playerNames[props.playerIndex],setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard);
 			}
+			setConfirmed(false);
+			if (doc.data().turn % totalPlayers === props.playerIndex) {
+				setIsTurn(true);
+			} else {
+				setIsTurn(false);
+			}
+			setCurrentTurn(doc.data().turn);
+			RegisterMoveCallback(roomName, doc.data().turn, props.playerID, playerNames[props.playerIndex],setMove, setCurrentMove, setConfirmed, 
+								 setWaitingMessage, setPlayerChosen, setLoseACard);
 		});
 		return () => subscribe();
-	}, [currentTurn]);
+	}, []);
 
 	if(move === "bluff"){
 		function confirmFunction(){
