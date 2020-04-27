@@ -16,7 +16,7 @@ let registeredTurn = -1;
 // TODO: get actual number of players
 
 export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard, setTakeCoins) {
+									 setWaitingMessage, setPlayerChosen, setLoseACard) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
 		var alreadyInvoked = false;
