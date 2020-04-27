@@ -49,7 +49,7 @@ function PlayerScreen(props) {
 			}
 		});
 		return () => subscribe();
-	}, []);
+	}, [currentTurn]);
 
 	if(move === "bluff"){
 		function confirmFunction(){

@@ -96,6 +96,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 										console.log("got here");
 										console.log(makeMove);
 										incrementTurnFromPlayer = false;
+										setConfirmed(true);
 									}else{
 										move="";
 										firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
@@ -128,7 +129,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 								}								
 							} else if (move === 'exchange_cards'){
 								if (doc.data().confirmations+1 === numPlayers || makeMove){
-									setConfirmed(false);
+									if(!makeMove) setConfirmed(false);
 									setCurrentMove("Ambassador");
 								}
 							} else if (move === 'assassinate'){
@@ -147,7 +148,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 								console.log(makeMove);
 								console.log(move);
 								if (doc.data().confirmations+1 === numPlayers || makeMove) {
-										setConfirmed(false);
+										if(!makeMove) setConfirmed(false);
 										switch (move) {
 											case "foreign_aid":
 												foreignAid(roomName, playerID);
@@ -170,9 +171,9 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 										}
 								}	
 							}
-							// if(bluffDecided && move !== ""){
-							// 	exchangeOneCard(roomName, playerID, move);
-							// }
+							if(bluffDecided && move !== ""){
+								exchangeOneCard(roomName, playerID, move);
+							}
 						}	
 				};
 			registeredTurn = turn;
