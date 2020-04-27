@@ -53,7 +53,7 @@ export function MoveList(props){
 				</div>
 
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
-					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Assassinate someone you dislike!"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID, props.setConfirmed)}
+					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Assassinate someone you dislike!"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID, null)}
 					disabled = {assassinDisabled}>Assassinate someone you dislike!</Button>
 				</div>
 
