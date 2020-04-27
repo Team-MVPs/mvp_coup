@@ -9,9 +9,7 @@ import '../styles/Card.css';
 
 
 
-export async function exchangeOneCard(roomName, playerID, move){
-	console.log("Calling from exchange");
-	let card = getCardFromMove(move);
+function exchangeOneCard(roomName, playerID, card){
 	firestore.collection(root).doc(roomName).get().then((room)=>{
 		let allCards = room.data().cards;
 		let topCard = allCards[0];
@@ -29,31 +27,9 @@ export async function exchangeOneCard(roomName, playerID, move){
 				});
 			})
 		})
-	})
-}
 
-function getCardFromMove(move){
-	console.log('move');
-	let card = "";
-	switch (move) {
-		case "foreign_aid":
-		case "duke":
-			card = "Duke"
-			break;
-		case "exchange_cards":
-			card = "Ambassador"
-			break;
-		case "assassinate":
-			card = "Assassin"
-			break;
-		case "steal":
-			card = "Captain";
-			break;
-		default:
-			alert("Invalid move type");
-			break;
-	}
-	return card;
+	})
+
 }
 
 function updateCardDeck(cards, chosenKeys, oldCards){
@@ -67,21 +43,49 @@ function updateCardDeck(cards, chosenKeys, oldCards){
 
 export async function HasCard(roomName, playerID, move){
 	let result = false;
-	let card = getCardFromMove(move);
+	let card = ""
 	await firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((player)=>{
 		let cardSet = new Set();
 		player.data().cards.forEach(card => cardSet.add(card));
 		console.log(cardSet);
 		console.log("Checking: " + move);
-		result = cardSet.has(card);
+		switch (move) {
+			case "foreign_aid":
+			case "duke":
+				result = cardSet.has("Duke");
+				if (result){
+					card = "Duke"
+				}
+				break;
+			case "exchange_cards":
+				result = cardSet.has("Ambassador");
+				if (result){
+					card = "Ambassador"
+				}
+				break;
+			case "assassinate":
+				result = cardSet.has("Assassin");
+				if (result){
+					card = "Assassin"
+				}
+				break;
+			case "steal":
+				result = cardSet.has("Captain");
+				if (result){
+					card = "Captain";
+				}
+				break;
+			default:
+				alert("Invalid move type");
+				break;
+		}
 	});
 	console.log("Result: " + result);
-	// if (result){
-	// 	exchangeOneCard(roomName, playerID, card);
-	// }
+	if (result){
+		exchangeOneCard(roomName, playerID, card);
+	}
 	return result;
 }
-
 export function generalIncome(roomName, playerID){
 	firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
 		coins: firebase.firestore.FieldValue.increment(1)
