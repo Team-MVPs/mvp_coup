@@ -48,7 +48,7 @@ export function MoveList(props){
 				</div>
 
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
-					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Steal 2 from a player as Captain"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID, props.setConfirmed)}
+					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={all_moves["Steal 2 from a player as Captain"](props.roomName, props.currentTurn, props.playerName, props.activePlayerID, null)}
 					disabled = {theRest}>Steal 2 from a player as Captain</Button>
 				</div>
 

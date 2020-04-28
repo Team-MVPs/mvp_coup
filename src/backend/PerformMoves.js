@@ -9,6 +9,13 @@ import '../styles/Card.css';
 
 
 
+export async function loseTwoCoins(roomName, playerID){
+	firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+		coins: firebase.firestore.FieldValue.increment(-2)
+		});
+}
+
+
 export async function exchangeOneCard(roomName, playerID, move){
 	console.log("Calling from exchange");
 	let card = getCardFromMove(move);
@@ -324,6 +331,37 @@ export function AttemptAssassin(roomName, playerID, playerList, playerIndex, tur
 				{newPlayerList.map(player =>(
 					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 						<button type="button" className="btn btn-lg btn-dark" key = {player} style = {{width:"20em"}} 
+						onClick = {handlePlayerClick(player)}> {player} </button>
+					</div>))}
+			</ul>
+		</div>)
+}
+
+export function Captain(roomName, playerID, playerList, playerIndex, turn){
+	let newPlayerList = [...playerList];
+	newPlayerList.splice(playerIndex, 1);
+
+	const handlePlayerClick = (playerChosen) =>{
+		return async () => {
+			console.log(playerChosen);
+			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).get().then(async (turn)=>{
+				let oldMove = turn.data().move
+				const newMove = Move(oldMove.type, oldMove.player, playerChosen);
+				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
+					move: newMove
+					});
+				}
+			)
+		}
+	}
+
+	return (
+		<div>
+			<h3>Choose a player to steal from!</h3>
+			<ul>
+				{newPlayerList.map(player =>(
+					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
+						<button type="button" className="btn btn-lg btn-primary" key = {player} style = {{width:"20em"}} 
 						onClick = {handlePlayerClick(player)}> {player} </button>
 					</div>))}
 			</ul>

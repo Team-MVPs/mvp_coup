@@ -113,7 +113,7 @@ function PlayerScreen(props) {
 			</div>
 		  );
 	} else if (move !== "") {
-		if (currentMove !== "AttemptAssassin" && currentMove !== "Coup"){
+		if (currentMove !== "AttemptAssassin" && currentMove !== "Coup" && currentMove !== "Captain"){
 			return (
 				<div>
 					<h3>{move}</h3>

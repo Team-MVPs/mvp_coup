@@ -2,7 +2,7 @@ import {firestore, root} from "../config/firebase";
 import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
-import { generalIncome, Coup, foreignAid, Duke, HasCard, exchangeOneCard } from "./PerformMoves";
+import { generalIncome, Coup, foreignAid, Duke, HasCard, exchangeOneCard, loseTwoCoins } from "./PerformMoves";
 
 export function Move(type, player, to) {
 	return {
@@ -26,7 +26,9 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
 				async (doc) => {
 					let makeMove = false;
+					let lostBluff = false;
 					let incrementTurnFromPlayer = true;
+					let exchanged = false;
 					if (doc.exists) {
 						let move = doc.data().move.type;
 						const playerName = doc.data().playerName;
@@ -38,6 +40,9 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 								if (move === 'assassinate'){
 									setCurrentMove("AttemptAssassin");
 									setWaitingMessage("Waiting for assassin to strike! Quick, try and hide!");																		
+								} else if (move === "steal"){
+									setCurrentMove("Captain");
+									setWaitingMessage("Player is waiting to choose from whom to steal");
 								}
 
 							} else {
@@ -57,17 +62,34 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 										setLoseACard(true);
 										if (targetPlayer === playerName){
 											setWaitingMessage("You have been Assassinated! Choose one card to lose!")
-										} else{
+										} else {
 											setWaitingMessage("The Assassin has struck! " + targetPlayer + " will loose a card!");
 										}
+									}
+								} else if (move === 'steal'){
+									if (targetPlayer != null){
+										setPlayerChosen(targetPlayer);
+
+									}
+									if (doc.data().confirmations === 1){
+										if(!takeCoins){
+											firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+												coins: firebase.firestore.FieldValue.increment(-2)
+												});
+											takeCoins = true;
+										};
 									}
 								}						
 
 								if(doc.data().bluffLoser !== undefined && !bluffDecided){
 									bluffDecided = true;
 									if(doc.data().bluffLoser.playerID == playerID){
+										if (move === "steal"){
+											loseTwoCoins(roomName, playerID);
+										}
 										setWaitingMessage("Unsuccessful Bluff. Pick 1 card to loose");
 										setMove("bluff");
+										
 									}else{
 										const bluffer = doc.data().bluffs[0].playerName;
 										const loser = doc.data().bluffLoser.playerName;
@@ -93,8 +115,6 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 											bluffLoser : doc.data().bluffs[0]
 										});
 										makeMove = true;
-										console.log("got here");
-										console.log(makeMove);
 										incrementTurnFromPlayer = false;
 										setConfirmed(true);
 									}else{
@@ -144,9 +164,23 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									setLoseACard(true);
 									setWaitingMessage("Your Assassin has struck! " + targetPlayer + ' will loose a card!')
 								}
+							} else if (move === 'steal'){
+								setCurrentMove("Captain");
+								if (targetPlayer != null){
+									setPlayerChosen(targetPlayer);
+								}
+								if (doc.data().confirmations === 1 || makeMove){
+									if(!takeCoins){
+										firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+											coins: firebase.firestore.FieldValue.increment(2)
+										});
+										takeCoins = true;
+									}
+									if (incrementTurnFromPlayer){
+										incrementTurn(roomName).then(() => console.log("turn incremented"));
+									}
+								}
 							} else {
-								console.log(makeMove);
-								console.log(move);
 								if (doc.data().confirmations+1 === numPlayers || makeMove) {
 										if(!makeMove) setConfirmed(false);
 										switch (move) {
@@ -160,7 +194,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 												break;
 											case "steal":
 												// somehow figure out how to get the `to`
-												move.to = "Vandit";
+												
 												break;
 											default:
 												alert("Invalid move type");
@@ -171,8 +205,9 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 										}
 								}	
 							}
-							if(bluffDecided && move !== ""){
+							if(bluffDecided && move !== "" && !exchanged){
 								exchangeOneCard(roomName, playerID, move);
+								exchanged = true;
 							}
 						}	
 				};
