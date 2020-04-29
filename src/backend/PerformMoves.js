@@ -19,6 +19,7 @@ export async function loseTwoCoins(roomName, playerID){
 export async function exchangeOneCard(roomName, playerID, move){
 	console.log("Calling from exchange");
 	let card = getCardFromMove(move);
+	let playerCardIndex = 0;
 	firestore.collection(root).doc(roomName).get().then((room)=>{
 		let allCards = room.data().cards;
 		let topCard = allCards[0];
@@ -29,7 +30,12 @@ export async function exchangeOneCard(roomName, playerID, move){
 		}).then(()=>{
 			firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((player)=>{
 				let playerCards = [...player.data().cards];
-				playerCards.splice(card, 1);
+				if (playerCards.length > 1){
+					if (playerCards[0] != card){
+						playerCardIndex = 1;
+					}
+				}
+				playerCards.splice(playerCardIndex, 1);
 				playerCards.push(topCard);
 				firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
 					cards: playerCards
