@@ -22,13 +22,13 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 		var alreadyInvoked = false;
 		var bluffDecided = false;
 		var takeCoins = false;
+		let exchanged = false;
 		if (turn >= 0 && turn !== registeredTurn) {
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
 				async (doc) => {
 					let makeMove = false;
 					let lostBluff = false;
-					let incrementTurnFromPlayer = true;
-					let exchanged = false;
+					let incrementTurnFromPlayer = true;					
 					if (doc.exists) {
 						let move = doc.data().move.type;
 						const playerName = doc.data().playerName;
