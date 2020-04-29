@@ -22,7 +22,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 		var alreadyInvoked = false;
 		var bluffDecided = false;
 		var takeCoins = false;
-		let exchanged = false;
+		let exchangeCard = false;
 		if (turn >= 0 && turn !== registeredTurn) {
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
 				async (doc) => {
@@ -117,6 +117,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 										makeMove = true;
 										incrementTurnFromPlayer = false;
 										setConfirmed(true);
+										exchangeCard = true;
 									}else{
 										move="";
 										firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
@@ -205,9 +206,9 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 										}
 								}	
 							}
-							if(bluffDecided && move !== "" && !exchanged){
+							if(exchangeCard && move !== ""){
 								exchangeOneCard(roomName, playerID, move);
-								exchanged = true;
+								exchangeCard = false;
 							}
 						}	
 				};

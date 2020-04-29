@@ -63,6 +63,16 @@ function getCardFromMove(move){
 	return card;
 }
 
+function updateCardDeckBluff(cards, chosenKeys, oldCards){
+	for(let i=0; i<cards.length;i++){
+		if(chosenKeys.has(cards[i][1])){
+			oldCards.push(cards[i][0]);
+		}
+	}
+	return oldCards;
+}
+
+
 function updateCardDeck(cards, chosenKeys, oldCards){
 	for(let i=0; i<cards.length;i++){
 		if(!chosenKeys.has(cards[i][1])){
@@ -173,7 +183,7 @@ export function LoseCard(props){
 			await firestore.collection(root).doc(props.roomName).collection("players").doc(props.playerID).update({
 				cards: chosenCards
 			});
-			const updatedCards = updateCardDeck(cards, chosenKeys, cardDeck);
+			const updatedCards = updateCardDeckBluff(cards, chosenKeys, cardDeck);
 			await firestore.collection(root).doc(props.roomName).update({
 				cards: updatedCards
 			}).then(() => {
