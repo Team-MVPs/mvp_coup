@@ -239,7 +239,7 @@ export function LoseCard(props){
 		)
 }
 
-export function Ambassador(roomName, playerID){
+export function Ambassador(roomName, playerID, ambassadorBluff){
 	const [cards, setCards] = useState([]);
 	const [cardDeck, setCardDeck] = useState([]);
 	const [isDisabled, setDisabled] = useState(false);
@@ -285,7 +285,9 @@ export function Ambassador(roomName, playerID){
 			await firestore.collection(root).doc(roomName).update({
 				cards: updatedCards
 			});
-			await incrementTurn(roomName);		
+			if(!ambassadorBluff){
+				await incrementTurn(roomName);		
+			};
 		}
 	}
 

@@ -16,7 +16,7 @@ let registeredTurn = -1;
 // TODO: get actual number of players
 
 export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard) {
+									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
 		var alreadyInvoked = false;
@@ -48,7 +48,11 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 								} else if (move === "foreign_aid"){
 									setCurrentMove("ForeignAid");
 									setConfirmed(false);
-								}	
+								} else if (move === "duke"){
+									setCurrentMove("Duke");
+								} else if (move === "exchange_cards"){
+									setCurrentMove("Ambassador");
+								}
 
 							} else {
 								if (move === 'coup'){
@@ -226,8 +230,20 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 								}								
 							} else if (move === 'exchange_cards'){
 								if (doc.data().confirmations+1 === numPlayers || makeMove){
-									if(!makeMove) setConfirmed(false);
-									setCurrentMove("Ambassador");
+									if (exchangeCard){
+										setAmbassadorBluff(true);
+										await exchangeOneCard(roomName, playerID, move);
+										exchangeCard = false;
+										setConfirmed(false);
+										setTimeout(()=>{
+											console.log('timeoutcalle')
+											setCurrentMove("Ambassador");
+										}, 1500);
+										
+									} else{
+										setConfirmed(false);
+										setCurrentMove("Ambassador");
+									}
 								}
 							} else if (move === 'assassinate'){
 								if (!takeCoins){
@@ -289,10 +305,6 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 												console.log("calling duke");
 												Duke(roomName, playerID);
 												break;
-											case "steal":
-												// somehow figure out how to get the `to`
-												
-												break;
 											default:
 												alert("Invalid move type");
 												break;
@@ -304,8 +316,8 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 							}							
 						}
 					if(exchangeCard && move !== ""){
-								exchangeOneCard(roomName, playerID, move);
-								exchangeCard = false;
+						exchangeOneCard(roomName, playerID, move);
+						exchangeCard = false;
 					}							
 				};
 			registeredTurn = turn;
@@ -461,6 +473,17 @@ export const responsesAssassin = {
 	"Call Bluff": respond("call_bluff"),
 	"Block as Contessa": respond("block")
 };
+
+export const responsesAmbassador = {
+	"Confirm": respond("confirm"),
+	"Call Bluff": respond("call_bluff")
+};
+
+export const responsesDuke = {
+	"Confirm": respond("confirm"),
+	"Call Bluff": respond("call_bluff")
+};
+
 
 export const responsesCaptain = {
 	"Confirm": respond("confirm"),

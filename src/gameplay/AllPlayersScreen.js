@@ -5,7 +5,7 @@ import {MoveList} from '../backend/MoveList.js';
 import {firestore, root} from '../config/firebase';
 import {RegisterMoveCallback, incrementTurn, confirmTurn} from "../backend/move_logic";
 import {RoomContext} from '../contexts/RoomContext.js';
-import {ResponseList, ResponseListForeignAid, ResponseListBlock, ResponseListAssassin, ResponseListCaptain} from "../backend/MoveList";
+import {ResponseList, ResponseListForeignAid, ResponseListBlock, ResponseListAssassin, ResponseListCaptain, ResponseListAmbassador, ResponseListDuke} from "../backend/MoveList";
 import OtherMoves from '../backend/OtherMoves.js';
 import { Spinner } from 'react-bootstrap';
 import {LoseCard} from '../backend/PerformMoves.js';
@@ -19,6 +19,7 @@ function PlayerScreen(props) {
 	const [playerChosen, setPlayerChosen] = useState("");
 	const [confirmed, setConfirmed] = useState(false);
 	const [loseACard, setLoseACard] = useState(false);
+	const [ambassadorBluff, setAmbassadorBluff] = useState(false);
 	const [waitingMessage, setWaitingMessage] = useState("Waiting for others");
 
 	const {roomName, playerNames} = useContext(RoomContext);
@@ -45,7 +46,7 @@ function PlayerScreen(props) {
 				}
 				setCurrentTurn(doc.data().turn);
 				RegisterMoveCallback(roomName, doc.data().turn, props.playerID, playerNames[props.playerIndex],setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard);
+									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff);
 			}
 		});
 		return () => subscribe();
@@ -80,7 +81,7 @@ function PlayerScreen(props) {
 				return(
 					<div>
 						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} 
-						playerList = {playerNames} playerIndex = {props.playerIndex}/>
+						playerList = {playerNames} playerIndex = {props.playerIndex} ambassadorBluff = {ambassadorBluff}/>
 					</div>)
 			} else if (currentMove === "blocked"){
 				return (
@@ -127,6 +128,22 @@ function PlayerScreen(props) {
 					<div>
 						<h3>{move}</h3>
 						<ResponseListForeignAid currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+					</div>
+				);
+			} else if (currentMove === "Ambassador"){
+				return (
+					<div>
+						<h3>{move}</h3>
+						<ResponseListAmbassador currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+					</div>
+				);
+			} else if (currentMove === "Duke"){
+				return (
+					<div>
+						<h3>{move}</h3>
+						<ResponseListDuke currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
 									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 					</div>
 				);

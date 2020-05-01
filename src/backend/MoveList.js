@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import { Button } from 'react-bootstrap';
-import {all_moves, responses, updateTurnInDB, responsesForBlock, responsesForeignAid, responsesAssassin, responsesCaptain} from './move_logic.js';
+import {all_moves, responses, updateTurnInDB, responsesForBlock, responsesForeignAid, responsesAssassin, responsesCaptain, responsesAmbassador, responsesDuke} from './move_logic.js';
 import {firestore, root} from "../config/firebase";
 import firebase from 'firebase';
 
@@ -113,5 +113,26 @@ export function ResponseListCaptain(props){
 		))}
 	</div>);
 }
+
+export function ResponseListAmbassador(props){
+	return (<div>
+		{Object.keys(responsesAmbassador).map(move => (
+			<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
+				<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={responsesAmbassador[move](props.roomName, props.currentTurn, props.playerName, props.notActivePlayerID, props.setConfirmed, props.setMove)}>{move}</Button>
+			</div>
+		))}
+	</div>);
+}
+
+export function ResponseListDuke(props){
+	return (<div>
+		{Object.keys(responsesDuke).map(move => (
+			<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
+				<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={responsesDuke[move](props.roomName, props.currentTurn, props.playerName, props.notActivePlayerID, props.setConfirmed, props.setMove)}>{move}</Button>
+			</div>
+		))}
+	</div>);
+}
+
 
 
