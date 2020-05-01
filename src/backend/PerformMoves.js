@@ -62,6 +62,10 @@ function getCardFromMove(move){
 		case "steal":
 			card = "Captain";
 			break;
+		case "contessa":
+			card = "Contessa";
+			break;
+
 		default:
 			alert("Invalid move type");
 			break;

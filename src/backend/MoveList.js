@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import { Button } from 'react-bootstrap';
-import {all_moves, responses, updateTurnInDB} from './move_logic.js';
+import {all_moves, responses, updateTurnInDB, responsesForBlock, responsesForeignAid, responsesAssassin, responsesCaptain} from './move_logic.js';
 import {firestore, root} from "../config/firebase";
 import firebase from 'firebase';
 
@@ -73,3 +73,45 @@ export function ResponseList(props){
 		))}
 	</div>);
 }
+
+export function ResponseListBlock(props){
+	return (<div>
+		{Object.keys(responsesForBlock).map(move => (
+			<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
+				<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={responsesForBlock[move](props.roomName, props.currentTurn, props.playerName, props.activePlayerID, props.setConfirmed, props.setMove)}>{move}</Button>
+			</div>
+		))}
+	</div>);
+}
+
+export function ResponseListForeignAid(props){
+	return (<div>
+		{Object.keys(responsesForeignAid).map(move => (
+			<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
+				<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={responsesForeignAid[move](props.roomName, props.currentTurn, props.playerName, props.notActivePlayerID, props.setConfirmed, props.setMove)}>{move}</Button>
+			</div>
+		))}
+	</div>);
+}
+
+export function ResponseListAssassin(props){
+	return (<div>
+		{Object.keys(responsesAssassin).map(move => (
+			<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
+				<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={responsesAssassin[move](props.roomName, props.currentTurn, props.playerName, props.notActivePlayerID, props.setConfirmed, props.setMove)}>{move}</Button>
+			</div>
+		))}
+	</div>);
+}
+
+export function ResponseListCaptain(props){
+	return (<div>
+		{Object.keys(responsesCaptain).map(move => (
+			<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
+				<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={responsesCaptain[move](props.roomName, props.currentTurn, props.playerName, props.notActivePlayerID, props.setConfirmed, props.setMove)}>{move}</Button>
+			</div>
+		))}
+	</div>);
+}
+
+

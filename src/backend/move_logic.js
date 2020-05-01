@@ -23,6 +23,8 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 		var bluffDecided = false;
 		var takeCoins = false;
 		let exchangeCard = false;
+		let blocked = false;
+		let changedMove = false;
 		if (turn >= 0 && turn !== registeredTurn) {
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
 				async (doc) => {
@@ -43,7 +45,10 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 								} else if (move === "steal"){
 									setCurrentMove("Captain");
 									setWaitingMessage("Player is waiting to choose from whom to steal");
-								}
+								} else if (move === "foreign_aid"){
+									setCurrentMove("ForeignAid");
+									setConfirmed(false);
+								}	
 
 							} else {
 								if (move === 'coup'){
@@ -79,56 +84,127 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 											takeCoins = true;
 										};
 									}
-								}						
+								} 			
 
 								if(doc.data().bluffLoser !== undefined && !bluffDecided){
-									bluffDecided = true;
-									if(doc.data().bluffLoser.playerID == playerID){
-										if (move === "steal"){
-											loseTwoCoins(roomName, playerID);
-										}
-										setWaitingMessage("Unsuccessful Bluff. Pick 1 card to loose");
-										setMove("bluff");
-										
-									}else{
-										const bluffer = doc.data().bluffs[0].playerName;
-										const loser = doc.data().bluffLoser.playerName;
-										if(doc.data().bluffs[0].playerID === playerID){
-											setWaitingMessage("Successful Bluff!" + loser + " is loosing a card.")
+										bluffDecided = true;
+										if(doc.data().bluffLoser.playerID === playerID){
+											if (move === "steal"){
+												loseTwoCoins(roomName, playerID);
+											}
+											if (doc.data().blocks.length != 0){
+												if (move === "assassinate"){
+													let noCards = []
+													firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+														cards: noCards
+													})
+													incrementTurn(roomName).then(() => console.log("turn incremented"));
+												} else{
+													setWaitingMessage("Unsuccessful Block. Pick 1 card to loose");
+													setMove("bluff");
+												}
+											}else {
+												setWaitingMessage("Unsuccessful Bluff. Pick 1 card to loose");
+												setMove("bluff");
+											}
+											
 										}else{
-											setWaitingMessage(bluffer + " bluffed " + playerName + " 's move." + loser + " is loosing a card");
+											const bluffer = doc.data().bluffs[0].playerName;
+											const loser = doc.data().bluffLoser.playerName;
+											if(doc.data().bluffs[0].playerID === playerID){
+												setWaitingMessage("Successful Bluff!" + loser + " is loosing a card.")
+											}else{
+												setWaitingMessage(bluffer + " bluffed " + playerName + " 's move." + loser + " is loosing a card");
+											}
+											setConfirmed(true);
+											setMove("");
 										}
-										setConfirmed(true);
-										setMove("");
+									
+								} else if (doc.data().blocks.length != 0){
+									if (doc.data().bluffs.length != 0){
+										let originalMove = move;
+										let blockedCardMove = '';
+										switch (originalMove) {
+												case "foreign_aid":
+													blockedCardMove = "duke";
+													break;
+												case "assassinate":
+													blockedCardMove = "contessa";
+													break;
+												case "steal":													
+													if (doc.data().blocks[0].card === "Ambassador"){
+														blockedCardMove = 'exchange_cards';
+													} else {
+														blockedCardMove = 'steal';
+													}											
+											}
+										await HasCard(roomName, playerID, blockedCardMove).then((result)=>{
+											if (result){
+												firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+													bluffLoser : doc.data().bluffs[0]
+												});
+												exchangeCard = true;
+											} else {
+												firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+													bluffLoser : {playerID: playerID, playerName: playerName}
+												});
+											}
+										})
 									}
 								}
 							}
 						} else {
 							if(doc.data().bluffs.length != 0 && !bluffDecided){
-								await HasCard(roomName, playerID, move).then((result) => {
-									bluffDecided = true;
-									console.log("Bluff Result " + result);
-									if(result){
-										const bluffer = doc.data().bluffs[0].playerName;
-										setWaitingMessage(bluffer + " bluffed " + "your move." + bluffer + " is loosing a card");
-										firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-											bluffLoser : doc.data().bluffs[0]
-										});
-										makeMove = true;
-										incrementTurnFromPlayer = false;
-										setConfirmed(true);
-										exchangeCard = true;
-									}else{
-										move="";
-										firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-											bluffLoser : {playerID: playerID, playerName: playerName}
-										}).then(() => {
-											setConfirmed(false);
-											setMove("bluff");
-											setWaitingMessage(doc.data().bluffs[0].playerName + " called Bluff. Pick 1 card to loose");
-										})
-									}
-								})
+								if (doc.data().blocks.length === 0){
+									await HasCard(roomName, playerID, move).then((result) => {
+										bluffDecided = true;
+										console.log("Bluff Result " + result);
+										if(result){
+											const bluffer = doc.data().bluffs[0].playerName;
+											setWaitingMessage(bluffer + " bluffed " + "your move." + bluffer + " is loosing a card");
+											firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+												bluffLoser : doc.data().bluffs[0]
+											});
+											makeMove = true;
+											incrementTurnFromPlayer = false;
+											setConfirmed(true);
+											exchangeCard = true;
+										}else{
+											move="";
+											firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+												bluffLoser : {playerID: playerID, playerName: playerName}
+											}).then(() => {
+												setConfirmed(false);
+												setMove("bluff");
+												setWaitingMessage(doc.data().bluffs[0].playerName + " called Bluff. Pick 1 card to loose");
+											})
+										}
+									})
+								} else {
+										if(doc.data().bluffLoser !== undefined){
+											if(doc.data().bluffLoser.playerID === playerID){
+												setWaitingMessage("Unsuccessful Bluff. Pick 1 card to loose");
+												setMove("bluff");
+											} else {
+												setWaitingMessage("Successful Block!");
+												incrementTurnFromPlayer = false;
+												makeMove = true;
+
+											}
+										} else {
+											console.log('undefined rn');
+										}
+								}
+							} else if (doc.data().blocks.length != 0){							
+								setConfirmed(false);
+								setLoseACard(true);
+								setCurrentMove('blocked');
+								if (doc.data().blocks.letGo){
+									setConfirmed(false);
+									incrementTurnFromPlayer = true;
+									blocked = true;
+								}
+								
 							}
 							
 							if (move === "general_income"){
@@ -158,15 +234,21 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
 										coins: firebase.firestore.FieldValue.increment(-3)
 									});
+									setCurrentMove("AttemptAssassin");
 									takeCoins = true;
-								}								
-								setCurrentMove("AttemptAssassin");
+								};								
 								if(doc.data().confirmations === 1){
 									setLoseACard(true);
 									setWaitingMessage("Your Assassin has struck! " + targetPlayer + ' will loose a card!')
 								}
+								if (incrementTurnFromPlayer && blocked){
+									incrementTurn(roomName).then(() => console.log("turn incremented"));
+								}
 							} else if (move === 'steal'){
-								setCurrentMove("Captain");
+								if (!changedMove){
+									setCurrentMove("Captain");
+									changedMove = true;
+								}
 								if (targetPlayer != null){
 									setPlayerChosen(targetPlayer);
 								}
@@ -180,10 +262,24 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									if (incrementTurnFromPlayer){
 										incrementTurn(roomName).then(() => console.log("turn incremented"));
 									}
+								} else if (incrementTurnFromPlayer && blocked){
+									incrementTurn(roomName).then(() => console.log("turn incremented"));
 								}
+							} else if (move === "foreign_aid"){
+								if (doc.data().confirmations + 1 === numPlayers && !blocked || makeMove){
+									foreignAid(roomName, playerID)
+								};
+								if (incrementTurnFromPlayer && blocked || doc.data().confirmations + 1 === numPlayers){
+									incrementTurn(roomName).then(() => console.log("turn incremented"));
+								}
+
+							
+
 							} else {
 								if (doc.data().confirmations+1 === numPlayers || makeMove) {
 										if(!makeMove) setConfirmed(false);
+										console.log(move);
+										console.log('here');
 										switch (move) {
 											case "foreign_aid":
 												foreignAid(roomName, playerID);
@@ -205,12 +301,12 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 											incrementTurn(roomName).then(() => console.log("turn incremented"));
 										}
 								}	
-							}
-							if(exchangeCard && move !== ""){
+							}							
+						}
+					if(exchangeCard && move !== ""){
 								exchangeOneCard(roomName, playerID, move);
 								exchangeCard = false;
-							}
-						}	
+					}							
 				};
 			registeredTurn = turn;
 		})
@@ -275,7 +371,66 @@ function respond(type) {
 					});
 					break;
 				case "block":
-					// duke
+					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false})
+					}).then(() => {
+						setConfirmed(true);
+						//setMove("");
+						//console.log("incremented confirmations");
+					});
+					break;
+				case "blockAsAM":
+					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false, card: "Ambassador"})
+					}).then(() => {
+						setConfirmed(true);
+						//setMove("");
+						//console.log("incremented confirmations");
+					});
+					break;
+				case "blockAsCAP":
+					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false, card: "Captain"})
+					}).then(() => {
+						setConfirmed(true);
+						//setMove("");
+						//console.log("incremented confirmations");
+					});
+					break;
+				default:
+					alert("Invalid response");
+					break;
+			}
+		}
+	}
+}
+
+function respondBlock(type) {
+	return function (roomName, turn, playerName, playerID, setConfirmed, setMove) {
+		return () => {
+			switch (type) {
+				case "LetGo":
+					let playerInfo = {
+							playerID: playerID,
+							playerName, playerName,
+							letGo: true
+						};
+					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+						blocks: playerInfo
+					}).then(() => {
+						console.log("incremented confirmations");
+						setConfirmed(true);
+						//setMove("");
+						});
+					break;
+				case "call_bluff":
+					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+						bluffs: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName}),
+					}).then(() => {
+						setConfirmed(true);
+						//setMove("");
+						//console.log("incremented confirmations");
+					});
 					break;
 				default:
 					alert("Invalid response");
@@ -289,6 +444,29 @@ export const responses = {
 	"Confirm": respond("confirm"),
 	"Call Bluff": respond("call_bluff"),
 	"Block": respond("block"),
+};
+
+export const responsesForeignAid = {
+	"Confirm": respond("confirm"),
+	"Block as Duke": respond("block")
+};
+
+export const responsesForBlock = {
+	"Let it go": respondBlock("LetGo"),
+	"Call Bluff": respondBlock("call_bluff")
+};
+
+export const responsesAssassin = {
+	"Confirm": respond("confirm"),
+	"Call Bluff": respond("call_bluff"),
+	"Block as Contessa": respond("block")
+};
+
+export const responsesCaptain = {
+	"Confirm": respond("confirm"),
+	"Call Bluff": respond("call_bluff"),
+	"Block as Ambassador": respond("blockAsAM"),
+	"Block as Captain": respond("blockAsCAP")
 };
 
 export async function incrementTurn(roomName) {
