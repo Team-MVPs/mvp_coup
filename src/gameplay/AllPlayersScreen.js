@@ -29,8 +29,6 @@ function PlayerScreen(props) {
 	useEffect(() => {
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
 			console.log("Snapshot Triggered");
-			console.log(doc.data().turn);
-			console.log(currentTurn);
 			if (doc.data().turn !== currentTurn){
 				// reset move variable
 				setMove("");

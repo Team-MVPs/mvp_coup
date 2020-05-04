@@ -19,18 +19,18 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
+		console.log('called register');
 		var alreadyInvoked = false;
 		var bluffDecided = false;
 		var takeCoins = false;
 		let exchangeCard = false;
 		let blocked = false;
 		let changedMove = false;
+		let makeMove = false;
+		let incrementTurnFromPlayer = true;	
 		if (turn >= 0 && turn !== registeredTurn) {
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
-				async (doc) => {
-					let makeMove = false;
-					let lostBluff = false;
-					let incrementTurnFromPlayer = true;					
+				async (doc) => {									
 					if (doc.exists) {
 						let move = doc.data().move.type;
 						const playerName = doc.data().playerName;
@@ -125,9 +125,10 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 										}
 									
 								} else if (doc.data().blocks.length != 0){
-									if (doc.data().bluffs.length != 0){
+									if (doc.data().bluffs.length != 0 && !bluffDecided){
 										let originalMove = move;
 										let blockedCardMove = '';
+										bluffDecided = true;
 										switch (originalMove) {
 												case "foreign_aid":
 													blockedCardMove = "duke";
@@ -424,20 +425,20 @@ function respondBlock(type) {
 				case "LetGo":
 					let playerInfo = {
 							playerID: playerID,
-							playerName, playerName,
+							playerName: playerName,
 							letGo: true
 						};
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 						blocks: playerInfo
 					}).then(() => {
-						console.log("incremented confirmations");
-						setConfirmed(true);
+						//console.log("incremented confirmations");
+						//setConfirmed(true);
 						//setMove("");
 						});
 					break;
 				case "call_bluff":
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-						bluffs: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName}),
+						bluffs: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName})
 					}).then(() => {
 						setConfirmed(true);
 						//setMove("");
