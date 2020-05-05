@@ -3,6 +3,7 @@ import {handleDBException} from "./callbacks";
 import firebase from 'firebase';
 import React, {useContext, useEffect, useState} from 'react';
 import { generalIncome, Coup, foreignAid, Duke, HasCard, exchangeOneCard, loseTwoCoins } from "./PerformMoves";
+import {RoomContext} from '../contexts/RoomContext.js';
 
 export function Move(type, player, to) {
 	return {
@@ -16,7 +17,7 @@ let registeredTurn = -1;
 // TODO: get actual number of players
 
 export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff) {
+									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff, totalPlayers) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		const numPlayers = snap.docs.length;
 		var alreadyInvoked = false;
@@ -101,7 +102,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 											firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
 												cards: noCards
 											})
-											incrementTurn(roomName).then(() => console.log("turn incremented"));											
+											incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));											
 										} else {
 											setWaitingMessage("Unsuccessful Bluff. Pick 1 card to loose");
 											setMove("bluff");
@@ -218,7 +219,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 							if (move === "general_income"){
 								setConfirmed(false);
 								generalIncome(roomName,playerID);
-								incrementTurn(roomName).then(() => console.log("turn incremented"));
+								incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
 							} else if (move === 'coup'){
 								setConfirmed(false);
 								if (!takeCoins){
@@ -264,7 +265,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									setWaitingMessage("Your Assassin has struck! " + targetPlayer + ' will loose a card!')
 								}
 								if (incrementTurnFromPlayer && blocked){
-									incrementTurn(roomName).then(() => console.log("turn incremented"));
+									incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
 								}
 							} else if (move === 'steal'){
 								if (!blocked){
@@ -281,27 +282,27 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 										takeCoins = true;
 									}
 									if (incrementTurnFromPlayer){
-										incrementTurn(roomName).then(() => console.log("turn incremented"));
+										incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
 									}
 								} else if (incrementTurnFromPlayer && blocked){
-									incrementTurn(roomName).then(() => console.log("turn incremented"));
+									incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
 								}
 							} else if (move === "foreign_aid"){
 								if (doc.data().confirmations +1 === numPlayers && !blocked || makeMove){
 									await foreignAid(roomName, playerID);
 									if (incrementTurnFromPlayer){
-										incrementTurn(roomName).then(() => console.log("turn incremented"));
+										incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
 									};
 								}
 								if (incrementTurnFromPlayer && blocked){
-									incrementTurn(roomName).then(() => console.log("turn incremented"));
+									incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
 								}
 
 							} else if(move === "duke"){
 								if (doc.data().confirmations+1 === numPlayers || makeMove){
 									Duke(roomName, playerID);
 									if (incrementTurnFromPlayer){
-										incrementTurn(roomName).then(() => console.log("turn incremented"));
+										incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
 									}
 								}
 
@@ -322,7 +323,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 												break;
 										}
 										if(incrementTurnFromPlayer){
-											incrementTurn(roomName).then(() => console.log("turn incremented"));
+											incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
 										}
 								}	
 							}							
@@ -519,10 +520,27 @@ export const responsesAmbassador = {
 	"Call Bluff": respond("call_bluff"),
 };
 
-export async function incrementTurn(roomName) {
-	await firestore.collection(root).doc(roomName).update({
-		turn: firebase.firestore.FieldValue.increment(1)
-	}).then(() => console.log("incremented turn"));
+export async function incrementTurn(roomName, totalPlayers) {
+	await firestore.collection(root).doc(roomName).get().then(async (room) => {
+		let nextTurn  = room.data().turn + 1;
+		while(!nextTurnHasCards(room, nextTurn % totalPlayers)){
+			nextTurn += 1;
+			if(nextTurn % totalPlayers == room.data().turn % totalPlayers){
+				//Game Over do something
+				break;
+			}
+		}
+		await firestore.collection(root).doc(roomName).update({
+			turn: nextTurn
+		}).then(() => console.log("incremented turn"));
+	})
+}
+
+function nextTurnHasCards(room, index){
+	let player = room.ref.collection("players").docs[index];
+	console.log("IN BOOL FUNCTION " + player.data().name);
+	console.log("Cards " + player.data().cards.length);
+	return player.data().cards.length > 0;
 }
 
 export async function confirmTurn(roomName, turn, setConfirmed, setWaitingMessage, setMove){

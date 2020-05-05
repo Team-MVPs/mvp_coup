@@ -46,7 +46,7 @@ function PlayerScreen(props) {
 				}
 				setCurrentTurn(doc.data().turn);
 				RegisterMoveCallback(roomName, doc.data().turn, props.playerID, playerNames[props.playerIndex],setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff);
+									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff, totalPlayers);
 			}
 		});
 		return () => subscribe();
@@ -55,7 +55,7 @@ function PlayerScreen(props) {
 	if(move === "bluff"){
 		function confirmFunction(){
 			return () => {
-					incrementTurn(roomName);
+					incrementTurn(roomName, totalPlayers);
 				}
 			}
 		return(
@@ -81,7 +81,7 @@ function PlayerScreen(props) {
 				return(
 					<div>
 						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} 
-						playerList = {playerNames} playerIndex = {props.playerIndex} ambassadorBluff = {ambassadorBluff}/>
+						playerList = {playerNames} playerIndex = {props.playerIndex} ambassadorBluff = {ambassadorBluff} totalPlayers={totalPlayers}/>
 					</div>)
 				} else if (currentMove === "blocked"){
 					return (
@@ -210,7 +210,7 @@ function PlayerScreen(props) {
 				} else {
 					function confirmFunction(){
 						return () => {
-								incrementTurn(roomName);
+								incrementTurn(roomName, totalPlayers);
 							}
 						}	
 					return (
