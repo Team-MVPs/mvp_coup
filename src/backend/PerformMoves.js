@@ -20,15 +20,15 @@ export async function exchangeOneCard(roomName, playerID, move){
 	console.log("Calling from exchange");
 	let card = getCardFromMove(move);
 	let playerCardIndex = 0;
-	firestore.collection(root).doc(roomName).get().then((room)=>{
+	await firestore.collection(root).doc(roomName).get().then(async (room)=>{
 		let allCards = room.data().cards;
 		let topCard = allCards[0];
 		allCards.shift();
 		allCards.push(card);
-		firestore.collection(root).doc(roomName).update({
+		await firestore.collection(root).doc(roomName).update({
 			cards: allCards
-		}).then(()=>{
-			firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((player)=>{
+		}).then(async ()=>{
+			await firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then(async (player)=>{
 				let playerCards = [...player.data().cards];
 				if (playerCards.length > 1){
 					if (playerCards[0] != card){
@@ -37,7 +37,7 @@ export async function exchangeOneCard(roomName, playerID, move){
 				}
 				playerCards.splice(playerCardIndex, 1);
 				playerCards.push(topCard);
-				firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
+				await firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
 					cards: playerCards
 				});
 			})
@@ -61,6 +61,9 @@ function getCardFromMove(move){
 			break;
 		case "steal":
 			card = "Captain";
+			break;
+		case "Contessa":
+			card = "Contessa";
 			break;
 		default:
 			alert("Invalid move type");
@@ -99,9 +102,6 @@ export async function HasCard(roomName, playerID, move){
 		result = cardSet.has(card);
 	});
 	console.log("Result: " + result);
-	// if (result){
-	// 	exchangeOneCard(roomName, playerID, card);
-	// }
 	return result;
 }
 
@@ -235,7 +235,7 @@ export function LoseCard(props){
 		)
 }
 
-export function Ambassador(roomName, playerID){
+export function Ambassador(roomName, playerID, ambassadorBluff){
 	const [cards, setCards] = useState([]);
 	const [cardDeck, setCardDeck] = useState([]);
 	const [isDisabled, setDisabled] = useState(false);
@@ -281,7 +281,9 @@ export function Ambassador(roomName, playerID){
 			await firestore.collection(root).doc(roomName).update({
 				cards: updatedCards
 			});
-			await incrementTurn(roomName);		
+			if (!ambassadorBluff){
+				await incrementTurn(roomName);
+			}		
 		}
 	}
 
