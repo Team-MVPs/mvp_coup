@@ -19,7 +19,13 @@ let registeredTurn = -1;
 export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMove, setCurrentMove, setConfirmed, 
 									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff, totalPlayers) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
-		const numPlayers = snap.docs.length;
+		let numPlayers = 0;
+		snap.forEach((player) => {
+			if(player.data().cards.length > 0){
+				numPlayers+=1;
+			}
+		 });
+		console.log(numPlayers);
 		var alreadyInvoked = false;
 		var bluffDecided = false;
 		var blockDecided = false;
@@ -523,9 +529,13 @@ export const responsesAmbassador = {
 export async function incrementTurn(roomName, totalPlayers) {
 	await firestore.collection(root).doc(roomName).get().then(async (room) => {
 		let nextTurn  = room.data().turn + 1;
-		while(!nextTurnHasCards(room, nextTurn % totalPlayers)){
+		console.log(nextTurn);
+		while(!await nextTurnHasCards(room, nextTurn % totalPlayers)){
 			nextTurn += 1;
+			console.log(nextTurn);
+			console.log(room.data().turn);
 			if(nextTurn % totalPlayers == room.data().turn % totalPlayers){
+				console.log("Breaking");
 				//Game Over do something
 				break;
 			}
@@ -536,11 +546,22 @@ export async function incrementTurn(roomName, totalPlayers) {
 	})
 }
 
-function nextTurnHasCards(room, index){
-	let player = room.ref.collection("players").docs[index];
-	console.log("IN BOOL FUNCTION " + player.data().name);
-	console.log("Cards " + player.data().cards.length);
-	return player.data().cards.length > 0;
+async function nextTurnHasCards(room, index){
+	return await room.ref.collection("players").get().then((docs) => {
+		let i = 0;
+		let result = false;
+		docs.forEach((player) => {
+			if(i == index){
+				console.log("IN BOOL FUNCTION " + player.data().name);
+				console.log("Cards " + player.data().cards.length);
+				result = player.data().cards.length > 0;
+			}
+			i++;
+		 })
+		 console.log("RETURNING " + result);
+		 return result;
+
+	})
 }
 
 export async function confirmTurn(roomName, turn, setConfirmed, setWaitingMessage, setMove){
