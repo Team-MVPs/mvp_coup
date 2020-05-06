@@ -5,7 +5,7 @@ import {MoveList} from '../backend/MoveList.js';
 import {firestore, root} from '../config/firebase';
 import {RegisterMoveCallback, incrementTurn, confirmTurn} from "../backend/move_logic";
 import {RoomContext} from '../contexts/RoomContext.js';
-import {ResponseList} from "../backend/MoveList";
+import {ResponseList, ResponseListForeignAid, ResponseListBlock, ResponseListAssassin, ResponseListDuke, ResponseListCaptain, ResponseListAmbassador} from "../backend/MoveList";
 import OtherMoves from '../backend/OtherMoves.js';
 import { Spinner } from 'react-bootstrap';
 import {LoseCard} from '../backend/PerformMoves.js';
@@ -19,12 +19,22 @@ function PlayerScreen(props) {
 	const [playerChosen, setPlayerChosen] = useState("");
 	const [confirmed, setConfirmed] = useState(false);
 	const [loseACard, setLoseACard] = useState(false);
+	const [ambassadorBluff, setAmbassadorBluff] = useState(false);
 	const [waitingMessage, setWaitingMessage] = useState("Waiting for others");
-
+	const [outOfGame, setOutOfGame] = useState(false);
 	const {roomName, playerNames} = useContext(RoomContext);
-	console.log(`Current Player Names ${playerNames}`);
+	//console.log(`Current Player Names ${playerNames}`);
 	let totalPlayers = playerNames.length;
-		
+	
+	useEffect(() => {
+        const subscribe = firestore.collection(root).doc(roomName).collection("players").doc(props.playerID).onSnapshot((doc) => {
+            if(doc.data().cards.length == 0) {
+				setOutOfGame(true);
+			}
+        });
+        return () => subscribe;
+	}, []);
+	
 	useEffect(() => {
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
 			console.log("Snapshot Triggered");
@@ -45,16 +55,23 @@ function PlayerScreen(props) {
 				}
 				setCurrentTurn(doc.data().turn);
 				RegisterMoveCallback(roomName, doc.data().turn, props.playerID, playerNames[props.playerIndex],setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard);
+									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff, totalPlayers);
 			}
 		});
 		return () => subscribe();
 	}, [currentTurn]);
 
-	if(move === "bluff"){
+	if(outOfGame){
+		return (
+			<div>
+				<h3>You Lost</h3>
+			</div>
+		);
+	}
+	else if(move === "bluff"){
 		function confirmFunction(){
 			return () => {
-					incrementTurn(roomName);
+					incrementTurn(roomName, totalPlayers);
 				}
 			}
 		return(
@@ -80,8 +97,16 @@ function PlayerScreen(props) {
 				return(
 					<div>
 						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} 
-						playerList = {playerNames} playerIndex = {props.playerIndex}/>
+						playerList = {playerNames} playerIndex = {props.playerIndex} ambassadorBluff = {ambassadorBluff} totalPlayers={totalPlayers}/>
 					</div>)
+				} else if (currentMove === "blocked"){
+					return (
+						<div>
+							<h3>You have been blocked!</h3>
+							<ResponseListBlock currentTurn={currentTurn} roomName={roomName} activePlayerID={props.playerID}
+										  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+						</div>
+					);
 				} else {
 					return (
 						<div>
@@ -114,27 +139,94 @@ function PlayerScreen(props) {
 		  );
 	} else if (move !== "") {
 		if (currentMove !== "AttemptAssassin" && currentMove !== "Coup" && currentMove !== "Captain"){
-			return (
-				<div>
-					<h3>{move}</h3>
-					<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-								  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
-				</div>
-			); 
+			if (currentMove === "ForeignAid"){
+				return (
+					<div>
+						<h3>{move}</h3>
+						<ResponseListForeignAid currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+					</div>
+				)
+
+			} else if (currentMove === "Duke"){
+				return (
+					<div>
+						<h3>{move}</h3>
+						<ResponseListDuke currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+					</div>
+				); 
+			}else if (currentMove === "Ambassador"){
+				return (
+					<div>
+						<h3>{move}</h3>
+						<ResponseListAmbassador currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+					</div>
+				); 
+			}else{
+				return (
+					<div>
+						<h3>{move}</h3>
+						<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+					</div>
+				); 
+			}
 		} else {
 			if (playerNames[props.playerIndex] === playerChosen){
 				if(!loseACard){
-					return (
+					if (currentMove === "AttemptAssassin" && !confirmed){
+						return (
 						<div>
-							<h3>{move}</h3>
-							<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-										  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
-						</div>
-					);
+								<h3>{move}</h3>
+								<ResponseListAssassin currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+											  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+							</div>
+						);
+					} else if (currentMove === "Captain" && !confirmed){
+						return (
+							<div>
+								<h3>{move}</h3>
+								<ResponseListCaptain currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+											  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+							</div>
+						);
+					} else if (currentMove === "Captain" && confirmed){
+						return (
+							<div>
+							  <div align="middle" style = {{paddingTop:"1em"}}>
+								<Spinner animation="border" as="span"/>
+							  </div>
+							  <div className="col-xs-6" align="middle">
+								Waiting for player!
+							  </div>
+							</div>
+						  );
+					} else if (currentMove === "AttemptAssassin" && confirmed){
+						return (
+							<div>
+							  <div align="middle" style = {{paddingTop:"1em"}}>
+								<Spinner animation="border" as="span"/>
+							  </div>
+							  <div className="col-xs-6" align="middle">
+								Waiting for player!
+							  </div>
+							</div>
+						  );
+					}else {
+						return (
+							<div>
+								<h3>{move}</h3>
+								<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
+											  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+							</div>
+						);
+					}
 				} else {
 					function confirmFunction(){
 						return () => {
-								incrementTurn(roomName);
+								incrementTurn(roomName, totalPlayers);
 							}
 						}	
 					return (
