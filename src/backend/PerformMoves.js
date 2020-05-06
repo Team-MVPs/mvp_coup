@@ -233,7 +233,7 @@ export function LoseCard(props){
 		)
 }
 
-export function Ambassador(roomName, playerID, ambassadorBluff){
+export function Ambassador(roomName, playerID, ambassadorBluff, totalPlayers){
 	const [cards, setCards] = useState([]);
 	const [isDisabled, setDisabled] = useState(false);
 	const [cardsToChoose, setCardsToChoose] = useState(0);
@@ -279,7 +279,7 @@ export function Ambassador(roomName, playerID, ambassadorBluff){
 					cards: updatedCards
 				});
 				if (!ambassadorBluff){
-					await incrementTurn(roomName);
+					await incrementTurn(roomName, totalPlayers);
 				}	
 			});	
 		}

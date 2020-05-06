@@ -21,11 +21,20 @@ function PlayerScreen(props) {
 	const [loseACard, setLoseACard] = useState(false);
 	const [ambassadorBluff, setAmbassadorBluff] = useState(false);
 	const [waitingMessage, setWaitingMessage] = useState("Waiting for others");
-
+	const [outOfGame, setOutOfGame] = useState(false);
 	const {roomName, playerNames} = useContext(RoomContext);
 	//console.log(`Current Player Names ${playerNames}`);
 	let totalPlayers = playerNames.length;
-		
+	
+	useEffect(() => {
+        const subscribe = firestore.collection(root).doc(roomName).collection("players").doc(props.playerID).onSnapshot((doc) => {
+            if(doc.data().cards.length == 0) {
+				setOutOfGame(true);
+			}
+        });
+        return () => subscribe;
+	}, []);
+	
 	useEffect(() => {
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
 			console.log("Snapshot Triggered");
@@ -46,16 +55,23 @@ function PlayerScreen(props) {
 				}
 				setCurrentTurn(doc.data().turn);
 				RegisterMoveCallback(roomName, doc.data().turn, props.playerID, playerNames[props.playerIndex],setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff);
+									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff, totalPlayers);
 			}
 		});
 		return () => subscribe();
 	}, [currentTurn]);
 
-	if(move === "bluff"){
+	if(outOfGame){
+		return (
+			<div>
+				<h3>You Lost</h3>
+			</div>
+		);
+	}
+	else if(move === "bluff"){
 		function confirmFunction(){
 			return () => {
-					incrementTurn(roomName);
+					incrementTurn(roomName, totalPlayers);
 				}
 			}
 		return(
@@ -81,7 +97,7 @@ function PlayerScreen(props) {
 				return(
 					<div>
 						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} 
-						playerList = {playerNames} playerIndex = {props.playerIndex} ambassadorBluff = {ambassadorBluff}/>
+						playerList = {playerNames} playerIndex = {props.playerIndex} ambassadorBluff = {ambassadorBluff} totalPlayers={totalPlayers}/>
 					</div>)
 				} else if (currentMove === "blocked"){
 					return (
@@ -210,7 +226,7 @@ function PlayerScreen(props) {
 				} else {
 					function confirmFunction(){
 						return () => {
-								incrementTurn(roomName);
+								incrementTurn(roomName, totalPlayers);
 							}
 						}	
 					return (

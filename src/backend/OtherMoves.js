@@ -12,7 +12,7 @@ export default function OtherMoves(props){
 	if (move === 'Ambassador'){
 		return (
 			<div>
-				{Ambassador(roomName, playerID, ambassadorBluff)}
+				{Ambassador(roomName, playerID, ambassadorBluff, props.totalPlayers)}
 			</div>)
 	} else if(move === "AttemptAssassin"){
 		return (
