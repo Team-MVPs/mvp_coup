@@ -78,7 +78,7 @@ export function ResponseListBlock(props){
 	return (<div>
 		{Object.keys(responsesBlock).map(move => (
 			<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
-				<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={responsesBlock[move](props.roomName, props.currentTurn, props.playerName, props.activePlayerID, props.setConfirmed, props.setMove)}>{move}</Button>
+				<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={responsesBlock[move](props.roomName, props.currentTurn, props.playerName, props.activePlayerID, props.setConfirmed)}>{move}</Button>
 			</div>
 		))}
 	</div>);

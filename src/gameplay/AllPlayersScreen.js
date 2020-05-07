@@ -3,14 +3,14 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {MoveList} from '../backend/MoveList.js';
 import {firestore, root} from '../config/firebase';
-import {RegisterMoveCallback, incrementTurn, confirmTurn} from "../backend/move_logic";
+import {RegisterMoveCallback, incrementTurn} from "../backend/move_logic";
 import {RoomContext} from '../contexts/RoomContext.js';
 import {ResponseList, ResponseListForeignAid, ResponseListBlock, ResponseListAssassin, ResponseListDuke, ResponseListCaptain, ResponseListAmbassador} from "../backend/MoveList";
 import OtherMoves from '../backend/OtherMoves.js';
-import { Spinner } from 'react-bootstrap';
+import {Button, Spinner} from 'react-bootstrap';
 import {LoseCard} from '../backend/PerformMoves.js';
+import Redirect from "react-router-dom/es/Redirect";
 
-// let currentTurn = -1;
 function PlayerScreen(props) {
 	const [isTurn, setIsTurn] = useState(props.playerIndex === 0);
 	const [currentTurn, setCurrentTurn] = useState(-1);
@@ -22,13 +22,13 @@ function PlayerScreen(props) {
 	const [ambassadorBluff, setAmbassadorBluff] = useState(false);
 	const [waitingMessage, setWaitingMessage] = useState("Waiting for others");
 	const [outOfGame, setOutOfGame] = useState(false);
+	const [winner, setWinner] = useState("");
 	const {roomName, playerNames} = useContext(RoomContext);
-	//console.log(`Current Player Names ${playerNames}`);
 	let totalPlayers = playerNames.length;
 	
 	useEffect(() => {
         const subscribe = firestore.collection(root).doc(roomName).collection("players").doc(props.playerID).onSnapshot((doc) => {
-            if(doc.data().cards.length == 0) {
+            if(doc.data().cards.length === 0) {
 				setOutOfGame(true);
 			}
         });
@@ -40,7 +40,10 @@ function PlayerScreen(props) {
 			console.log("Snapshot Triggered");
 			console.log(doc.data().turn);
 			console.log(currentTurn);
-			if (doc.data().turn !== currentTurn){
+			
+			if (doc.data().winner) {
+				setWinner(doc.data().winner);
+			} else if (doc.data().turn !== currentTurn){
 				// reset move variable
 				setMove("");
 				setCurrentMove("");
@@ -61,7 +64,19 @@ function PlayerScreen(props) {
 		return () => subscribe();
 	}, [currentTurn]);
 
-	if(outOfGame){
+	if (winner) {
+		return (
+			<div>
+				<h3>{winner} is the winner!</h3>
+				<p style={{paddingTop: "1em"}}>Thanks for playing MVP Coup!</p>
+				<div style={{paddingBottom: "1em", paddingTop: "1em"}}>
+					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={
+						() => (<Redirect to="/" />)
+					}>New Game</Button>
+				</div>
+			</div>
+		);
+	} else if (outOfGame) {
 		return (
 			<div>
 				<h3>You Lost</h3>
@@ -71,7 +86,7 @@ function PlayerScreen(props) {
 	else if(move === "bluff"){
 		function confirmFunction(){
 			return () => {
-					incrementTurn(roomName, totalPlayers);
+					incrementTurn(roomName, totalPlayers, playerChosen).then(() => {});
 				}
 			}
 		return(
@@ -226,7 +241,7 @@ function PlayerScreen(props) {
 				} else {
 					function confirmFunction(){
 						return () => {
-								incrementTurn(roomName, totalPlayers);
+								incrementTurn(roomName, totalPlayers, playerChosen).then(() => {});
 							}
 						}	
 					return (
