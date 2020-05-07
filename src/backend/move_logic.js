@@ -307,36 +307,14 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 							} else if(move === "duke"){
 								if (doc.data().confirmations+1 === numPlayers || makeMove){
 									Duke(roomName, playerID);
+									makeMove = false;
 									if (incrementTurnFromPlayer){
 										incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
 									}
 								}
 
-							}else {
-								if (doc.data().confirmations+1 === numPlayers || makeMove) {
-										if(!makeMove) setConfirmed(false);
-										switch (move) {
-											//case "foreign_aid":
-											//	foreignAid(roomName, playerID);
-											///	break;
-											case "duke":
-												// duke
-												console.log("calling duke");
-												Duke(roomName, playerID);
-												break;
-											default:
-												alert("Invalid move type");
-												break;
-										}
-										if(incrementTurnFromPlayer){
-											incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
-										}
-								}	
-							}							
+							}						
 						}
-					console.log(exchangeCard);
-					console.log(move);
-					console.log('if exchangeCard');
 					if(exchangeCard && move !== ""){
 						if (doc.data().blocks.length !== 0 && move === "assassinate"){
 							move = "Contessa";
