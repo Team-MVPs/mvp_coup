@@ -8,7 +8,14 @@ function OtherPlayerInfo(props) {
 		return (
 			<Card>
 				<Accordion.Toggle as={Card.Header} eventKey={props.keyIndex}>
-					{props.data.name}
+					<Row>
+						<Col>
+							{props.data.name} 
+						</Col>
+						<Col align="right">
+							Current Coin Count: {props.data.coins}
+						</Col>
+					</Row>
 				</Accordion.Toggle>
 				<Accordion.Collapse eventKey={props.keyIndex}>
 					<Card.Body>
