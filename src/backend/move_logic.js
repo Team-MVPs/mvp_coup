@@ -16,7 +16,7 @@ export function Move(type, player, to) {
 let registeredTurn = -1;
 // TODO: get actual number of players
 
-export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMove, setCurrentMove, setConfirmed, 
+export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, setMove, setCurrentMove, setConfirmed, 
 									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff, totalPlayers) {
 	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
 		let numPlayers = 0;
@@ -76,7 +76,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 									}
 									if (doc.data().confirmations === 1){
 										setLoseACard(true);
-										if (targetPlayer === playerName){
+										if (targetPlayer === realPlayerName){
 											setWaitingMessage("You have been Assassinated! Choose one card to lose!")
 										} else {
 											setWaitingMessage("The Assassin has struck! " + targetPlayer + " will loose a card!");
@@ -103,7 +103,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 										if (move === "steal"){
 											loseTwoCoins(roomName, playerID);
 										}
-										if (move === "assassinate" && doc.data().blocks.length !== 0){											
+										if (move === "assassinate"){											
 											let noCards = []
 											firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
 												cards: noCards
@@ -307,36 +307,14 @@ export function RegisterMoveCallback(roomName, turn, playerID, playerName, setMo
 							} else if(move === "duke"){
 								if (doc.data().confirmations+1 === numPlayers || makeMove){
 									Duke(roomName, playerID);
+									makeMove = false;
 									if (incrementTurnFromPlayer){
 										incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
 									}
 								}
 
-							}else {
-								if (doc.data().confirmations+1 === numPlayers || makeMove) {
-										if(!makeMove) setConfirmed(false);
-										switch (move) {
-											//case "foreign_aid":
-											//	foreignAid(roomName, playerID);
-											///	break;
-											case "duke":
-												// duke
-												console.log("calling duke");
-												Duke(roomName, playerID);
-												break;
-											default:
-												alert("Invalid move type");
-												break;
-										}
-										if(incrementTurnFromPlayer){
-											incrementTurn(roomName, totalPlayers).then(() => console.log("turn incremented"));
-										}
-								}	
-							}							
+							}						
 						}
-					console.log(exchangeCard);
-					console.log(move);
-					console.log('if exchangeCard');
 					if(exchangeCard && move !== ""){
 						if (doc.data().blocks.length !== 0 && move === "assassinate"){
 							move = "Contessa";
