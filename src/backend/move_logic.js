@@ -86,7 +86,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 										setPlayerChosen(targetPlayer);
 
 									}
-									if (doc.data().confirmations === 1){
+									if (doc.data().confirmations === 1 && targetPlayer === realPlayerName){
 										if(!takeCoins){
 											firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
 												coins: firebase.firestore.FieldValue.increment(-2)
