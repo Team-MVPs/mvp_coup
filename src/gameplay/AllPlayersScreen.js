@@ -23,7 +23,9 @@ function PlayerScreen(props) {
 	const [waitingMessage, setWaitingMessage] = useState("Waiting for others");
 	const [outOfGame, setOutOfGame] = useState(false);
 	const [winner, setWinner] = useState("");
+	const [redirect, setRedirect] = useState(false);
 	const {roomName, playerNames} = useContext(RoomContext);
+
 	let totalPlayers = playerNames.length;
 	
 	useEffect(() => {
@@ -64,14 +66,17 @@ function PlayerScreen(props) {
 		return () => subscribe();
 	}, [currentTurn]);
 
-	if (winner) {
+	if (redirect){
+		return (<Redirect to="/" />);
+
+	}else if (winner) {
 		return (
 			<div>
 				<h3>{winner} is the winner!</h3>
 				<p style={{paddingTop: "1em"}}>Thanks for playing MVP Coup!</p>
 				<div style={{paddingBottom: "1em", paddingTop: "1em"}}>
 					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={
-						() => (<Redirect to="/" />)
+						() => setRedirect(true)
 					}>New Game</Button>
 				</div>
 			</div>
