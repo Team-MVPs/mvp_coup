@@ -155,6 +155,7 @@ export function Duke(roomName, playerID){
 }
 
 export function LoseCard(props){
+	let turn = props.turn;
 	const [cards, setCards] = useState([]);
 	const [isDisabled, setDisabled] = useState(false);
 	const [chosenKeys, setChosenKeys] = useState(new Set());
@@ -169,6 +170,13 @@ export function LoseCard(props){
 				viewCards.push([player.data().cards[0], 1]);
 			}
 			setCards(viewCards);
+			firestore.collection(root).doc(props.roomName).collection("turns").doc(turn.toString()).onSnapshot((doc)=>{
+				if (doc.data().ambassadorBluff){
+					setDisabled(true);
+				}else{
+					setDisabled(false);
+				}
+			})
 		});
 		return () => subscribe;
 	}, []);
@@ -233,7 +241,7 @@ export function LoseCard(props){
 		)
 }
 
-export function Ambassador(roomName, playerID, ambassadorBluff, totalPlayers){
+export function Ambassador(roomName, playerID, ambassadorBluff, turn, totalPlayers){
 	const [cards, setCards] = useState([]);
 	const [isDisabled, setDisabled] = useState(false);
 	const [cardsToChoose, setCardsToChoose] = useState(0);
@@ -280,7 +288,11 @@ export function Ambassador(roomName, playerID, ambassadorBluff, totalPlayers){
 				});
 				if (!ambassadorBluff){
 					await incrementTurn(roomName, totalPlayers);
-				}	
+				}else{
+					await firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
+						ambassadorBluff:false
+					})
+				}
 			});	
 		}
 	}

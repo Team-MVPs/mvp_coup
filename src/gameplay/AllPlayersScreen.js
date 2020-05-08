@@ -96,7 +96,7 @@ function PlayerScreen(props) {
 			}
 		return(
 			<div>
-				<LoseCard title={waitingMessage} roomName = {roomName} playerID = {props.playerID} confirmFunction={confirmFunction()}/>
+				<LoseCard title={waitingMessage} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} confirmFunction={confirmFunction()}/>
 			</div>
 		);
 	}else if (isTurn) {

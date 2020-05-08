@@ -39,6 +39,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 						let move = doc.data().move.type;
 						const playerName = doc.data().playerName;
 						var targetPlayer = doc.data().move.to;
+						var ambassadorBluffDoc = doc.data().ambassadorBluff;
 						if (doc.data().playerID !== playerID) {
 							if(!alreadyInvoked && move !== "general_income" && move !== 'coup'){
 								setMove(`${playerName} performed ${move}`);
@@ -108,6 +109,11 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 											})
 											incrementTurn(roomName, totalPlayers, playerName).then(() => console.log("turn incremented"));
 										} else {
+											if (move === "exchange_cards"){
+												doc.ref.update({
+													ambassadorBluff:true
+												})
+											}
 											setWaitingMessage("Unsuccessful Bluff. Pick 1 card to lose");
 											setMove("bluff");
 										}
@@ -250,7 +256,9 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 										
 									} else{
 										setConfirmed(false);
-										setCurrentMove("Ambassador");
+										if (!ambassadorBluffDoc){
+											setCurrentMove("Ambassador");
+										}										
 									}
 									
 								}
@@ -334,7 +342,8 @@ export async function updateTurnInDB(roomName, turn, playerName, playerID, move)
 		move: move,
 		confirmations: 0,
 		blocks: [],
-		bluffs: []
+		bluffs: [],
+		ambassadorBluff: false
 	}).then(() => {
 		console.log("Added turn to db");
 	}).catch(() => handleDBException());
