@@ -14,6 +14,7 @@ import MainGameScreen from './gameplay/MainScreen.js';
 import Popup from "./components/PopupComponent";
 import GameStart from './gameplay/GameStart.js'
 import RoomContextProvider from './contexts/RoomContext.js'
+import CreatorComponent from "./components/Creators";
 
 
 function App() {
@@ -53,6 +54,11 @@ function App() {
             <Route exact path="/">
               <div align="center" style={{ position: "absolute", top: "0", bottom: "0", left: "0", right: "0", margin: "auto" }}>
                 <LoginComponent setPlayerID={setPlayerID} setHost={setHost} />
+              </div>
+            </Route>
+            <Route exact path="/creators">
+              <div align="center">
+                <CreatorComponent />
               </div>
             </Route>
             <Route exact path="/start">
