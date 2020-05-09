@@ -18,7 +18,7 @@ function Creator(creator) {
 	
 	return (
 		<Col style={{ marginBottom: "3em" }}>
-			<Card style={{ width: '15rem' }}>
+			<Card style={{ width: '18rem' }}>
 				<Card.Header>
 					<img src={image} alt={name} style={{maxWidth: "100%", height: "15rem", borderRadius: "2em"}}/>
 				</Card.Header>
