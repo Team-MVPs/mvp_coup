@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { register, checkRoomNameExists, checkPlayerNameExists, createRoomName } from '../backend/startup';
-import { Redirect } from 'react-router-dom';
+import {Link, Redirect} from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { RoomContext } from '../contexts/RoomContext.js';
 
@@ -95,6 +95,9 @@ function LoginComponent(props) {
 					<button style={{ width: "100%" }} type="Submit" className="btn btn-primary mb-2" onClick={existingRoom}>Join an Existing Room</button>
 				</Col>
 			</Row>
+			<div className="fixed-bottom" style={{ marginBottom: "1em" }}>
+				<Link to='/creators'>Meet the Creators</Link>
+			</div>
 		</Container>
 	)
 }
