@@ -1,9 +1,9 @@
 import React from 'react';
 import {Container, Row, Col, Card} from 'react-bootstrap';
 import shehan_img from "../images/creators/shehan.jpg";
-import preet_img from "../images/duke.JPG";
-import aravind_img from "../images/captain.JPG";
-import vandit_img from "../images/contessa.JPG";
+import preet_img from "../images/creators/preet.jpg";
+import aravind_img from "../images/creators/aravind.jpeg";
+import vandit_img from "../images/creators/vandit.png";
 import shivam_img from "../images/assasin.JPG";
 
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
