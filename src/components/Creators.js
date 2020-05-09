@@ -4,7 +4,7 @@ import shehan_img from "../images/creators/shehan.jpg";
 import preet_img from "../images/creators/preet.jpg";
 import aravind_img from "../images/creators/aravind.jpeg";
 import vandit_img from "../images/creators/vandit.png";
-import shivam_img from "../images/assasin.JPG";
+import shivam_img from "../images/creators/shivam.jpg";
 
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import {Link} from "react-router-dom";
@@ -17,7 +17,7 @@ function Creator(creator) {
 	const github = creator["github"];
 	
 	return (
-		<Col style={{ marginBottom: "2em" }}>
+		<Col style={{ marginBottom: "3em" }}>
 			<Card style={{ width: '15rem' }}>
 				<Card.Header>
 					<img src={image} alt={name} style={{maxWidth: "100%", height: "15rem", borderRadius: "2em"}}/>
@@ -67,7 +67,7 @@ function CreatorComponent(props) {
 	];
 	
 	return (
-		<Container style={{ marginTop: "5em", width: "50%" }}>
+		<Container style={{ marginTop: "3em", width: "75%" }}>
 			<h1 style={{ marginBottom: "3%" }}>Creators of MVP Coup</h1>
 			<Row>
 				{creators.map(creator => Creator(creator))}
