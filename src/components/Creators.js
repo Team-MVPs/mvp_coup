@@ -3,7 +3,7 @@ import {Container, Row, Col, Card} from 'react-bootstrap';
 import shehan_img from "../images/creators/shehan.jpg";
 import preet_img from "../images/creators/preet.jpg";
 import aravind_img from "../images/creators/aravind.jpeg";
-import vandit_img from "../images/creators/vandit.png";
+import vandit_img from "../images/creators/vandit.jpeg";
 import shivam_img from "../images/creators/shivam.jpg";
 
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
