@@ -4,7 +4,7 @@ import shehan_img from "../images/creators/shehan.jpg";
 import preet_img from "../images/creators/preet.jpg";
 import aravind_img from "../images/creators/aravind.jpeg";
 import vandit_img from "../images/creators/vandit.png";
-import shivam_img from "../images/assasin.JPG";
+import shivam_img from "../images/creators/shivam.jpg";
 
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import {Link} from "react-router-dom";
