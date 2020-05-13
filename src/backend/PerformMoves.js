@@ -111,7 +111,7 @@ export function generalIncome(roomName, playerID){
 		});
 } 
 
-export function Coup(roomName, playerID, playerList, playerIndex, turn){
+export function Coup(roomName, playerID, playerList, playerIndex, turn, setConfirmed, setWaitingMessage){
 	let newPlayerList = [...playerList];
 	newPlayerList.splice(playerIndex, 1);
 
@@ -124,6 +124,8 @@ export function Coup(roomName, playerID, playerList, playerIndex, turn){
 				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
 					move: newMove
 					});
+				setConfirmed(true);
+				setWaitingMessage("Waiting for response");
 				}
 			)
 		}
@@ -334,7 +336,7 @@ export function Ambassador(roomName, playerID, ambassadorBluff, turn, totalPlaye
 		)
 }
 
-export function AttemptAssassin(roomName, playerID, playerList, playerIndex, turn){
+export function AttemptAssassin(roomName, playerID, playerList, playerIndex, turn, setConfirmed, setWaitingMessage){
 	let newPlayerList = [...playerList];
 	newPlayerList.splice(playerIndex, 1);
 
@@ -346,6 +348,8 @@ export function AttemptAssassin(roomName, playerID, playerList, playerIndex, tur
 				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
 					move: newMove
 					});
+				setConfirmed(true);
+				setWaitingMessage("Waiting for response");
 				}
 			)
 		}
@@ -364,7 +368,7 @@ export function AttemptAssassin(roomName, playerID, playerList, playerIndex, tur
 		</div>)
 }
 
-export function Captain(roomName, playerID, playerList, playerIndex, turn){
+export function Captain(roomName, playerID, playerList, playerIndex, turn, setConfirmed, setWaitingMessage){
 	let newPlayerList = [...playerList];
 	newPlayerList.splice(playerIndex, 1);
 
@@ -375,7 +379,9 @@ export function Captain(roomName, playerID, playerList, playerIndex, turn){
 				const newMove = Move(oldMove.type, oldMove.player, playerChosen);
 				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
 					move: newMove
-					});
+					})
+				setConfirmed(true);
+				setWaitingMessage("Waiting for response");
 				}
 			)
 		}
