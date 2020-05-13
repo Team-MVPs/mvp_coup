@@ -251,7 +251,7 @@ function PlayerScreen(props) {
 						}	
 					return (
 							<div>
-								<LoseCard title={waitingMessage} roomName = {roomName} playerID = {props.playerID} confirmFunction={confirmFunction()}/>
+								<LoseCard title={waitingMessage} roomName = {roomName} turn = {currentTurn} playerID = {props.playerID} confirmFunction={confirmFunction()}/>
 							</div>)
 				}
 
