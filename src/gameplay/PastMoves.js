@@ -68,64 +68,6 @@ function PastMoves() {
 		});
 		return () => subscribe();
     }, []);
-    
-    // React.useEffect(() => {
-    //     const unsubscribe = firestore.collection(root).doc(roomName).collection("turns").onSnapshot((docs) => {
-    //         let moves = Array(docs.length);
-    //         docs.forEach(function (doc) {
-    //             const turn = doc.data();
-    //             const turn_num = parseInt(doc.id);
-    //             const move = turn.move;
-    //             let move_msg = [];
-    //             console.log(currentTurn);
-    //             if(currentTurn !== turn_num){
-    //                 switch (turn.move.type) {
-    //                     case "general_income":
-    //                         move_msg.push(`${turn.playerName} took general income`);
-    //                         break;
-    //                     case "foreign_aid":
-    //                         move_msg.push(`${turn.playerName} took foreign aid`);
-    //                         break;
-    //                     case "duke":
-    //                         move_msg.push(`${turn.playerName} took 3 coins as Duke`);
-    //                         break;
-    //                     case "exchange_cards":
-    //                         move_msg.push(`${turn.playerName} exchanged cards as Ambassador`);
-    //                         break;
-    //                     case "steal":
-    //                         move_msg.push(`${turn.playerName} stole 2 coins from ${move.to}`);
-    //                         break;
-    //                     case "assassinate":
-    //                         move_msg.push(`${turn.playerName} assassinated ${move.to}`);
-    //                         break;
-    //                     case "coup":
-    //                         move_msg.push(`${turn.playerName} launched a coup on ${move.to}`);
-    //                         break;
-    //                     default:
-    //                         alert("Invalid move type");
-    //                         break;
-    //                 }
-    //                 if (turn.blocks.length !== 0) {
-    //                     const block = turn.blocks[0];
-    //                     const playerName = block.playerName;
-    //                     const card = (block.card !== undefined) ? block.card : "Contessa"
-    //                     move_msg.push(playerName + " blocked " + turn.playerName + "'s move as " + card);
-    //                 }
-    //                 if (turn.bluffs.length !== 0) {
-    //                     const bluff = turn.bluffs[0];
-    //                     const playerName = bluff.playerName;
-    //                     const loser = turn.bluffLoser.playerName;
-    //                     move_msg.push(playerName + " bluffed the move");
-    //                     move_msg.push(loser + " lost a card");
-    //                 }
-    //                 moves[turn_num] = move_msg;
-    //             }
-    //         });
-    //         // console.log(moves);
-    //         setMoves(moves);
-    //     });
-    //     return () => unsubscribe;
-    // }, []);
 
     return (
         <div align="center">
