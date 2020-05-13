@@ -11,27 +11,52 @@ function PlayCard(props) {
         case "Duke": {
             return (<div style={{
                 width: "8em",
-            }}> <img src={duke} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} /></div >);
+            }}> <img src={duke} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} />
+            <div style={{
+                textAlign: "center",
+                paddingTop: "3%"
+            }}>Duke</div>
+            </div >);
         }
         case "Assassin": {
             return (<div style={{
                 width: "8em",
-            }}> <img src={assassin} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} /></div >);
+            }}> <img src={assassin} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} />
+            <div style={{
+                textAlign: "center",
+                paddingTop: "3%"
+            }}>Assassin</div>
+            </div >);
         }
         case "Contessa": {
             return (<div style={{
                 width: "8em",
-            }}> <img src={contessa} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} /></div >);
+            }}> <img src={contessa} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} />
+            <div style={{
+                textAlign: "center",
+                paddingTop: "3%"
+            }}>Contessa</div>
+            </div >);
         }
         case "Captain": {
             return (<div style={{
                 width: "8em",
-            }}> <img src={captain} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} /></div >);
+            }}> <img src={captain} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} />
+            <div style={{
+                textAlign: "center",
+                paddingTop: "3%"
+            }}>Captain</div>
+            </div >);
         }
         case "Ambassador": {
             return (<div style={{
                 width: "8em",
-            }}> <img src={ambassador} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} /></div >);
+            }}> <img src={ambassador} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} />
+            <div style={{
+                textAlign: "center",
+                paddingTop: "3%"
+            }}>Ambassador</div>
+            </div >);
         }
     }
     return (<div style={{
