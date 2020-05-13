@@ -23,7 +23,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 				numPlayers+=1;
 			}
 		 });
-		console.log(numPlayers);
+		//console.log(numPlayers);
 		var alreadyInvoked = false;
 		var bluffDecided = false;
 		var blockDecided = false;
@@ -150,7 +150,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 
 											}
 										await HasCard(roomName, playerID, blockedCardMove).then((result)=>{
-											console.log("Bluff result from block bluff " + result);
+											//console.log("Bluff result from block bluff " + result);
 											if (result){
 												setWaitingMessage("You were bluffed but they were wrong")
 												setConfirmed(true);
@@ -159,8 +159,8 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 													bluffLoser : doc.data().bluffs[0]
 												});
 											} else {
-												console.log(playerID, playerName);
-												console.log('wrong bluff, this is loser');
+												//console.log(playerID, playerName);
+												//console.log('wrong bluff, this is loser');
 												firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 													bluffLoser : {playerID: playerID, playerName: playerName}
 												});
@@ -174,7 +174,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 								if (doc.data().blocks.length === 0){
 									await HasCard(roomName, playerID, move).then((result) => {
 										bluffDecided = true;
-										console.log("Bluff Result " + result);
+										//console.log("Bluff Result " + result);
 										if(result){
 											const bluffer = doc.data().bluffs[0].playerName;
 											setWaitingMessage(bluffer + " bluffed " + "your move." + bluffer + " is losing a card");
@@ -247,8 +247,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 								if (doc.data().confirmations+1 === numPlayers || makeMove){
 									if (exchangeCard){
 										setAmbassadorBluff(true);
-										await exchangeOneCard(roomName, playerID, move).then(()=>{
-											console.log("move changed");
+										await exchangeOneCard(roomName, playerID, move).then(()=>{											
 											exchangeCard = false;
 											setConfirmed(false);
 											setCurrentMove("Ambassador");
@@ -378,7 +377,7 @@ function respond(type) {
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 						confirmations: firebase.firestore.FieldValue.increment(1)
 					}).then(() => {
-						console.log("incremented confirmations");
+						//console.log("incremented confirmations");
 						setConfirmed(true);
 						//setMove("");
 						});
@@ -387,20 +386,14 @@ function respond(type) {
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 						bluffs: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName}),
 					}).then(() => {
-						setConfirmed(true);
-						//setMove("");
-						console.log("incremented confirmations");
+						setConfirmed(true);						
 					});
 					break;
 				case "block":
-					console.log(playerID, playerName);
-					console.log('blocked by');
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false}),
 					}).then(() => {
 						setConfirmed(true);
-						//setMove("");
-						//console.log("incremented confirmations");
 					});
 					break;
 				case "blockAsCAP":
@@ -409,20 +402,14 @@ function respond(type) {
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false, card: "Captain"}),
 					}).then(() => {
-						setConfirmed(true);
-						//setMove("");
-						//console.log("incremented confirmations");
+						setConfirmed(true);						
 					});
 					break;
 				case "blockAsAM":
-					console.log(playerID, playerName);
-					console.log('blocked by');
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false, card: "Ambassador"}),
 					}).then(() => {
 						setConfirmed(true);
-						//setMove("");
-						//console.log("incremented confirmations");
 					});
 					break;
 				default:
@@ -443,15 +430,11 @@ function respondBlock(type) {
 							playerName: playerName,
 							letGo: true
 						};
-					console.log(playerName, playerID);
-					console.log('let it go');
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 						blocks: playerInfo
 					}).then(() => {});
 					break;
 				case "bluff":
-					console.log(playerID, playerName);
-					console.log('called bluff');
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 						bluffs: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName}),
 					}).then(() => setConfirmed(true));
@@ -506,11 +489,11 @@ export const responsesAmbassador = {
 export async function incrementTurn(roomName, totalPlayers, playerName) {
 	await firestore.collection(root).doc(roomName).get().then(async (room) => {
 		let nextTurn  = room.data().turn + 1;
-		console.log(nextTurn);
+		//console.log(nextTurn);
 		while(!await nextTurnHasCards(room, nextTurn % totalPlayers)){
 			nextTurn += 1;
-			console.log(nextTurn);
-			console.log(room.data().turn);
+			//console.log(nextTurn);
+			//console.log(room.data().turn);
 			if (nextTurn % totalPlayers === room.data().turn % totalPlayers) {
 				await firestore.collection(root).doc(roomName).update({
 					winner: playerName
@@ -530,20 +513,20 @@ async function nextTurnHasCards(room, index){
 		let result = false;
 		docs.forEach((player) => {
 			if(i == index){
-				console.log("IN BOOL FUNCTION " + player.data().name);
-				console.log("Cards " + player.data().cards.length);
+				//console.log("IN BOOL FUNCTION " + player.data().name);
+				//console.log("Cards " + player.data().cards.length);
 				result = player.data().cards.length > 0;
 			}
 			i++;
 		 });
-		 console.log("RETURNING " + result);
+		 //console.log("RETURNING " + result);
 		 return result;
 
 	})
 }
 
 export async function confirmTurn(roomName, turn, setConfirmed, setWaitingMessage, setMove){
-	console.log("Incrementing Confiramtions");
+	//console.log("Incrementing Confiramtions");
 	if(setConfirmed !== null) setConfirmed(true);
 	if(setWaitingMessage !== null) setWaitingMessage("Waiting for others");
 	if(setMove !== null) setMove("");

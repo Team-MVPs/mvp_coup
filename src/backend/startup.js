@@ -7,7 +7,7 @@ export async function register(setPlayerID, name, roomName) {
     }).then((docRef) => {
         const playerID = docRef.id;
         setPlayerID(playerID);
-        console.log("Document written with ID: ", playerID);
+        //console.log("Document written with ID: ", playerID);
     })
 }
 
@@ -24,7 +24,7 @@ export async function checkRoomNameExists(roomName) {
 export async function checkPlayerNameExists(roomName, playerName) {
     const currentPlayers = await firestore.collection(root).doc(roomName).collection("players").get();
     for (let i=0; i<currentPlayers.docs.length; i++){
-        console.log(currentPlayers.docs[i].data().name);
+        //console.log(currentPlayers.docs[i].data().name);
         if (currentPlayers.docs[i].data().name === playerName) {
             return true;
         }
