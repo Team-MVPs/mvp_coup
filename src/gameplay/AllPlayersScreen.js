@@ -24,7 +24,7 @@ function PlayerScreen(props) {
 	const [outOfGame, setOutOfGame] = useState(false);
 	const [winner, setWinner] = useState("");
 	const [redirect, setRedirect] = useState(false);
-	const {roomName, playerNames, playerNamesMapping} = useContext(RoomContext);
+	const {roomName, playerNames} = useContext(RoomContext);
 
 	let totalPlayers = playerNames.length;
 	
@@ -143,7 +143,7 @@ function PlayerScreen(props) {
 			<div>
 				<h3>Make A Move!</h3>
 				<MoveList currentTurn={currentTurn} roomName={roomName} activePlayerID={props.playerID}
-						  playerName={playerNamesMapping[props.playerID]} setConfirmed={setConfirmed}/>
+						  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed={setConfirmed}/>
 			</div>
 		);
 	}else if(confirmed && playerNames[props.playerIndex] !== playerChosen){
@@ -201,7 +201,7 @@ function PlayerScreen(props) {
 						<div>
 								<h3>{move}</h3>
 								<ResponseListAssassin currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-											  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+											  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 							</div>
 						);
 					} else if (currentMove === "Captain" && !confirmed){
@@ -209,7 +209,7 @@ function PlayerScreen(props) {
 							<div>
 								<h3>{move}</h3>
 								<ResponseListCaptain currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-											  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+											  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 							</div>
 						);
 					} else if (currentMove === "Captain" && confirmed){
@@ -239,7 +239,7 @@ function PlayerScreen(props) {
 							<div>
 								<h3>{move}</h3>
 								<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-											  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+											  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 							</div>
 						);
 					}
