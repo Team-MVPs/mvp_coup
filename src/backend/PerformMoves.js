@@ -17,7 +17,7 @@ export async function loseTwoCoins(roomName, playerID){
 
 
 export async function exchangeOneCard(roomName, playerID, move){
-	console.log("Calling from exchange");
+	//console.log("Calling from exchange");
 	let card = getCardFromMove(move);
 	let playerCardIndex = 0;
 	await firestore.collection(root).doc(roomName).get().then(async (room)=>{
@@ -46,7 +46,7 @@ export async function exchangeOneCard(roomName, playerID, move){
 }
 
 function getCardFromMove(move){
-	console.log('move');
+	//console.log('move');
 	let card = "";
 	switch (move) {
 		case "foreign_aid":
@@ -97,11 +97,11 @@ export async function HasCard(roomName, playerID, move){
 	await firestore.collection(root).doc(roomName).collection("players").doc(playerID).get().then((player)=>{
 		let cardSet = new Set();
 		player.data().cards.forEach(card => cardSet.add(card));
-		console.log(cardSet);
-		console.log("Checking: " + move);
+		//console.log(cardSet);
+		//console.log("Checking: " + move);
 		result = cardSet.has(card);
 	});
-	console.log("Result: " + result);
+	//console.log("Result: " + result);
 	return result;
 }
 
@@ -117,7 +117,7 @@ export function Coup(roomName, playerID, playerList, playerIndex, turn){
 
 	const handlePlayerClick = (playerChosen) =>{
 		return async () => {
-			console.log(playerChosen);
+			//console.log(playerChosen);
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).get().then(async (turn)=>{
 				let oldMove = turn.data().move
 				const newMove = Move(oldMove.type, oldMove.player, playerChosen);
@@ -340,7 +340,6 @@ export function AttemptAssassin(roomName, playerID, playerList, playerIndex, tur
 
 	const handlePlayerClick = (playerChosen) =>{
 		return async () => {
-			console.log(playerChosen);
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).get().then(async (turn)=>{
 				let oldMove = turn.data().move
 				const newMove = Move(oldMove.type, oldMove.player, playerChosen);
@@ -371,7 +370,6 @@ export function Captain(roomName, playerID, playerList, playerIndex, turn){
 
 	const handlePlayerClick = (playerChosen) =>{
 		return async () => {
-			console.log(playerChosen);
 			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).get().then(async (turn)=>{
 				let oldMove = turn.data().move
 				const newMove = Move(oldMove.type, oldMove.player, playerChosen);

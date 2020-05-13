@@ -18,7 +18,7 @@ function UserDetails(props) {
             docs.forEach(function (doc) {
                 dict[doc.id] = doc.data();
             });
-            console.log(dict);
+            //console.log(dict);
             setDetails(dict);
         });
         return () => unsubscribe;

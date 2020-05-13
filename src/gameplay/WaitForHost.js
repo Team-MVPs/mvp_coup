@@ -16,7 +16,7 @@ function WaitForHost(props) {
         return handleDBException();
       }
       if (doc.data().startGame) {
-        console.log("Game started");
+        //console.log("Game started");
         setStart(true);
       }
     });
@@ -29,7 +29,7 @@ function WaitForHost(props) {
 
   if (leave) {
     firestore.collection(root).doc(roomName).collection("players").doc(props.id).delete().then(() => {
-      console.log('A player left ' + roomName);
+      //console.log('A player left ' + roomName);
     });
     return (<Redirect to="/" />);
   }
@@ -37,7 +37,7 @@ function WaitForHost(props) {
   if (gameStarted) {
     for(let i = 0; i < props.playerArray.length; i++){
       if (props.playerArray[i] === props.id) {
-        console.log("Setting player index" + i);
+        //console.log("Setting player index" + i);
         setPlayerNames(props.playerNames);
         props.setPlayerIndex(i);
         break;
