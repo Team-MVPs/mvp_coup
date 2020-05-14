@@ -116,13 +116,13 @@ function PlayerScreen(props) {
 			if (!loseACard){
 				return(
 					<div>
-						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} 
-						playerList = {playerNames} playerIndex = {props.playerIndex} ambassadorBluff = {ambassadorBluff} totalPlayers={totalPlayers}/>
+						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} ambassadorBluff = {ambassadorBluff} totalPlayers={totalPlayers}
+						setConfirmed = {setConfirmed} setWaitingMessage={setWaitingMessage}/>
 					</div>)
 				} else if (currentMove === "blocked"){
 					return (
 						<div>
-							<h3>You have been blocked!</h3>
+							<h3>{waitingMessage}</h3>
 							<ResponseListBlock currentTurn={currentTurn} roomName={roomName} activePlayerID={props.playerID}
 										  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 						</div>
@@ -251,7 +251,7 @@ function PlayerScreen(props) {
 						}	
 					return (
 							<div>
-								<LoseCard title={waitingMessage} roomName = {roomName} playerID = {props.playerID} confirmFunction={confirmFunction()}/>
+								<LoseCard title={waitingMessage} roomName = {roomName} turn = {currentTurn} playerID = {props.playerID} confirmFunction={confirmFunction()}/>
 							</div>)
 				}
 
