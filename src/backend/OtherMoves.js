@@ -18,18 +18,18 @@ export default function OtherMoves(props){
 	} else if(move === "AttemptAssassin"){
 		return (
 			<div>
-				{AttemptAssassin(roomName, playerID, props.playerList, props.playerIndex, props.turn)}
+				{AttemptAssassin(roomName, playerID, props.turn, props.setConfirmed, props.setWaitingMessage)}
 			</div>
 		)
 	} else if (move === "Coup"){
 		return (
 			<div>
-				{Coup(roomName, playerID, props.playerList, props.playerIndex, props.turn)}
+				{Coup(roomName, playerID, props.turn, props.setConfirmed, props.setWaitingMessage)}
 			</div>)
 	} else if (move === "Captain"){
 		return (
 			<div>
-				{Captain(roomName, playerID, props.playerList, props.playerIndex, props.turn)}
+				{Captain(roomName, playerID, props.turn, props.setConfirmed, props.setWaitingMessage)}
 			</div>)
 	}
 

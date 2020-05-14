@@ -24,7 +24,7 @@ function PlayerScreen(props) {
 	const [outOfGame, setOutOfGame] = useState(false);
 	const [winner, setWinner] = useState("");
 	const [redirect, setRedirect] = useState(false);
-	const {roomName, playerNames, playerNamesMapping} = useContext(RoomContext);
+	const {roomName, playerNames} = useContext(RoomContext);
 
 	let totalPlayers = playerNames.length;
 	
@@ -116,13 +116,13 @@ function PlayerScreen(props) {
 			if (!loseACard){
 				return(
 					<div>
-						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} 
-						playerList = {playerNames} playerIndex = {props.playerIndex} ambassadorBluff = {ambassadorBluff} totalPlayers={totalPlayers}/>
+						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} ambassadorBluff = {ambassadorBluff} totalPlayers={totalPlayers}
+						setConfirmed = {setConfirmed} setWaitingMessage={setWaitingMessage}/>
 					</div>)
 				} else if (currentMove === "blocked"){
 					return (
 						<div>
-							<h3>You have been blocked!</h3>
+							<h3>{waitingMessage}</h3>
 							<ResponseListBlock currentTurn={currentTurn} roomName={roomName} activePlayerID={props.playerID}
 										  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 						</div>
@@ -143,7 +143,7 @@ function PlayerScreen(props) {
 			<div>
 				<h3>Make A Move!</h3>
 				<MoveList currentTurn={currentTurn} roomName={roomName} activePlayerID={props.playerID}
-						  playerName={playerNamesMapping[props.playerID]} setConfirmed={setConfirmed}/>
+						  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed={setConfirmed}/>
 			</div>
 		);
 	}else if(confirmed && playerNames[props.playerIndex] !== playerChosen){
@@ -201,7 +201,7 @@ function PlayerScreen(props) {
 						<div>
 								<h3>{move}</h3>
 								<ResponseListAssassin currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-											  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+											  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 							</div>
 						);
 					} else if (currentMove === "Captain" && !confirmed){
@@ -209,7 +209,7 @@ function PlayerScreen(props) {
 							<div>
 								<h3>{move}</h3>
 								<ResponseListCaptain currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-											  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+											  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 							</div>
 						);
 					} else if (currentMove === "Captain" && confirmed){
@@ -239,7 +239,7 @@ function PlayerScreen(props) {
 							<div>
 								<h3>{move}</h3>
 								<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-											  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+											  playerName={playerNames[currentTurn % totalPlayers]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 							</div>
 						);
 					}
@@ -251,7 +251,7 @@ function PlayerScreen(props) {
 						}	
 					return (
 							<div>
-								<LoseCard title={waitingMessage} roomName = {roomName} playerID = {props.playerID} confirmFunction={confirmFunction()}/>
+								<LoseCard title={waitingMessage} roomName = {roomName} turn = {currentTurn} playerID = {props.playerID} confirmFunction={confirmFunction()}/>
 							</div>)
 				}
 

@@ -217,6 +217,19 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 								setConfirmed(false);
 								setCurrentMove("blocked");
 								blocked = true;
+
+								if (doc.data().blocks[0] !== undefined){
+									if (doc.data().blocks[0].card === "Ambassador"){
+										setWaitingMessage(targetPlayer + " blocked your move as Ambassador. Pick one!")
+									}else if (doc.data().blocks[0].card === "Captain"){
+										setWaitingMessage(targetPlayer + " blocked your move as Captain. Pick one!")
+									} else if (move === "assassinate"){
+										setWaitingMessage(targetPlayer + " blocked your move as Contessa. Pick one!")
+									} else {
+										setWaitingMessage(doc.data().blocks[0].playerName + " blocked your move as Duke. Pick one!")
+									}
+								}
+
 								if (doc.data().blocks[0].letGo){
 									setConfirmed(false);
 									incrementTurnFromPlayer = true;

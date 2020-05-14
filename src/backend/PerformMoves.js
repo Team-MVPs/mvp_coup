@@ -111,9 +111,21 @@ export function generalIncome(roomName, playerID){
 		});
 } 
 
-export function Coup(roomName, playerID, playerList, playerIndex, turn){
-	let newPlayerList = [...playerList];
-	newPlayerList.splice(playerIndex, 1);
+export function Coup(roomName, playerID, turn, setConfirmed, setWaitingMessage){
+	const [playerArray, setPlayerArray] = useState([]);
+
+	useEffect( () => {
+		const subscribe = firestore.collection(root).doc(roomName).collection("players").get().then((players)=>{
+				let newArray =[]
+				players.docs.forEach((doc)=>{
+					if(doc.id !== playerID && doc.data().cards.length >= 1){
+						newArray.push(doc.data().name)
+					}
+				})
+				setPlayerArray(newArray);
+			});
+		return () => subscribe; 
+	}, []);
 
 	const handlePlayerClick = (playerChosen) =>{
 		return async () => {
@@ -124,6 +136,8 @@ export function Coup(roomName, playerID, playerList, playerIndex, turn){
 				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
 					move: newMove
 					});
+				setConfirmed(true);
+				setWaitingMessage("Waiting for response");
 				}
 			)
 		}
@@ -133,7 +147,7 @@ export function Coup(roomName, playerID, playerList, playerIndex, turn){
 		<div>
 			<h3>Choose a player to Coup!</h3>
 			<ul>
-				{newPlayerList.map(player =>(
+				{playerArray.map(player =>(
 					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 						<button type="button" className="btn btn-lg btn-danger" key = {player} style = {{width:"20em"}} 
 						onClick = {handlePlayerClick(player)}> {player} </button>
@@ -334,9 +348,21 @@ export function Ambassador(roomName, playerID, ambassadorBluff, turn, totalPlaye
 		)
 }
 
-export function AttemptAssassin(roomName, playerID, playerList, playerIndex, turn){
-	let newPlayerList = [...playerList];
-	newPlayerList.splice(playerIndex, 1);
+export function AttemptAssassin(roomName, playerID, turn, setConfirmed, setWaitingMessage){
+	const [playerArray, setPlayerArray] = useState([]);
+
+	useEffect( () => {
+		const subscribe = firestore.collection(root).doc(roomName).collection("players").get().then((players)=>{
+				let newArray =[]
+				players.docs.forEach((doc)=>{
+					if(doc.id !== playerID && doc.data().cards.length >= 1){
+						newArray.push(doc.data().name)
+					}
+				})
+				setPlayerArray(newArray);
+			});
+		return () => subscribe; 
+	}, []);
 
 	const handlePlayerClick = (playerChosen) =>{
 		return async () => {
@@ -346,6 +372,8 @@ export function AttemptAssassin(roomName, playerID, playerList, playerIndex, tur
 				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
 					move: newMove
 					});
+				setConfirmed(true);
+				setWaitingMessage("Waiting for response");
 				}
 			)
 		}
@@ -355,7 +383,7 @@ export function AttemptAssassin(roomName, playerID, playerList, playerIndex, tur
 		<div>
 			<h3>Choose a player to assasinate!</h3>
 			<ul>
-				{newPlayerList.map(player =>(
+				{playerArray.map(player =>(
 					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 						<button type="button" className="btn btn-lg btn-dark" key = {player} style = {{width:"20em"}} 
 						onClick = {handlePlayerClick(player)}> {player} </button>
@@ -364,9 +392,22 @@ export function AttemptAssassin(roomName, playerID, playerList, playerIndex, tur
 		</div>)
 }
 
-export function Captain(roomName, playerID, playerList, playerIndex, turn){
-	let newPlayerList = [...playerList];
-	newPlayerList.splice(playerIndex, 1);
+export function Captain(roomName, playerID,turn, setConfirmed, setWaitingMessage){
+	const [playerArray, setPlayerArray] = useState([]);
+
+		useEffect( () => {
+			const subscribe = firestore.collection(root).doc(roomName).collection("players").get().then((players)=>{
+					let newArray =[]
+					players.docs.forEach((doc)=>{
+						if(doc.id !== playerID && doc.data().coins >= 2 && doc.data().cards.length >= 1){
+							newArray.push(doc.data().name)
+						}
+					})
+					setPlayerArray(newArray);
+				});
+			return () => subscribe; 
+		}, []);
+
 
 	const handlePlayerClick = (playerChosen) =>{
 		return async () => {
@@ -375,7 +416,9 @@ export function Captain(roomName, playerID, playerList, playerIndex, turn){
 				const newMove = Move(oldMove.type, oldMove.player, playerChosen);
 				await firestore.collection(root).doc(roomName).collection("turns").doc(turn.id.toString()).update({
 					move: newMove
-					});
+					})
+				setConfirmed(true);
+				setWaitingMessage("Waiting for response");
 				}
 			)
 		}
@@ -385,7 +428,7 @@ export function Captain(roomName, playerID, playerList, playerIndex, turn){
 		<div>
 			<h3>Choose a player to steal from!</h3>
 			<ul>
-				{newPlayerList.map(player =>(
+				{playerArray.map(player =>(
 					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
 						<button type="button" className="btn btn-lg btn-primary" key = {player} style = {{width:"20em"}} 
 						onClick = {handlePlayerClick(player)}> {player} </button>

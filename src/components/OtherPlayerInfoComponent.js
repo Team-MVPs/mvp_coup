@@ -10,7 +10,7 @@ function OtherPlayerInfo(props) {
 				<Accordion.Toggle as={Card.Header} eventKey={props.keyIndex}>
 					<Row>
 						<Col>
-							{props.data.name} 
+							{props.data.name} [{props.data.cards.length} card(s) left!]
 						</Col>
 						<Col align="right">
 							Current Coin Count: {props.data.coins}
