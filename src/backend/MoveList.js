@@ -9,7 +9,6 @@ export function MoveList(props){
 	const [assassinDisabled, setAssassinDisabled] = useState(true);
 	const [coupDisabled, setCoupDisabled] = useState(true);
 	const [theRest, setTheRest] = useState(false);
-
 	useEffect( () => {
 		const subscribe = firestore.collection(root).doc(props.roomName).collection("players").doc(props.activePlayerID).get().then((player)=>{
 			let coins = player.data().coins;
