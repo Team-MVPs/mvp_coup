@@ -217,6 +217,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 								setConfirmed(false);
 								setCurrentMove("blocked");
 								blocked = true;
+
 								if (doc.data().blocks[0] !== undefined){
 									if (doc.data().blocks[0].card === "Ambassador"){
 										setWaitingMessage(targetPlayer + " blocked your move as Ambassador. Pick one!")
@@ -229,7 +230,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 									}
 								}
 
-								if (doc.data().blocks.letGo){
+								if (doc.data().blocks[0].letGo){
 									setConfirmed(false);
 									incrementTurnFromPlayer = true;
 
@@ -434,16 +435,16 @@ function respond(type) {
 
 function respondBlock(type) {
 	return function (roomName, turn, playerName, playerID, setConfirmed) {
-		return () => {
+		return async () => {
 			switch (type) {
 				case "letGo":
-					let playerInfo = {
-							playerID: playerID,
-							playerName: playerName,
-							letGo: true
-						};
+					let playerInfo = {};
+					await firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).get().then((doc) => {
+						playerInfo = doc.data().blocks[0];
+						playerInfo["letGo"] = true;
+					});
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-						blocks: playerInfo
+						blocks: [playerInfo]
 					}).then(() => {});
 					break;
 				case "bluff":
