@@ -5,7 +5,7 @@ import {firestore, root} from "../config/firebase";
 import firebase from 'firebase';
 
 
-export function MoveList(props){
+export function MoveList(props) {
 	const [assassinDisabled, setAssassinDisabled] = useState(true);
 	const [coupDisabled, setCoupDisabled] = useState(true);
 	const [theRest, setTheRest] = useState(false);
@@ -15,7 +15,7 @@ export function MoveList(props){
 			let coins = player.data().coins;
 			if (coins >= 3 && coins < 10){
 				setAssassinDisabled(false);
-			} 
+			}
 			if (coins >= 7){
 				setCoupDisabled(false);
 			}
@@ -23,21 +23,18 @@ export function MoveList(props){
 				setTheRest(true);
 			}
 			await firestore.collection(root).doc(props.roomName).collection("players").get().then((players)=>{
-				let i = -1;
-				let j = 0;
-				players.docs.forEach((doc)=>{
-					i += 1
-					if(doc.id !== props.activePlayerID && doc.data().coins<2 && doc.data().cards.length >=1){
-						j+=1
-							}
-					})
-				if (i === j){
-					setCaptainDisabled(true);
+				let disableCaptain = true;
+				for (let i = 0; i < players.docs.length; ++i) {
+					let doc = players.docs[i];
+					if (doc.id !== props.activePlayerID && doc.data().coins>=2 && doc.data().cards.length >= 1) {
+						disableCaptain = false;
 					}
-				})
+				}
+				setCaptainDisabled(disableCaptain);
 			});
-		return () => subscribe; 
+		return () => subscribe;
 		}, []);
+	});
 
 	return (<div>
 				<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
