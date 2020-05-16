@@ -34,8 +34,6 @@ export function MoveList(props){
 				if (i === j){
 					setCaptainDisabled(true);
 					}
-				console.log(i,j,captainDisabled, theRest);
-				console.log('here');
 				})
 			});
 		return () => subscribe; 
