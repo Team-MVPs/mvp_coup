@@ -109,11 +109,6 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 											})
 											incrementTurn(roomName, totalPlayers, playerName).then(() => console.log("turn incremented"));
 										} else {
-											if (move === "exchange_cards"){
-												doc.ref.update({
-													ambassadorBluff:true
-												})
-											}
 											setWaitingMessage("Unsuccessful Bluff. Pick 1 card to lose");
 											setMove("bluff");
 										}
@@ -178,8 +173,10 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 										if(result){
 											const bluffer = doc.data().bluffs[0].playerName;
 											setWaitingMessage(bluffer + " bluffed " + "your move." + bluffer + " is losing a card");
+											let isAmbassador = move === "exchange_cards";
 											firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-												bluffLoser : doc.data().bluffs[0]
+												bluffLoser : doc.data().bluffs[0],
+												ambassadorBluff: isAmbassador
 											});
 											makeMove = true;
 											incrementTurnFromPlayer = false;
@@ -260,8 +257,8 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 								if (doc.data().confirmations+1 === numPlayers || makeMove){
 									if (exchangeCard){
 										setAmbassadorBluff(true);
-										await exchangeOneCard(roomName, playerID, move).then(()=>{											
-											exchangeCard = false;
+										exchangeCard = false;
+										await exchangeOneCard(roomName, playerID, move).then(()=>{										
 											setConfirmed(false);
 											setCurrentMove("Ambassador");
 										});
