@@ -255,7 +255,7 @@ export function LoseCard(props){
 		)
 }
 
-export function Ambassador(roomName, playerID, ambassadorBluff, turn, totalPlayers){
+export function Ambassador(roomName, playerID, ambassadorBluff, turn, totalPlayers, playerNames){
 	const [cards, setCards] = useState([]);
 	const [isDisabled, setDisabled] = useState(false);
 	const [cardsToChoose, setCardsToChoose] = useState(0);
@@ -301,7 +301,7 @@ export function Ambassador(roomName, playerID, ambassadorBluff, turn, totalPlaye
 					cards: updatedCards
 				});
 				if (!ambassadorBluff){
-					await incrementTurn(roomName, totalPlayers);
+					await incrementTurn(roomName, totalPlayers, playerNames);
 				}else{
 					await firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
 						ambassadorBluff:false
