@@ -63,7 +63,7 @@ function PastMoves() {
                     }
                 });
                 // console.log(moves);
-                setMoves(moves);
+                setMoves(moves.reverse());
             });
 		});
 		return () => subscribe();
