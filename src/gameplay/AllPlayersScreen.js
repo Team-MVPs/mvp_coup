@@ -60,7 +60,7 @@ function PlayerScreen(props) {
 				}
 				setCurrentTurn(doc.data().turn);
 				RegisterMoveCallback(roomName, doc.data().turn, props.playerID, playerNames[props.playerIndex],setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff, totalPlayers);
+									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff, totalPlayers, playerNames);
 			}
 		});
 		return () => subscribe();
