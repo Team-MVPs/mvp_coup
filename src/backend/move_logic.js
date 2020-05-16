@@ -379,7 +379,7 @@ export const all_moves = {
 	"Coup a scrub": move("coup")
 };
 
-function respond(type) {
+function respond(type, card) {
 	return function (roomName, turn, playerName, playerID, setConfirmed, setMove) {
 		return () => {
 			switch (type) {
@@ -401,7 +401,7 @@ function respond(type) {
 					break;
 				case "block":
 					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false}),
+						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false, card: card}),
 					}).then(() => {
 						setConfirmed(true);
 					});
@@ -465,7 +465,7 @@ export const responses = {
 
 export const responsesForeignAid = {
 	"Confirm": respond("confirm"),
-	"Block as Duke": respond("block")
+	"Block as Duke": respond("block", "Duke")
 };
 
 export const responsesBlock = {
@@ -476,7 +476,7 @@ export const responsesBlock = {
 export const responsesAssassin = {
 	"Confirm": respond("confirm"),
 	"Call Bluff": respond("call_bluff"),
-	"Block as Contessa": respond("block")
+	"Block as Contessa": respond("block", "Contessa")
 };
 
 export const responsesCaptain = {
