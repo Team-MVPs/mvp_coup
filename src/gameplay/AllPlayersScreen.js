@@ -91,7 +91,7 @@ function PlayerScreen(props) {
 	else if(move === "bluff"){
 		function confirmFunction(){
 			return () => {
-					incrementTurn(roomName, totalPlayers, playerChosen).then(() => {});
+					incrementTurn(roomName, totalPlayers, playerNames).then(() => {});
 				}
 			}
 		return(
@@ -117,7 +117,7 @@ function PlayerScreen(props) {
 				return(
 					<div>
 						<OtherMoves move = {currentMove} roomName = {roomName} playerID = {props.playerID} turn = {currentTurn} ambassadorBluff = {ambassadorBluff} totalPlayers={totalPlayers}
-						setConfirmed = {setConfirmed} setWaitingMessage={setWaitingMessage}/>
+						setConfirmed = {setConfirmed} setWaitingMessage={setWaitingMessage} playerNames={playerNames}/>
 					</div>)
 				} else if (currentMove === "blocked"){
 					return (
@@ -246,7 +246,7 @@ function PlayerScreen(props) {
 				} else {
 					function confirmFunction(){
 						return () => {
-								incrementTurn(roomName, totalPlayers, playerChosen).then(() => {});
+								incrementTurn(roomName, totalPlayers, playerNames).then(() => {});
 							}
 						}	
 					return (
