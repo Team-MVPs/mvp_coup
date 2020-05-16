@@ -500,14 +500,23 @@ export async function incrementTurn(roomName, totalPlayers, playerNames) {
 	await firestore.collection(root).doc(roomName).get().then(async (room) => {
 		let nextTurn  = room.data().turn + 1;
 		// console.log("Calling incrementTurn from:" + playerName);
+		let winner = false;
 		while(!await nextTurnHasCards(room, nextTurn % totalPlayers)){
 			nextTurn += 1;
 			//console.log(room.data().turn);
 			if (nextTurn % totalPlayers === room.data().turn % totalPlayers) {
+				winner = true;
 				await firestore.collection(root).doc(roomName).update({
 					winner: playerNames[nextTurn % totalPlayers]
 				}).then(() => console.log(`Winner: ${playerNames[nextTurn % totalPlayers]}`));
 				break;
+			}
+		}
+		if(!winner){
+			if(await foundWinner(room, nextTurn % totalPlayers)){
+				await firestore.collection(root).doc(roomName).update({
+					winner: playerNames[nextTurn % totalPlayers]
+				}).then(() => console.log(`Winner: ${playerNames[nextTurn % totalPlayers]}`));
 			}
 		}
 		await firestore.collection(root).doc(roomName).update({
@@ -516,6 +525,19 @@ export async function incrementTurn(roomName, totalPlayers, playerNames) {
 	})
 }
 
+async function foundWinner(room, index){
+	return await room.ref.collection("players").get().then((docs) => {
+		let i = 0;
+		let winner = true;
+		docs.forEach((player) => {
+			if(i != index && player.data().cards.length > 0){
+				winner = false;
+			}
+			i++;
+		 });
+		 return winner;
+	})
+}
 async function nextTurnHasCards(room, index){
 	return await room.ref.collection("players").get().then((docs) => {
 		let i = 0;
