@@ -119,7 +119,7 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 										if(doc.data().bluffs[0].playerID === playerID){
 											setWaitingMessage("Successful Bluff!" + loser + " is losing a card.")
 										}else{
-											setWaitingMessage(bluffer + " bluffed " + playerName + " 's move." + loser + " is losing a card");
+											setWaitingMessage(bluffer + " bluffed " + playerName + " 's move. " + loser + " is losing a card");
 										}
 										setConfirmed(true);
 										setMove("");
