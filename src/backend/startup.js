@@ -14,7 +14,7 @@ export async function register(setPlayerID, name, roomName) {
 export async function checkRoomNameExists(roomName) {
     const snapshot = await firestore.collection(root).get();
     for (let i = 0; i < snapshot.docs.length; i++){
-        if (snapshot.docs[i].id === roomName) {
+        if (snapshot.docs[i].id === roomName && !snapshot.docs[i].data().startGame) {
             return true;
         }
     }
