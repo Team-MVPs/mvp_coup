@@ -51,7 +51,7 @@ function LoginComponent(props) {
 		} else {
 			checkRoomNameExists(tempRoomName).then((exists) => {
 				if (!exists) {
-					alert('Room name does not exist');
+					alert('Room name does not exist or the game has already started!');
 					return (<Redirect to="/" />);
 				} else {
 					
