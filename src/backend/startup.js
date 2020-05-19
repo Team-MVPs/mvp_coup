@@ -14,11 +14,21 @@ export async function register(setPlayerID, name, roomName) {
 export async function checkRoomNameExists(roomName) {
     const snapshot = await firestore.collection(root).get();
     for (let i = 0; i < snapshot.docs.length; i++){
-        if (snapshot.docs[i].id === roomName && !snapshot.docs[i].data().startGame) {
+        if (snapshot.docs[i].id === roomName) {
             return true;
         }
     }
     return false;
+}
+
+export async function checkGameStart(roomName) {
+    const doc = await firestore.collection(root).doc(roomName).get();
+    if (doc.data().startGame){
+    	return true
+    } else{
+    	return false
+    }
+    
 }
 
 export async function checkPlayerNameExists(roomName, playerName) {

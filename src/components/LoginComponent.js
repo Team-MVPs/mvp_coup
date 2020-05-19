@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { register, checkRoomNameExists, checkPlayerNameExists, createRoomName } from '../backend/startup';
+import { register, checkRoomNameExists, checkPlayerNameExists, createRoomName, checkGameStart } from '../backend/startup';
 import {Link, Redirect} from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { RoomContext } from '../contexts/RoomContext.js';
@@ -51,23 +51,30 @@ function LoginComponent(props) {
 		} else {
 			checkRoomNameExists(tempRoomName).then((exists) => {
 				if (!exists) {
-					alert('Room name does not exist or the game has already started!');
+					alert('Room name does not exist');
 					return (<Redirect to="/" />);
 				} else {
-					
-					checkPlayerNameExists(tempRoomName, playerName).then((exists) =>{
-						if (exists) {
-							alert("This player name already exists, choose another one.");
+					checkGameStart(tempRoomName).then((start) =>{
+						if (start){
+							alert("You cannot join this lobby, game has already started!");
 							return (<Redirect to="/" />);
-						}
-						else {
-							register(props.setPlayerID, playerName, tempRoomName).then(() => {
-								setRoomName(tempRoomName);
-								setRedirect(true);
+						} else{
+							checkPlayerNameExists(tempRoomName, playerName).then((exists) =>{
+								if (exists) {
+									alert("This player name already exists, choose another one.");
+									return (<Redirect to="/" />);
+								}
+								else {
+									register(props.setPlayerID, playerName, tempRoomName).then(() => {
+										setRoomName(tempRoomName);
+										setRedirect(true);
+									})
+								}
+
 							})
 						}
-
-					})
+					})										
+					
 				}
 			})
 		}
