@@ -124,7 +124,7 @@ function PlayerScreen(props) {
 						<div>
 							<h3>{waitingMessage}</h3>
 							<ResponseListBlock currentTurn={currentTurn} roomName={roomName} activePlayerID={props.playerID}
-										  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+										  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 						</div>
 					);
 				} else {
@@ -164,7 +164,7 @@ function PlayerScreen(props) {
 					<div>
 						<h3>{move}</h3>
 						<ResponseListForeignAid currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+									  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 					</div>
 				)
 
@@ -173,7 +173,7 @@ function PlayerScreen(props) {
 					<div>
 						<h3>{move}</h3>
 						<ResponseListDuke currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+									  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 					</div>
 				); 
 			}else if (currentMove === "Ambassador"){
@@ -181,7 +181,7 @@ function PlayerScreen(props) {
 					<div>
 						<h3>{move}</h3>
 						<ResponseListAmbassador currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+									  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 					</div>
 				); 
 			}else{
@@ -189,7 +189,7 @@ function PlayerScreen(props) {
 					<div>
 						<h3>{move}</h3>
 						<ResponseList currentTurn={currentTurn} roomName={roomName} notActivePlayerID={props.playerID}
-									  playerName={playerNames[props.playerIndex]} setConfirmed = {setConfirmed} setMove = {setMove}/>
+									  playerName={playerNamesMapping[props.playerID]} setConfirmed = {setConfirmed} setMove = {setMove}/>
 					</div>
 				); 
 			}

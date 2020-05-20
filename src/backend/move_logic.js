@@ -42,7 +42,11 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 						var ambassadorBluffDoc = doc.data().ambassadorBluff;
 						if (doc.data().playerID !== playerID) {
 							if(!alreadyInvoked && move !== "general_income" && move !== 'coup'){
-								setMove(`${playerName} performed ${move}`);
+								if (move === 'exchange_cards'){
+									setMove(`${playerName} performed Ambassador`);
+								}else {
+									setMove(`${playerName} performed ${move}`);
+								}
 								alreadyInvoked = true;
 								if (move === 'assassinate'){
 									setCurrentMove("AttemptAssassin");
@@ -119,7 +123,8 @@ export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, s
 										if(doc.data().bluffs[0].playerID === playerID){
 											setWaitingMessage("Successful Bluff!" + loser + " is losing a card.")
 										}else{
-											setWaitingMessage(bluffer + " bluffed " + playerName + " 's move. " + loser + " is losing a card");
+											//setWaitingMessage(bluffer + " bluffed " + playerName + " 's move. " + loser + " is losing a card");
+											setWaitingMessage(loser + " is losing a card on a failed bluff call");
 										}
 										setConfirmed(true);
 										setMove("");
