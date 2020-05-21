@@ -2,7 +2,7 @@ import { firestore, root } from '../config/firebase';
 
 export const all_chars = ["Duke", "Assassin", "Contessa", "Captain", "Ambassador"];
 
-const num_of_each_card = 3;
+let num_of_each_card = 3;
 
 export async function distributeCards(roomName) {
 	// helper functions
@@ -14,6 +14,24 @@ export async function distributeCards(roomName) {
 		return a;
 	}
 
+	const roomRef = firestore.collection(root).doc(roomName);
+	const playerCollection = roomRef.collection("players");
+	let roomSize = 0
+	await playerCollection.get().then(async (playersInside)=>{
+		playersInside.forEach((doc)=>{
+			roomSize++;
+		})
+	});
+
+	console.log(roomSize);
+	
+	if (roomSize > 6){
+		num_of_each_card = 5;
+	}
+
+	console.log(num_of_each_card + " num of cards");
+	console.log(roomSize);
+
 	let cards = [];
 	all_chars.forEach(char => {
 		for (let i = 0; i < num_of_each_card; ++i) {
@@ -22,8 +40,8 @@ export async function distributeCards(roomName) {
 	});
 	shuffle(cards);
 	
-	const roomRef = firestore.collection(root).doc(roomName);
-	const playerCollection = roomRef.collection("players");
+	//const roomRef = firestore.collection(root).doc(roomName);
+	//const playerCollection = roomRef.collection("players");
 	await playerCollection.get().then(async (players) => {
 		// give each player 2 cards and 2 coins
 		await players.forEach(async function(doc) {
