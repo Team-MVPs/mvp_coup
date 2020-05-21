@@ -91,6 +91,11 @@ function GameStart(props) {
     }
   }
 
+  let noteMsg = "";
+  if (players.length > 6){
+    noteMsg = "NOTE: Your room size is 6+ players, there will be 5 of each card type in the deck"
+  } 
+
   return (
     <div>
 	    <ol className="list-group list-group-flush" style = {{marginBottom: 50, marginTop: 20}}>
@@ -100,6 +105,9 @@ function GameStart(props) {
 	    </ol>
       <div align="center"> <h4>Current Room: {roomName}</h4> </div>
 	    <JoinGame isHost={props.isHost} roomName={roomName} playerID = {props.playerID} setPlayerIndex = {props.setPlayerIndex}/>
+      <div style ={{ paddingTop: "2em", fontWeight: 500}}>
+        {noteMsg}
+      </div>
     </div>
   );
 }

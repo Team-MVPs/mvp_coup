@@ -28,6 +28,7 @@ function MovesPopup(props) {
                 <Button onClick={props.onHide}>Close</Button>
             </Modal.Footer>
         </Modal>
+
     );
 }
 
