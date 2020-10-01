@@ -92,9 +92,11 @@ function GameStart(props) {
   }
 
   let noteMsg = "";
-  if (players.length > 6){
+  if (players.length > 6 && players.length <= 10){
     noteMsg = "NOTE: Your room size is 6+ players, there will be 5 of each card type in the deck"
-  } 
+  }else if(players.length > 10){
+    noteMsg = "NOTE: Your room size is 10+ players, there will be 6 of each card type in the deck"
+  }
 
   return (
     <div>

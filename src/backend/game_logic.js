@@ -25,8 +25,10 @@ export async function distributeCards(roomName) {
 
 	console.log(roomSize);
 	
-	if (roomSize > 6){
+	if (roomSize > 6 && roomSize <= 10){
 		num_of_each_card = 5;
+	}else if(roomSize > 10){
+		num_of_each_card = 6
 	}
 
 	console.log(num_of_each_card + " num of cards");
