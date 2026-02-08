@@ -33,6 +33,7 @@ This is a web-based multiplayer implementation of the card game Coup, built with
 - **Styling**: CSS Modules with SCSS
 - **Responsiveness**: Mobile-first design (320px+)
 - **Node**: Compatible with Node 18+
+- always make new branch when making changes
 
 ### State Management
 
