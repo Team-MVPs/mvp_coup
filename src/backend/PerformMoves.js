@@ -5,7 +5,8 @@ import React, {useContext, useEffect, useState} from 'react';
 import { Modal, Button, Col, Row, Container } from 'react-bootstrap';
 import { incrementTurn, Move } from './move_logic';
 import PlayCard from '../components/PlayCard.js';
-import '../styles/Card.css';
+import cardStyles from '../styles/Card.module.scss';
+import styles from './PerformMoves.module.scss';
 
 
 
@@ -148,8 +149,8 @@ export function Coup(roomName, playerID, turn, setConfirmed, setWaitingMessage){
 			<h3>Choose a player to Coup!</h3>
 			<ul>
 				{playerArray.map(player =>(
-					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
-						<button type="button" className="btn btn-lg btn-danger" key = {player} style = {{width:"20em"}} 
+					<div className={styles.buttonContainer}>
+						<button type="button" className={`btn btn-lg btn-danger ${styles.actionButton}`} key = {player}
 						onClick = {handlePlayerClick(player)}> {player} </button>
 					</div>))}
 			</ul>
@@ -235,13 +236,13 @@ export function LoseCard(props){
 
 	return (
 		<div>
-		<h3 style={{paddingBottom: "5%"}}>{props.title}</h3>
-		<Container style={{paddingBottom: "5%"}}>
+		<h3 className={styles.cardSelectionTitle}>{props.title}</h3>
+		<Container className={styles.cardSelectionContainer}>
 			<Row>
 				{cards.map(card =>{
 					return(
 					<Col>
-						<div className={chosenKeys.has(card[1]) ? "Selected" : "Highlight"} onClick = {selectCard(card)} style={{display:"inline-block"}}>
+						<div className={`${chosenKeys.has(card[1]) ? cardStyles.Selected : cardStyles.Highlight} ${styles.cardWrapper}`} onClick = {selectCard(card)}>
 							<PlayCard cardName={card[0]} />
 						</div>
 					</Col>
@@ -249,7 +250,7 @@ export function LoseCard(props){
 					})}
 			</Row>
 		</Container>
-		<button type="button" className="btn btn-lg btn-success" style = {{width:"20em"}} 
+		<button type="button" className={`btn btn-lg btn-success ${styles.actionButton}`}
 					 	disabled = {isDisabled || cardsToChoose!==chosenKeys.size} 	onClick = {handleClick()}>Confirm</button>
 		</div>
 		)
@@ -328,13 +329,13 @@ export function Ambassador(roomName, playerID, ambassadorBluff, turn, totalPlaye
 
 	return (
 		<div>
-		<h3 style={{paddingBottom: "5%"}}>Choose {cardsToChoose}</h3>
-		<Container style={{paddingBottom: "5%"}}>
+		<h3 className={styles.cardSelectionTitle}>Choose {cardsToChoose}</h3>
+		<Container className={styles.cardSelectionContainer}>
 			<Row>
 				{cards.map(card =>{
 					return(
 					<Col>
-						<div className={chosenKeys.has(card[1]) ? "Selected" : "Highlight"} onClick = {selectCard(card)} style={{display:"inline-block"}}>
+						<div className={`${chosenKeys.has(card[1]) ? cardStyles.Selected : cardStyles.Highlight} ${styles.cardWrapper}`} onClick = {selectCard(card)}>
 							<PlayCard cardName={card[0]} />
 						</div>
 					</Col>
@@ -342,7 +343,7 @@ export function Ambassador(roomName, playerID, ambassadorBluff, turn, totalPlaye
 					})}
 			</Row>
 		</Container>
-		<button type="button" className="btn btn-lg btn-success" style = {{width:"20em"}} 
+		<button type="button" className={`btn btn-lg btn-success ${styles.actionButton}`}
 					 	disabled = {isDisabled || cardsToChoose!==chosenKeys.size} 	onClick = {handleClick()}>Confirm</button>
 		</div>
 		)
@@ -384,8 +385,8 @@ export function AttemptAssassin(roomName, playerID, turn, setConfirmed, setWaiti
 			<h3>Choose a player to assasinate!</h3>
 			<ul>
 				{playerArray.map(player =>(
-					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
-						<button type="button" className="btn btn-lg btn-dark" key = {player} style = {{width:"20em"}} 
+					<div className={styles.buttonContainer}>
+						<button type="button" className={`btn btn-lg btn-dark ${styles.actionButton}`} key = {player}
 						onClick = {handlePlayerClick(player)}> {player} </button>
 					</div>))}
 			</ul>
@@ -429,8 +430,8 @@ export function Captain(roomName, playerID,turn, setConfirmed, setWaitingMessage
 			<h3>Choose a player to steal from!</h3>
 			<ul>
 				{playerArray.map(player =>(
-					<div style ={{paddingBottom: "1em", paddingTop: "1em"}}>
-						<button type="button" className="btn btn-lg btn-primary" key = {player} style = {{width:"20em"}} 
+					<div className={styles.buttonContainer}>
+						<button type="button" className={`btn btn-lg btn-primary ${styles.actionButton}`} key = {player}
 						onClick = {handlePlayerClick(player)}> {player} </button>
 					</div>))}
 			</ul>

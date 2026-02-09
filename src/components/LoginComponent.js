@@ -3,6 +3,7 @@ import { register, checkRoomNameExists, checkPlayerNameExists, createRoomName, c
 import {Link, Redirect} from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { RoomContext } from '../contexts/RoomContext.js';
+import styles from './LoginComponent.module.scss';
 
 function LoginComponent(props) {
 	const [playerName, setPlayerName] = React.useState("");
@@ -86,23 +87,23 @@ function LoginComponent(props) {
 	}
 
 	return (
-		<Container style={{ marginTop: "5em", width: "50%" }}>
-			<h1 style={{ marginBottom: "3%" }}>Welcome to MVP Coup</h1>
-			<Row style={{ marginBottom: "3%" }}>
+		<Container className={styles.loginContainer}>
+			<h1 className={styles.welcomeTitle}>Welcome to MVP Coup</h1>
+			<Row className={styles.inputRow}>
 				<input className="form-control" type="text" value={playerName} onChange={handlePlayerNameChange} placeholder="Player Name" />
 			</Row>
-			<Row style={{ marginBottom: "3%" }}>
+			<Row className={styles.inputRow}>
 				<input className="form-control" type="text" value={tempRoomName} onChange={handleRoomNameChange} placeholder="Room Name" />
 			</Row>
-			<Row>
-				<Col xs={6}>
-					<button style={{ width: "100%" }} type="Submit" className="btn btn-primary mb-2" onClick={newRoom}>Create a New Room</button>
+			<Row className={styles.buttonRow}>
+				<Col xs={6} className={styles.buttonCol}>
+					<button className={`btn btn-primary mb-2 ${styles.actionButton}`} type="Submit" onClick={newRoom}>Create a New Room</button>
 				</Col>
-				<Col xs={6}>
-					<button style={{ width: "100%" }} type="Submit" className="btn btn-primary mb-2" onClick={existingRoom}>Join an Existing Room</button>
+				<Col xs={6} className={styles.buttonCol}>
+					<button className={`btn btn-primary mb-2 ${styles.actionButton}`} type="Submit" onClick={existingRoom}>Join an Existing Room</button>
 				</Col>
 			</Row>
-			<div className="fixed-bottom" style={{ marginBottom: "1em" }}>
+			<div className={`fixed-bottom ${styles.footerLink}`}>
 				<Link to='/creators'>Meet the Creators</Link>
 			</div>
 		</Container>

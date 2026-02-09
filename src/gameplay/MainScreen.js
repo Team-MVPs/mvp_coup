@@ -7,6 +7,7 @@ import PastMoves from './PastMoves.js';
 import UserDetails from './UserDetails.js';
 import {cleanupRoom} from "../backend/callbacks.js"
 import moves from '../images/moves.jpg';
+import styles from './MainScreen.module.scss';
 
 function MovesPopup(props) {
     return (
@@ -22,7 +23,7 @@ function MovesPopup(props) {
             </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-            <img src={moves} style={{maxWidth: "100%"}} />
+            <img src={moves} className={styles.movesImage} />
             </Modal.Body>
             <Modal.Footer>
                 <Button onClick={props.onHide}>Close</Button>
@@ -49,15 +50,15 @@ function MainGameScreen(props) {
     }
 
     return (
-        <div style={{margin:"3em", minWidth: "900px"}}>
-            <Row>
-                <Col xs={4}>
+        <div className={styles.mainContainer}>
+            <Row className={styles.gameRow}>
+                <Col xs={4} className={styles.playerInfoCol}>
                    <UserDetails playerID = {playerID} />
                 </Col>
-                <Col xs={5}>
+                <Col xs={5} className={styles.movesCol}>
                     <PlayerScreen playerID = {playerID}  playerIndex={props.playerIndex} />
                 </Col>
-                <Col xs={3}>
+                <Col xs={3} className={styles.historyCol}>
                     <PastMoves/>
                 </Col>
             </Row>

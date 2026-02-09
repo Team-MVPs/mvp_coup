@@ -1,0 +1,71 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.creatorColumn {
+  margin-bottom: 3rem; // 48px
+
+  @include mobile {
+    margin-bottom: $spacing-xl;
+  }
+}
+
+.creatorCard {
+  width: 18rem; // 288px
+
+  @include mobile {
+    width: 100%;
+    max-width: 20rem;
+  }
+}
+
+.creatorImage {
+  max-width: 100%;
+  height: 15rem; // 240px
+  border-radius: $border-radius-lg;
+  object-fit: cover;
+
+  @include mobile {
+    height: 12rem;
+  }
+}
+
+.socialLink {
+  padding: $spacing-md;
+  display: inline-block;
+
+  @include mobile {
+    padding: $spacing-sm;
+  }
+}
+
+.creatorsContainer {
+  margin-top: 3rem; // 48px
+  width: 75%;
+
+  @include mobile {
+    margin-top: $spacing-xl;
+    width: 95%;
+    padding: 0 $spacing-sm;
+  }
+
+  @include tablet {
+    width: 85%;
+  }
+}
+
+.creatorsTitle {
+  margin-bottom: 3%;
+
+  @include mobile {
+    margin-bottom: $spacing-lg;
+    font-size: $font-size-xl;
+  }
+}
+
+.footerLink {
+  margin-bottom: $spacing-md;
+
+  @include mobile {
+    margin-bottom: $spacing-lg;
+  }
+}

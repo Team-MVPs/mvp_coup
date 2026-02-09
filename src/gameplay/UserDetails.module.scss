@@ -1,0 +1,45 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.cardsContainer {
+  width: $card-width-container; // 20em
+
+  .cards {
+    display: flex;
+    justify-content: center;
+  }
+
+  @include mobile {
+    width: 100%;
+    max-width: $card-width-container;
+  }
+}
+
+.coinsDisplay {
+  font-size: 2rem; // x-large equivalent
+  padding-top: $spacing-md;
+
+  @include mobile {
+    font-size: $font-size-xl;
+  }
+}
+
+.coinIcon {
+  max-width: 10%;
+  border-radius: $border-radius-lg;
+  padding-right: $spacing-sm;
+
+  @include mobile {
+    max-width: 15%;
+  }
+}
+
+.cardSection {
+  padding-bottom: $spacing-md;
+  padding-top: $spacing-md;
+
+  @include mobile {
+    padding-bottom: $spacing-sm;
+    padding-top: $spacing-sm;
+  }
+}

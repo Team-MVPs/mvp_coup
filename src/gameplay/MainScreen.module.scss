@@ -1,0 +1,87 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.mainContainer {
+  margin: 3rem; // 48px
+  min-width: 56.25rem; // 900px
+
+  @include mobile {
+    margin: 0;
+    padding: $spacing-md;
+    padding-bottom: 5rem; // Extra padding for fixed bottom navbar
+    min-width: auto;
+  }
+
+  @include tablet {
+    margin: 0;
+    padding: $spacing-lg;
+    padding-bottom: 5rem; // Extra padding for fixed bottom navbar
+    min-width: auto;
+  }
+}
+
+.gameRow {
+  display: flex;
+  flex-direction: row;
+  gap: 0; // No gap on desktop to prevent wrapping
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-lg; // 1.5rem spacing between components
+  }
+
+  @include tablet {
+    flex-direction: column;
+    gap: $spacing-lg; // 1.5rem spacing between components
+  }
+}
+
+// Order 1: Moves component (PlayerScreen) - shows first on mobile/tablet
+.movesCol {
+  @include mobile {
+    order: 1;
+    flex: 0 0 auto;
+    max-width: 100% !important;
+  }
+
+  @include tablet {
+    order: 1;
+    flex: 0 0 auto;
+    max-width: 100% !important;
+  }
+}
+
+// Order 2: Player info component (UserDetails) - shows second on mobile/tablet
+.playerInfoCol {
+  @include mobile {
+    order: 2;
+    flex: 0 0 auto;
+    max-width: 100% !important;
+  }
+
+  @include tablet {
+    order: 2;
+    flex: 0 0 auto;
+    max-width: 100% !important;
+  }
+}
+
+// Order 3: History component (PastMoves) - shows third on mobile/tablet
+.historyCol {
+  @include mobile {
+    order: 3;
+    flex: 0 0 auto;
+    max-width: 100% !important;
+  }
+
+  @include tablet {
+    order: 3;
+    flex: 0 0 auto;
+    max-width: 100% !important;
+  }
+}
+
+.movesImage {
+  max-width: 100%;
+  height: auto;
+}

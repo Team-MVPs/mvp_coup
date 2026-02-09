@@ -1,0 +1,29 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.cardWrapper {
+  width: $card-width-base; // 8em (128px)
+
+  @include mobile {
+    width: 6rem; // Smaller cards on mobile
+  }
+
+  @include tablet {
+    width: 7rem;
+  }
+}
+
+.cardImage {
+  max-width: 100%;
+  border-radius: $border-radius-md;
+  display: block;
+}
+
+.cardLabel {
+  text-align: center;
+  padding-top: 3%;
+
+  @include mobile {
+    font-size: 0.875rem; // 14px
+  }
+}

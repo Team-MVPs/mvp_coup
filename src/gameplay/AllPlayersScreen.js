@@ -1,4 +1,4 @@
-// @flow 
+// @flow
 
 import React, {useContext, useEffect, useState} from 'react';
 import {MoveList} from '../backend/MoveList.js';
@@ -10,6 +10,7 @@ import OtherMoves from '../backend/OtherMoves.js';
 import {Button, Spinner} from 'react-bootstrap';
 import {LoseCard} from '../backend/PerformMoves.js';
 import Redirect from "react-router-dom/es/Redirect";
+import styles from './AllPlayersScreen.module.scss';
 
 function PlayerScreen(props) {
 	const [isTurn, setIsTurn] = useState(props.playerIndex === 0);
@@ -73,9 +74,9 @@ function PlayerScreen(props) {
 		return (
 			<div>
 				<h3>{winner} is the winner!</h3>
-				<p style={{paddingTop: "1em"}}>Thanks for playing MVP Coup!</p>
-				<div style={{paddingBottom: "1em", paddingTop: "1em"}}>
-					<Button type="button" className="btn btn-lg btn-light" style = {{width:"20em"}} onClick={
+				<p className={styles.thankYouMessage}>Thanks for playing MVP Coup!</p>
+				<div className={styles.buttonContainer}>
+					<Button type="button" className={`btn btn-lg btn-light ${styles.newGameButton}`} onClick={
 						() => setRedirect(true)
 					}>New Game</Button>
 				</div>
@@ -103,7 +104,7 @@ function PlayerScreen(props) {
 		if(confirmed){
 			return (
 				<div>
-				  <div align="middle" style = {{paddingTop:"1em"}}>
+				  <div align="middle" className={styles.spinnerContainer}>
 					<Spinner animation="border" as="span"/>
 				  </div>
 				  <div className="col-xs-6" align="middle">

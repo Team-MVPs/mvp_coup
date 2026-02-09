@@ -5,6 +5,7 @@ import { startGame } from '../backend/startup';
 import { Redirect } from 'react-router-dom';
 import WaitForHost from "./WaitForHost.js";
 import { RoomContext } from '../contexts/RoomContext.js';
+import styles from './GameStart.module.scss';
 
 function GameStart(props) {
   const [players, setPlayers] = React.useState([]);
@@ -57,7 +58,7 @@ function GameStart(props) {
   function WaitMsg() {
     return (
       <div>
-        <div align="middle" style = {{paddingTop:"1em"}}>
+        <div align="middle" className={styles.spinnerContainer}>
           <Spinner animation="border" as="span"/>
           <span className="sr-only">Loading...</span>
         </div>
@@ -75,9 +76,9 @@ function GameStart(props) {
         waitingMsg = <WaitMsg />
       }
       return (
-          <div style = {{paddingTop: "1em"}}>
+          <div className={styles.joinGameContainer}>
             <button
-              type="button" className="btn btn-lg btn-primary" onClick={handleClick} style={{ marginBottom: 10 }} disabled = {isDisabled}>
+              type="button" className={`btn btn-lg btn-primary ${styles.startButton}`} onClick={handleClick} disabled = {isDisabled}>
               Start Game!
             </button>
             {waitingMsg}
@@ -100,14 +101,14 @@ function GameStart(props) {
 
   return (
     <div>
-	    <ol className="list-group list-group-flush" style = {{marginBottom: 50, marginTop: 20}}>
+	    <ol className={`list-group list-group-flush ${styles.playerList}`}>
 	      {players.map(name => (
 	        <li className="list-group-item" key={name}>{name} is in the lobby</li>
 	      ))}
 	    </ol>
       <div align="center"> <h4>Current Room: {roomName}</h4> </div>
 	    <JoinGame isHost={props.isHost} roomName={roomName} playerID = {props.playerID} setPlayerIndex = {props.setPlayerIndex}/>
-      <div style ={{ paddingTop: "2em", fontWeight: 500}}>
+      <div className={styles.noteMessage}>
         {noteMsg}
       </div>
     </div>

@@ -3,6 +3,7 @@ import { firestore, root } from '../config/firebase';
 import { Redirect } from 'react-router-dom';
 import { handleDBException } from "../backend/callbacks";
 import { RoomContext } from '../contexts/RoomContext.js';
+import styles from './WaitForHost.module.scss';
 
 function WaitForHost(props) {
   const [leave, setLeave] = React.useState(false);
@@ -47,10 +48,10 @@ function WaitForHost(props) {
   } else {
     return (
       <div>
-        <div style={{ fontSize: "large", marginBottom: 30 }}>
+        <div className={styles.waitingContainer}>
           <h3>Waiting on Host to Start the Game ...</h3>
         </div>
-        <button className="btn btn-lg btn-primary" onClick={handleLeaveRoom}>Leave Room</button>
+        <button className={`btn btn-lg btn-primary ${styles.leaveButton}`} onClick={handleLeaveRoom}>Leave Room</button>
       </div>
     )
   }

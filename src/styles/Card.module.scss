@@ -1,0 +1,35 @@
+@import './variables';
+@import './mixins';
+
+.Highlight {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  @include mobile {
+    &:hover {
+      transform: scale(1.05); // Smaller scale on mobile
+    }
+  }
+}
+
+.Selected {
+  box-shadow: 0 0 0 6px $color-black;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  @include mobile {
+    box-shadow: 0 0 0 4px $color-black; // Smaller shadow on mobile
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}

@@ -7,7 +7,7 @@ import {
   Route,
 } from "react-router-dom";
 
-import './App.css';
+import './App.module.scss';
 
 import LoginComponent from "./components/LoginComponent";
 import MainGameScreen from './gameplay/MainScreen.js';

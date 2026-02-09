@@ -1,0 +1,47 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.buttonContainer {
+  padding-bottom: $spacing-md;
+  padding-top: $spacing-md;
+
+  @include mobile {
+    padding-bottom: $spacing-sm;
+    padding-top: $spacing-sm;
+  }
+}
+
+.actionButton {
+  width: $card-width-container; // 20em
+
+  @include mobile {
+    width: 100%;
+    max-width: $card-width-container;
+  }
+}
+
+.cardSelectionTitle {
+  padding-bottom: 5%;
+
+  @include mobile {
+    padding-bottom: $spacing-md;
+    font-size: $font-size-large;
+  }
+}
+
+.cardSelectionContainer {
+  padding-bottom: 5%;
+
+  @include mobile {
+    padding-bottom: $spacing-md;
+  }
+}
+
+.cardWrapper {
+  display: inline-block;
+
+  @include mobile {
+    display: block;
+    margin: 0 auto $spacing-sm;
+  }
+}

@@ -8,6 +8,7 @@ import shivam_img from "../images/creators/shivam.jpg";
 
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import {Link} from "react-router-dom";
+import styles from './Creators.module.scss';
 
 
 function Creator(creator) {
@@ -17,15 +18,15 @@ function Creator(creator) {
 	const github = creator["github"];
 	
 	return (
-		<Col style={{ marginBottom: "3em" }}>
-			<Card style={{ width: '18rem' }}>
+		<Col className={styles.creatorColumn}>
+			<Card className={styles.creatorCard}>
 				<Card.Header>
-					<img src={image} alt={name} style={{maxWidth: "100%", height: "15rem", borderRadius: "2em"}}/>
+					<img src={image} alt={name} className={styles.creatorImage}/>
 				</Card.Header>
 				<Card.Body>
 					<h4>{name}</h4>
-					<a href={github} target="_blank" style={{padding: "1em"}}><FaGithub /></a>
-					<a href={linkedin} target="_blank" style={{padding: "1em"}}><FaLinkedin /></a>
+					<a href={github} target="_blank" className={styles.socialLink}><FaGithub /></a>
+					<a href={linkedin} target="_blank" className={styles.socialLink}><FaLinkedin /></a>
 				</Card.Body>
 			</Card>
 		</Col>
@@ -67,12 +68,12 @@ function CreatorComponent(props) {
 	];
 	
 	return (
-		<Container style={{ marginTop: "3em", width: "75%" }}>
-			<h1 style={{ marginBottom: "3%" }}>Creators of MVP Coup</h1>
+		<Container className={styles.creatorsContainer}>
+			<h1 className={styles.creatorsTitle}>Creators of MVP Coup</h1>
 			<Row>
 				{creators.map(creator => Creator(creator))}
 			</Row>
-			<div className="fixed-bottom" style={{ marginBottom: "1em" }}>
+			<div className={`fixed-bottom ${styles.footerLink}`}>
 				<Link to='/'>Back to the Game</Link>
 			</div>
 		</Container>

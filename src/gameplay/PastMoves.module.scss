@@ -1,0 +1,41 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.historySection {
+  padding-bottom: $spacing-md;
+  padding-top: $spacing-md;
+
+  @include mobile {
+    padding-bottom: $spacing-sm;
+    padding-top: $spacing-sm;
+  }
+}
+
+.cardBody {
+  padding: 0;
+  height: 40rem; // 640px
+  overflow-y: auto;
+
+  @include mobile {
+    max-height: 25rem; // 400px - scrollable on mobile
+    height: auto;
+  }
+
+  @include tablet {
+    max-height: 30rem; // 480px - scrollable on tablet
+    height: auto;
+  }
+}
+
+.listItem {
+  border: 1px solid $color-border;
+}
+
+.moveList {
+  padding-left: 0;
+  list-style-type: none;
+
+  li {
+    list-style-type: none;
+  }
+}

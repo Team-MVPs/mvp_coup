@@ -1,0 +1,67 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.loginContainer {
+  margin-top: 5rem;
+
+  @include mobile {
+    margin-top: $spacing-xl;
+    width: 90% !important;
+    padding: 0 $spacing-md;
+  }
+
+  @include tablet {
+    width: 70%;
+  }
+}
+
+.welcomeTitle {
+  margin-bottom: 3%;
+
+  @include mobile {
+    margin-bottom: $spacing-lg;
+    font-size: $font-size-xl;
+  }
+}
+
+.inputRow {
+  margin-bottom: 3%;
+
+  @include mobile {
+    margin-bottom: $spacing-md;
+  }
+}
+
+.buttonRow {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+}
+
+.buttonCol {
+  @include mobile {
+    flex: 1;
+    max-width: 100% !important;
+  }
+}
+
+.actionButton {
+  width: 100%;
+
+  @include mobile {
+    margin-bottom: 0;
+  }
+}
+
+.footerLink {
+  margin-bottom: $spacing-md;
+
+  @include mobile {
+    margin-bottom: $spacing-lg;
+  }
+}

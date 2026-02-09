@@ -6,6 +6,7 @@ import PlayCard from '../components/PlayCard.js';
 import { firestore, root } from '../config/firebase';
 import coins from '../images/coins.jpg';
 import { RoomContext } from '../contexts/RoomContext.js';
+import styles from './UserDetails.module.scss';
 
 function UserDetails(props) {
     const [playerDetails, setDetails] = React.useState({});
@@ -30,9 +31,9 @@ function UserDetails(props) {
         	if (numCards === 2){
 	        	return (
 	                <div>
-	                    <Container style={{width:"20em"}}>
+	                    <Container className={styles.cardsContainer}>
 	                        <Row>
-	                            <Col xs={6}>
+	                            <Col xs={6} className={styles.cards}>
 	                                <PlayCard cardName={playerDetails[props.playerID].cards[0]} />
 	                            </Col>
 	                            <Col xs={6}>
@@ -40,8 +41,8 @@ function UserDetails(props) {
 	                            </Col>
 	                        </Row>
 	                    </Container>
-                        <div align = "center" style = {{fontSize: "x-large", paddingTop: "1em"}}>
-                          <img src ={coins} alt="coins" style={{maxWidth: "10%", borderRadius: "2em", paddingRight: "0.5em"}}/>
+                        <div align = "center" className={styles.coinsDisplay}>
+                          <img src ={coins} alt="coins" className={styles.coinIcon}/>
                           {playerDetails[props.playerID].coins}
                         </div>
 	                </div>);
@@ -49,18 +50,18 @@ function UserDetails(props) {
         	} else if (numCards === 1){
 	        	return (
 	                <div>
-	                    <Container style={{width:"20em"}}>
+	                    <Container className={styles.cardsContainer}>
 	                        <Row>
 	                            <Col xs={6}>
 	                                <PlayCard cardName={playerDetails[props.playerID].cards[0]} />
 	                            </Col>
 	                        </Row>
 	                    </Container>
-                        <div align = "center" style = {{fontSize: "x-large", paddingTop: "1em"}}>
-                          <img src ={coins} alt="coins" style={{maxWidth: "10%", borderRadius: "2em", paddingRight: "0.5em"}}/>
+                        <div align = "center" className={styles.coinsDisplay}>
+                          <img src ={coins} alt="coins" className={styles.coinIcon}/>
                           {playerDetails[props.playerID].coins}
                         </div>
-	                </div>);        		
+	                </div>);
         	}else {
         		return (<div>You are out of the game!</div>);
         	}
@@ -73,7 +74,7 @@ function UserDetails(props) {
     return (
         <div align="center">
             <h3>Player Information</h3>
-            <div align="left" style={{paddingBottom: "1em", paddingTop:"1em"}}>
+            <div align="left" className={styles.cardSection}>
                 <Card>
                     <Card.Header><h4>Your Cards and Currency</h4></Card.Header>
                     <Card.Body>
