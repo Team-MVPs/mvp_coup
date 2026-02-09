@@ -1,0 +1,37 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.thankYouMessage {
+  padding-top: $spacing-md;
+
+  @include mobile {
+    font-size: $font-size-base;
+  }
+}
+
+.buttonContainer {
+  padding-bottom: $spacing-md;
+  padding-top: $spacing-md;
+
+  @include mobile {
+    padding-bottom: $spacing-sm;
+    padding-top: $spacing-sm;
+  }
+}
+
+.newGameButton {
+  width: $card-width-container; // 20em
+
+  @include mobile {
+    width: 100%;
+    max-width: $card-width-container;
+  }
+}
+
+.spinnerContainer {
+  padding-top: $spacing-md;
+
+  @include mobile {
+    padding-top: $spacing-sm;
+  }
+}

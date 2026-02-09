@@ -1,0 +1,72 @@
+@import './styles/variables';
+@import './styles/mixins';
+
+.App {
+  text-align: center;
+}
+
+.AppLogo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .AppLogo {
+    animation: AppLogoSpin infinite 20s linear;
+  }
+}
+
+.AppHeader {
+  background-color: $color-dark-bg;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(0.625rem + 2vmin); // 10px base + 2vmin
+  color: $color-text-light;
+
+  @include mobile {
+    min-height: 80vh;
+    font-size: $font-size-base;
+  }
+}
+
+.AppBody {
+  background-color: $color-dark-bg;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(0.625rem + 2vmin); // 10px base + 2vmin
+  color: $color-text-light;
+
+  @include mobile {
+    min-height: 80vh;
+    font-size: $font-size-base;
+  }
+}
+
+.AppLink {
+  color: $color-link;
+}
+
+.bottomText {
+  bottom: 0;
+  position: absolute;
+}
+
+@keyframes AppLogoSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+button:disabled {
+  cursor: not-allowed;
+  pointer-events: all !important;
+}

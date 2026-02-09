@@ -1,0 +1,19 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.waitingContainer {
+  font-size: $font-size-large;
+  margin-bottom: 1.875rem; // 30px
+
+  @include mobile {
+    font-size: $font-size-base;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.leaveButton {
+  @include mobile {
+    width: 100%;
+    max-width: 20rem;
+  }
+}

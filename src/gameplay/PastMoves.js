@@ -3,6 +3,7 @@ import React, { useContext } from 'react';
 import { Card, ListGroup } from "react-bootstrap";
 import { RoomContext } from "../contexts/RoomContext";
 import { firestore, root } from "../config/firebase";
+import styles from './PastMoves.module.scss';
 
 function PastMoves() {
     const [moves, setMoves] = React.useState([]);
@@ -72,18 +73,18 @@ function PastMoves() {
     return (
         <div align="center">
             <h3>History</h3>
-            <div align="left" style={{ paddingBottom: "1em", paddingTop: "1em" }}>
+            <div align="left" className={styles.historySection}>
                 <Card>
                     <Card.Header><h4>Past Moves</h4></Card.Header>
-                    <Card.Body className="overflow-auto" style={{padding:"0rem", height: "40em"}}>
+                    <Card.Body className={`overflow-auto ${styles.cardBody}`}>
                         <ListGroup>
                             {moves.map(move => {
                                 if (move !== undefined) {
                                     return(
-                                        <ListGroup.Item style={{border: "1px solid rgba(0, 0, 0, 0.125)"}}>
-                                            <ol style={{paddingLeft: "0"}}>
+                                        <ListGroup.Item className={styles.listItem}>
+                                            <ol className={styles.moveList}>
                                                 {move.map(line => {
-                                                    return (<li style={{listStyleType: "none"}}>{line}</li>)
+                                                    return (<li>{line}</li>)
                                                 })}
                                             </ol>
                                         </ListGroup.Item>

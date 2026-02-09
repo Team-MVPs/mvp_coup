@@ -5,63 +5,44 @@ import back from '../images/back.JPG';
 import captain from '../images/captain.JPG';
 import contessa from '../images/contessa.JPG';
 import duke from '../images/duke.JPG';
+import styles from './PlayCard.module.scss';
 
 function PlayCard(props) {
     switch(props.cardName){
         case "Duke": {
-            return (<div style={{
-                width: "8em",
-            }}> <img src={duke} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} />
-            <div style={{
-                textAlign: "center",
-                paddingTop: "3%"
-            }}>Duke</div>
-            </div >);
+            return (<div className={styles.cardWrapper}>
+                <img src={duke} alt={props.cardName} className={styles.cardImage} />
+                <div className={styles.cardLabel}>Duke</div>
+            </div>);
         }
         case "Assassin": {
-            return (<div style={{
-                width: "8em",
-            }}> <img src={assassin} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} />
-            <div style={{
-                textAlign: "center",
-                paddingTop: "3%"
-            }}>Assassin</div>
-            </div >);
+            return (<div className={styles.cardWrapper}>
+                <img src={assassin} alt={props.cardName} className={styles.cardImage} />
+                <div className={styles.cardLabel}>Assassin</div>
+            </div>);
         }
         case "Contessa": {
-            return (<div style={{
-                width: "8em",
-            }}> <img src={contessa} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} />
-            <div style={{
-                textAlign: "center",
-                paddingTop: "3%"
-            }}>Contessa</div>
-            </div >);
+            return (<div className={styles.cardWrapper}>
+                <img src={contessa} alt={props.cardName} className={styles.cardImage} />
+                <div className={styles.cardLabel}>Contessa</div>
+            </div>);
         }
         case "Captain": {
-            return (<div style={{
-                width: "8em",
-            }}> <img src={captain} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} />
-            <div style={{
-                textAlign: "center",
-                paddingTop: "3%"
-            }}>Captain</div>
-            </div >);
+            return (<div className={styles.cardWrapper}>
+                <img src={captain} alt={props.cardName} className={styles.cardImage} />
+                <div className={styles.cardLabel}>Captain</div>
+            </div>);
         }
         case "Ambassador": {
-            return (<div style={{
-                width: "8em",
-            }}> <img src={ambassador} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} />
-            <div style={{
-                textAlign: "center",
-                paddingTop: "3%"
-            }}>Ambassador</div>
-            </div >);
+            return (<div className={styles.cardWrapper}>
+                <img src={ambassador} alt={props.cardName} className={styles.cardImage} />
+                <div className={styles.cardLabel}>Ambassador</div>
+            </div>);
         }
     }
-    return (<div style={{
-        width: "8em",
-    }}> <img src={back} alt={props.cardName} style={{maxWidth: "100%", borderRadius: "1em"}} /></div >);
+    return (<div className={styles.cardWrapper}>
+        <img src={back} alt={props.cardName} className={styles.cardImage} />
+    </div>);
 }
 
 export default PlayCard;

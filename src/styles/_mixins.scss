@@ -1,0 +1,88 @@
+@import './variables';
+
+// Responsive Breakpoint Mixins
+@mixin mobile {
+  @media (max-width: #{$breakpoint-mobile - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-mobile) and (max-width: #{$breakpoint-tablet - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+@mixin tablet-up {
+  @media (min-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+@mixin desktop-up {
+  @media (min-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+// Flexbox Center Mixin
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-column-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// Card Styling Mixin
+@mixin card-style($border-radius: $border-radius-md) {
+  border-radius: $border-radius;
+  max-width: 100%;
+}
+
+// Button Full Width Mixin
+@mixin button-full-width {
+  width: 100%;
+
+  @include tablet-up {
+    width: auto;
+  }
+}
+
+// Responsive Container
+@mixin responsive-container($mobile-width: 100%, $tablet-width: 80%, $desktop-width: 50%) {
+  width: $mobile-width;
+
+  @include tablet-up {
+    width: $tablet-width;
+  }
+
+  @include desktop-up {
+    width: $desktop-width;
+  }
+}
+
+// Text Truncation
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Image Responsive
+@mixin img-responsive($max-width: 100%) {
+  max-width: $max-width;
+  height: auto;
+  display: block;
+}

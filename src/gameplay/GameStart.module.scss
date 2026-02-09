@@ -1,0 +1,39 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.spinnerContainer {
+  padding-top: $spacing-md;
+}
+
+.joinGameContainer {
+  padding-top: $spacing-md;
+}
+
+.startButton {
+  margin-bottom: 0.625rem; // 10px
+
+  @include mobile {
+    width: 100%;
+    max-width: 20rem;
+  }
+}
+
+.playerList {
+  margin-bottom: 3.125rem; // 50px
+  margin-top: 1.25rem; // 20px
+
+  @include mobile {
+    margin-bottom: $spacing-xl;
+    margin-top: $spacing-md;
+  }
+}
+
+.noteMessage {
+  padding-top: 2rem; // 2em
+  font-weight: $font-weight-medium;
+
+  @include mobile {
+    padding-top: $spacing-lg;
+    font-size: $font-size-base;
+  }
+}

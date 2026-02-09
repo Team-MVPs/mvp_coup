@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Row, Col, Accordion, Card } from 'react-bootstrap';
 import PlayCard from '../components/PlayCard.js';
 import coins from '../images/coins.jpg';
+import styles from './OtherPlayerInfoComponent.module.scss';
 
 function OtherPlayerInfo(props) {
 	function AccordianBody(props) {
@@ -20,7 +21,7 @@ function OtherPlayerInfo(props) {
 				<Accordion.Collapse eventKey={props.keyIndex}>
 					<Card.Body>
 						<div>
-							<Container style={{ width: "20em" }}>
+							<Container className={styles.cardsContainer}>
 								<Row>
 									<Col xs={6}>
 										{(props.data.cards.length >= 1) ? <PlayCard cardName={"back"}/> : <div>Out Of game, what a loser!</div>}
@@ -31,11 +32,11 @@ function OtherPlayerInfo(props) {
 								</Row>
 							</Container>
 						</div>
-						<div align = "center" style = {{ marginTop: "1em", fontSize: "large" }}>
-							{(props.data.cards.length !== 0) ? 
-								<div>  
-								<img src ={coins} alt="coins" style={{maxWidth: "10%", borderRadius: "2em", paddingRight: "0.5em"}}/>{props.data.coins}
-								</div> 
+						<div align = "center" className={styles.coinsDisplay}>
+							{(props.data.cards.length !== 0) ?
+								<div>
+								<img src ={coins} alt="coins" className={styles.coinIcon}/>{props.data.coins}
+								</div>
 								: <div/>}
 						</div>
 					</Card.Body>
