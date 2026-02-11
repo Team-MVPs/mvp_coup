@@ -18,21 +18,24 @@ function Creator(creator) {
 	const github = creator["github"];
 	
 	return (
-		<Col className={styles.creatorColumn}>
+		<div className={styles.creatorColumn}>
 			<Card className={styles.creatorCard}>
 				<Card.Header>
 					<img src={image} alt={name} className={styles.creatorImage}/>
 				</Card.Header>
 				<Card.Body>
 					<h4>{name}</h4>
-					<a href={github} target="_blank" className={styles.socialLink}><FaGithub /></a>
-					<a href={linkedin} target="_blank" className={styles.socialLink}><FaLinkedin /></a>
+					<a href={github} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+						<FaGithub />
+					</a>
+					<a href={linkedin} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+						<FaLinkedin />
+					</a>
 				</Card.Body>
 			</Card>
-		</Col>
+		</div>
 	)
 }
-
 function CreatorComponent(props) {
 	const creators = [
 		{
@@ -69,12 +72,12 @@ function CreatorComponent(props) {
 	
 	return (
 		<Container className={styles.creatorsContainer}>
-			<h1 className={styles.creatorsTitle}>Creators of MVP Coup</h1>
-			<Row>
-				{creators.map(creator => Creator(creator))}
-			</Row>
-			<div className={`fixed-bottom ${styles.footerLink}`}>
+			<div className={`${styles.footerLink}`}>
 				<Link to='/'>Back to the Game</Link>
+			</div>
+			<h1 className={styles.creatorsTitle}>Creators of MVP Coup</h1>
+			<div className={styles.creatorsGrid}>
+				{creators.map(creator => Creator(creator))}
 			</div>
 		</Container>
 	)
