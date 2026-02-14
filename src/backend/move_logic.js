@@ -1,572 +1,336 @@
-import {firestore, root} from "../config/firebase";
-import {handleDBException} from "./callbacks";
-import firebase from 'firebase';
-import React from 'react';
-import { generalIncome, Coup, foreignAid, Duke, HasCard, exchangeOneCard, loseTwoCoins } from "./PerformMoves";
+/**
+ * Core move logic and game state machine for Coup
+ * This file has been refactored to use modular helpers and the API layer
+ */
 
-export function Move(type, player, to) {
-	return {
-		type: type,
-		player: player,
-		to: to
-	}
-}
+// Import dependencies
+import { getActivePlayerCount, updatePlayerCoins } from '../api/playerApi';
+import { firestore } from '../config/firebase';
+import { FIREBASE_ROOT_COLLECTION, TURNS_COLLECTION } from '../constants';
+import {
+  MOVE_GENERAL_INCOME,
+  MOVE_COUP,
+  MOVE_FOREIGN_AID,
+  MOVE_DUKE,
+  MOVE_EXCHANGE_CARDS,
+  MOVE_ASSASSINATE,
+  MOVE_STEAL,
+} from '../constants/moveTypes';
+import {
+  COUP_COST,
+  ASSASSINATE_COST,
+  CAPTAIN_STEAL_AMOUNT,
+} from '../constants/gameConstants';
+import { CHAR_CONTESSA } from '../constants/characterTypes';
+import {
+  generalIncome,
+  foreignAid,
+  Duke,
+  exchangeOneCard,
+} from '../components/moves/moveHelpers';
+import { incrementTurn as incrementTurnApi } from '../api/gameApi';
+import { handleBluffLoser, handleBlockBluff, handlePlayerBluffed } from './move_logic_helpers';
+
+// Re-export from move creators
+export { Move, updateTurnInDB, all_moves, confirmTurn } from './move_creators';
+
+// Re-export from move responses
+export {
+  responses,
+  responsesForeignAid,
+  responsesBlock,
+  responsesAssassin,
+  responsesCaptain,
+  responsesDuke,
+  responsesAmbassador,
+} from './move_responses';
+
+// Re-export incrementTurn from API
+export { incrementTurn } from '../api/gameApi';
 
 let registeredTurn = -1;
 
-export function RegisterMoveCallback(roomName, turn, playerID, realPlayerName, setMove, setCurrentMove, setConfirmed, 
-									 setWaitingMessage, setPlayerChosen, setLoseACard, setAmbassadorBluff, totalPlayers, playerNames) {
-	firestore.collection(root).doc(roomName).collection("players").get().then((snap)=>{
-		let numPlayers = 0;
-		snap.forEach((player) => {
-			if(player.data().cards.length > 0){
-				numPlayers+=1;
-			}
-		 });
-		//console.log(numPlayers);
-		var alreadyInvoked = false;
-		var bluffDecided = false;
-		var blockDecided = false;
-		var takeCoins = false;
-		let exchangeCard = false;
-		let blocked = false;
-		let makeMove = false;
-		let incrementTurnFromPlayer = true;	
-		if (turn >= 0 && turn !== registeredTurn) {
-			firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).onSnapshot(
-				async (doc) => {									
-					if (doc.exists) {
-						let move = doc.data().move.type;
-						const playerName = doc.data().playerName;
-						var targetPlayer = doc.data().move.to;
-						var ambassadorBluffDoc = doc.data().ambassadorBluff;
-						if (doc.data().playerID !== playerID) {
-							if(!alreadyInvoked && move !== "general_income" && move !== 'coup'){
-								if (move === 'exchange_cards'){
-									setMove(`${playerName} performed Ambassador`);
-								}else {
-									setMove(`${playerName} performed ${move}`);
-								}
-								alreadyInvoked = true;
-								if (move === 'assassinate'){
-									setCurrentMove("AttemptAssassin");
-									setWaitingMessage("Waiting for assassin to strike! Quick, try and hide!");																		
-								} else if (move === "steal"){
-									setCurrentMove("Captain");
-									setWaitingMessage("Player is waiting to choose from whom to steal");
-								} else if (move === "foreign_aid"){
-									setCurrentMove("ForeignAid")
-									setConfirmed(false);
-								} else if (move === "duke"){
-									setCurrentMove("Duke");
-									setConfirmed(false);
-								} else if (move === "exchange_cards"){
-									setCurrentMove("Ambassador");
-								}
+/**
+ * Registers callbacks for move handling and game state updates
+ * This is the main game state machine that handles all move logic
+ */
+export const RegisterMoveCallback = (
+  roomName,
+  turn,
+  playerID,
+  realPlayerName,
+  setMove,
+  setCurrentMove,
+  setConfirmed,
+  setWaitingMessage,
+  setPlayerChosen,
+  setLoseACard,
+  setAmbassadorBluff,
+  totalPlayers,
+  playerNames
+) => {
+  getActivePlayerCount(roomName).then((numPlayers) => {
+    let alreadyInvoked = false;
+    let bluffDecided = false;
+    let blockDecided = false;
+    let takeCoins = false;
+    let exchangeCard = false;
+    let blocked = false;
+    let makeMove = false;
+    let incrementTurnFromPlayer = true;
 
-							} else {
-								if (move === 'coup'){
-									setMove(`${playerName} performed ${move}`);
-									setCurrentMove("Coup");
-									setWaitingMessage("A Coup has been launched! Start Praying!");
-									if (targetPlayer !== null){
-										setPlayerChosen(targetPlayer);
-										setLoseACard(true);
-									}								
-								} else if (move === 'assassinate'){
-									if (targetPlayer !== null){
-										setPlayerChosen(targetPlayer);
-									}
-									if (doc.data().confirmations === 1){
-										setLoseACard(true);
-										if (targetPlayer === realPlayerName){
-											setWaitingMessage("You have been Assassinated! Choose one card to lose!")
-										} else {
-											setWaitingMessage("The Assassin has struck! " + targetPlayer + " will lose a card!");
-										}
-									}
-								} else if (move === 'steal'){
-									if (targetPlayer != null){
-										setPlayerChosen(targetPlayer);
+    if (turn >= 0 && turn !== registeredTurn) {
+      firestore
+        .collection(FIREBASE_ROOT_COLLECTION)
+        .doc(roomName)
+        .collection(TURNS_COLLECTION)
+        .doc(turn.toString())
+        .onSnapshot(async (doc) => {
+          if (doc.exists) {
+            const turnData = doc.data();
+            let move = turnData.move.type;
+            const playerName = turnData.playerName;
+            const targetPlayer = turnData.move.to;
+            const ambassadorBluffDoc = turnData.ambassadorBluff;
 
-									}
-									if (doc.data().confirmations === 1 && targetPlayer === realPlayerName){
-										if(!takeCoins){
-											firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-												coins: firebase.firestore.FieldValue.increment(-2)
-												});
-											takeCoins = true;
-										};
-									}
-								}						
+            // Handle moves from other players
+            if (turnData.playerID !== playerID) {
+              // Initial move announcement
+              if (!alreadyInvoked && move !== MOVE_GENERAL_INCOME && move !== MOVE_COUP) {
+                const moveLabel = move === MOVE_EXCHANGE_CARDS ? 'Ambassador' : move;
+                setMove(`${playerName} performed ${moveLabel}`);
+                alreadyInvoked = true;
 
-								if(doc.data().bluffLoser !== undefined && !bluffDecided){
-									bluffDecided = true;
-									if(doc.data().bluffLoser.playerID === playerID){
-										if (move === "steal"){
-											loseTwoCoins(roomName, playerID);
-										}
-										if (move === "assassinate"){											
-											let noCards = []
-											firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-												cards: noCards
-											})
-											incrementTurn(roomName, totalPlayers, playerNames).then(() => console.log("turn incremented"));
-										} else {
-											setWaitingMessage("Unsuccessful Bluff. Pick 1 card to lose");
-											setMove("bluff");
-										}
-										
-									}else{
-										const bluffer = doc.data().bluffs[0].playerName;
-										const loser = doc.data().bluffLoser.playerName;
-										if(doc.data().bluffs[0].playerID === playerID){
-											setWaitingMessage("Successful Bluff!" + loser + " is losing a card.")
-										}else{
-											//setWaitingMessage(bluffer + " bluffed " + playerName + " 's move. " + loser + " is losing a card");
-											setWaitingMessage(loser + " is losing a card on a failed bluff call");
-										}
-										setConfirmed(true);
-										setMove("");
-									}
-								} else if (doc.data().blocks.length !== 0){
-									if (doc.data().bluffs.length !== 0 && !blockDecided && doc.data().blocks[0].playerID === playerID){
-										let originalMove = move;
-										blockDecided = true;
-										let blockedCardMove = "";
-										switch (originalMove) {
-												case "foreign_aid":
-													blockedCardMove = "duke";
-													break;
-												case "assassinate":
-													blockedCardMove = "Contessa";
-													break;	
-												case "steal":
-													if (doc.data().blocks[0].card === "Ambassador"){
-														blockedCardMove = "exchange_cards";
-													} else{
-														blockedCardMove = "steal";
-													}
+                if (move === MOVE_ASSASSINATE) {
+                  setCurrentMove('AttemptAssassin');
+                  setWaitingMessage('Waiting for assassin to strike! Quick, try and hide!');
+                } else if (move === MOVE_STEAL) {
+                  setCurrentMove('Captain');
+                  setWaitingMessage('Player is waiting to choose from whom to steal');
+                } else if (move === MOVE_FOREIGN_AID) {
+                  setCurrentMove('ForeignAid');
+                  setConfirmed(false);
+                } else if (move === MOVE_DUKE) {
+                  setCurrentMove('Duke');
+                  setConfirmed(false);
+                } else if (move === MOVE_EXCHANGE_CARDS) {
+                  setCurrentMove('Ambassador');
+                }
+              } else {
+                if (move === MOVE_COUP) {
+                  setMove(`${playerName} performed ${move}`);
+                  setCurrentMove('Coup');
+                  setWaitingMessage('A Coup has been launched! Start Praying!');
+                  if (targetPlayer !== null) {
+                    setPlayerChosen(targetPlayer);
+                    setLoseACard(true);
+                  }
+                } else if (move === MOVE_ASSASSINATE) {
+                  if (targetPlayer !== null) {
+                    setPlayerChosen(targetPlayer);
+                  }
+                  if (turnData.confirmations === 1) {
+                    setLoseACard(true);
+                    const message =
+                      targetPlayer === realPlayerName
+                        ? 'You have been Assassinated! Choose one card to lose!'
+                        : `The Assassin has struck! ${targetPlayer} will lose a card!`;
+                    setWaitingMessage(message);
+                  }
+                } else if (move === MOVE_STEAL) {
+                  if (targetPlayer !== null) {
+                    setPlayerChosen(targetPlayer);
+                  }
+                  if (turnData.confirmations === 1 && targetPlayer === realPlayerName) {
+                    if (!takeCoins) {
+                      await updatePlayerCoins(roomName, playerID, -CAPTAIN_STEAL_AMOUNT);
+                      takeCoins = true;
+                    }
+                  }
+                }
 
-											}
-										await HasCard(roomName, playerID, blockedCardMove).then((result)=>{
-											//console.log("Bluff result from block bluff " + result);
-											if (result){
-												setWaitingMessage("You were bluffed but they were wrong")
-												setConfirmed(true);
-												exchangeCard = true;
-												firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-													bluffLoser : doc.data().bluffs[0]
-												});
-											} else {
-												//console.log(playerID, playerName);
-												//console.log('wrong bluff, this is loser');
-												firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-													bluffLoser : {playerID: playerID, playerName: playerName}
-												});
-											}
-										})
-									}
-								}
-							}
-						} else {
-							if(doc.data().bluffs.length != 0 && !bluffDecided){
-								if (doc.data().blocks.length === 0){
-									await HasCard(roomName, playerID, move).then((result) => {
-										bluffDecided = true;
-										//console.log("Bluff Result " + result);
-										if(result){
-											const bluffer = doc.data().bluffs[0].playerName;
-											setWaitingMessage(bluffer + " bluffed " + "your move." + bluffer + " is losing a card");
-											let isAmbassador = move === "exchange_cards";
-											firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-												bluffLoser : doc.data().bluffs[0],
-												ambassadorBluff: isAmbassador
-											});
-											makeMove = true;
-											incrementTurnFromPlayer = false;
-											setConfirmed(true);
-											exchangeCard = true;
-										}else{
-											move="";
-											firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-												bluffLoser : {playerID: playerID, playerName: playerName}
-											}).then(() => {
-												setConfirmed(false);
-												setMove("bluff");
-												setWaitingMessage(doc.data().bluffs[0].playerName + " called Bluff. Pick 1 card to lose");
-											})
-										}
-									})
-								} else {
-									if (doc.data().bluffLoser !== undefined){
-										bluffDecided = true;
-										if (doc.data().bluffLoser.playerID === playerID){
-											setWaitingMessage("Unsuccessful Bluff. Pick 1 card to lose");
-											setConfirmed(false);
-											setMove("bluff");
-											incrementTurnFromPlayer = false;										
-										} else {
-											setWaitingMessage("Gottem");
-											incrementTurnFromPlayer = false;
-											makeMove = true;
-										}
-									}
+                // Handle bluff results
+                if (turnData.bluffLoser !== undefined && !bluffDecided) {
+                  bluffDecided = true;
+                  await handleBluffLoser(
+                    turnData,
+                    playerID,
+                    move,
+                    roomName,
+                    totalPlayers,
+                    playerNames,
+                    setWaitingMessage,
+                    setMove,
+                    setConfirmed
+                  );
+                }
+                // Handle block bluffs
+                else if (turnData.blocks.length !== 0) {
+                  await handleBlockBluff(
+                    turnData,
+                    playerID,
+                    playerName,
+                    move,
+                    roomName,
+                    { blockDecided, exchangeCard },
+                    setWaitingMessage,
+                    setConfirmed
+                  );
+                }
+              }
+            }
+            // Handle moves from current player
+            else {
+              // Handle bluffs against current player's move
+              if (turnData.bluffs.length !== 0 && !bluffDecided) {
+                await handlePlayerBluffed(
+                  turnData,
+                  move,
+                  roomName,
+                  playerID,
+                  realPlayerName,
+                  turn,
+                  { bluffDecided, incrementTurnFromPlayer, makeMove, exchangeCard },
+                  setWaitingMessage,
+                  setConfirmed,
+                  setMove
+                );
+              }
+              // Handle blocks against current player's move
+              else if (turnData.blocks.length !== 0) {
+                setLoseACard(true);
+                setConfirmed(false);
+                setCurrentMove('blocked');
+                blocked = true;
 
-								}
-							} else if (doc.data().blocks.length !== 0){
-								setLoseACard(true);
-								setConfirmed(false);
-								setCurrentMove("blocked");
-								blocked = true;
+                if (turnData.blocks[0] !== undefined) {
+                  const blockCard = turnData.blocks[0].card;
+                  let message = `${targetPlayer} blocked your move as ${blockCard}. Pick one!`;
+                  if (move === MOVE_ASSASSINATE && blockCard !== CHAR_CONTESSA) {
+                    message = `${targetPlayer} blocked your move as Contessa. Pick one!`;
+                  } else if (blockCard === 'Duke') {
+                    message = `${turnData.blocks[0].playerName} blocked your move as Duke. Pick one!`;
+                  }
+                  setWaitingMessage(message);
+                }
 
-								if (doc.data().blocks[0] !== undefined){
-									if (doc.data().blocks[0].card === "Ambassador"){
-										setWaitingMessage(targetPlayer + " blocked your move as Ambassador. Pick one!")
-									}else if (doc.data().blocks[0].card === "Captain"){
-										setWaitingMessage(targetPlayer + " blocked your move as Captain. Pick one!")
-									} else if (move === "assassinate"){
-										setWaitingMessage(targetPlayer + " blocked your move as Contessa. Pick one!")
-									} else {
-										setWaitingMessage(doc.data().blocks[0].playerName + " blocked your move as Duke. Pick one!")
-									}
-								}
+                incrementTurnFromPlayer = turnData.blocks[0].letGo;
+              }
 
-								if (doc.data().blocks[0].letGo){
-									setConfirmed(false);
-									incrementTurnFromPlayer = true;
+              // Execute moves based on type
+              switch (move) {
+                case MOVE_GENERAL_INCOME:
+                  setConfirmed(false);
+                  await generalIncome(roomName, playerID);
+                  await incrementTurnApi(roomName, totalPlayers, playerNames);
+                  break;
 
-								} else {
-									incrementTurnFromPlayer = false;
-								}
-							}
-							
-							if (move === "general_income"){
-								setConfirmed(false);
-								generalIncome(roomName,playerID);
-								incrementTurn(roomName, totalPlayers, playerNames).then(() => console.log("turn incremented"));
-							} else if (move === 'coup'){
-								setConfirmed(false);
-								if (!takeCoins){
-									firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-										coins: firebase.firestore.FieldValue.increment(-7)
-									});
-									takeCoins = true;
-								}	
-								setCurrentMove('Coup')
-								if (targetPlayer !== null){
-									setLoseACard(true);
-									setWaitingMessage('You have launched a Coup! '+ targetPlayer + ' will now lose a card!')
-								}								
-							} else if (move === 'exchange_cards'){
-								if (doc.data().confirmations+1 === numPlayers || makeMove){
-									if (exchangeCard){
-										setAmbassadorBluff(true);
-										exchangeCard = false;
-										await exchangeOneCard(roomName, playerID, move).then(()=>{										
-											setConfirmed(false);
-											setCurrentMove("Ambassador");
-										});
-										
-									} else{
-										setConfirmed(false);
-										if (!ambassadorBluffDoc){
-											setCurrentMove("Ambassador");
-										}										
-									}
-									
-								}
-							} else if (move === 'assassinate'){
-								if (!takeCoins){
-									firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-										coins: firebase.firestore.FieldValue.increment(-3)
-									});
-									takeCoins = true;
-								}
-								if (!blocked){								
-									setCurrentMove("AttemptAssassin");
-								}
-								if(doc.data().confirmations === 1){
-									setLoseACard(true);
-									setWaitingMessage("Your Assassin has struck! " + targetPlayer + ' will lose a card!')
-								}
-								if (incrementTurnFromPlayer && blocked){
-									incrementTurn(roomName, totalPlayers, playerNames).then(() => console.log("turn incremented"));
-								}
-							} else if (move === 'steal'){
-								if (!blocked){
-									setCurrentMove("Captain");
-								}
-								if (targetPlayer != null){
-									setPlayerChosen(targetPlayer);
-								}
-								if (doc.data().confirmations === 1 || makeMove){
-									if(!takeCoins){
-										firestore.collection(root).doc(roomName).collection("players").doc(playerID).update({
-											coins: firebase.firestore.FieldValue.increment(2)
-										});
-										takeCoins = true;
-									}
-									if (incrementTurnFromPlayer){
-										incrementTurn(roomName, totalPlayers, playerNames).then(() => console.log("turn incremented"));
-									}
-								} else if (incrementTurnFromPlayer && blocked){
-									incrementTurn(roomName, totalPlayers, playerNames).then(() => console.log("turn incremented"));
-								}
-							} else if (move === "foreign_aid"){
-								if (doc.data().confirmations +1 === numPlayers && !blocked || makeMove){
-									await foreignAid(roomName, playerID);
-									if (incrementTurnFromPlayer){
-										incrementTurn(roomName, totalPlayers, playerNames).then(() => console.log("turn incremented"));
-									};
-								}
-								if (incrementTurnFromPlayer && blocked){
-									incrementTurn(roomName, totalPlayers, playerNames).then(() => console.log("turn incremented"));
-								}
+                case MOVE_COUP:
+                  setConfirmed(false);
+                  if (!takeCoins) {
+                    await updatePlayerCoins(roomName, playerID, -COUP_COST);
+                    takeCoins = true;
+                  }
+                  setCurrentMove('Coup');
+                  if (targetPlayer !== null) {
+                    setLoseACard(true);
+                    setWaitingMessage(`You have launched a Coup! ${targetPlayer} will now lose a card!`);
+                  }
+                  break;
 
-							} else if(move === "duke"){
-								if (doc.data().confirmations+1 === numPlayers || makeMove){
-									Duke(roomName, playerID);
-									makeMove = false;
-									if (incrementTurnFromPlayer){
-										incrementTurn(roomName, totalPlayers, playerNames).then(() => console.log("turn incremented"));
-									}
-								}
+                case MOVE_EXCHANGE_CARDS:
+                  if (turnData.confirmations + 1 === numPlayers || makeMove) {
+                    if (exchangeCard) {
+                      setAmbassadorBluff(true);
+                      exchangeCard = false;
+                      await exchangeOneCard(roomName, playerID, move);
+                      setConfirmed(false);
+                      setCurrentMove('Ambassador');
+                    } else {
+                      setConfirmed(false);
+                      if (!ambassadorBluffDoc) {
+                        setCurrentMove('Ambassador');
+                      }
+                    }
+                  }
+                  break;
 
-							}						
-						}
-					if(exchangeCard && move !== ""){
-						if (doc.data().blocks.length !== 0 && move === "assassinate"){
-							move = "Contessa";
-						}
-						exchangeOneCard(roomName, playerID, move);
-						exchangeCard = false;
-					}	
-				};
-			registeredTurn = turn;
-		})
-	}})
-}
+                case MOVE_ASSASSINATE:
+                  if (!takeCoins) {
+                    await updatePlayerCoins(roomName, playerID, -ASSASSINATE_COST);
+                    takeCoins = true;
+                  }
+                  if (!blocked) {
+                    setCurrentMove('AttemptAssassin');
+                  }
+                  if (turnData.confirmations === 1) {
+                    setLoseACard(true);
+                    setWaitingMessage(`Your Assassin has struck! ${targetPlayer} will lose a card!`);
+                  }
+                  if (incrementTurnFromPlayer && blocked) {
+                    await incrementTurnApi(roomName, totalPlayers, playerNames);
+                  }
+                  break;
 
-export async function updateTurnInDB(roomName, turn, playerName, playerID, move) {
-	await firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).set({
-		turn: turn,
-		playerName: playerName,
-		playerID: playerID,
-		move: move,
-		confirmations: 0,
-		blocks: [],
-		bluffs: [],
-		ambassadorBluff: false
-	}).then(() => {
-		console.log("Added turn to db");
-	}).catch(() => handleDBException());
-}
+                case MOVE_STEAL:
+                  if (!blocked) {
+                    setCurrentMove('Captain');
+                  }
+                  if (targetPlayer !== null) {
+                    setPlayerChosen(targetPlayer);
+                  }
+                  if (turnData.confirmations === 1 || makeMove) {
+                    if (!takeCoins) {
+                      await updatePlayerCoins(roomName, playerID, CAPTAIN_STEAL_AMOUNT);
+                      takeCoins = true;
+                    }
+                    if (incrementTurnFromPlayer) {
+                      await incrementTurnApi(roomName, totalPlayers, playerNames);
+                    }
+                  } else if (incrementTurnFromPlayer && blocked) {
+                    await incrementTurnApi(roomName, totalPlayers, playerNames);
+                  }
+                  break;
 
-function move(type) {
-	return (roomName, turn, playerName, activePlayerID, setConfirmed) => {
-		return () => {
-			const move = Move(type, playerName, null, "");
-			updateTurnInDB(roomName, turn, playerName, activePlayerID, move).then(() =>{
-				if(setConfirmed !== null) setConfirmed(true);
-			});	
-		}
-	}
-}
+                case MOVE_FOREIGN_AID:
+                  if ((turnData.confirmations + 1 === numPlayers && !blocked) || makeMove) {
+                    await foreignAid(roomName, playerID);
+                    if (incrementTurnFromPlayer) {
+                      await incrementTurnApi(roomName, totalPlayers, playerNames);
+                    }
+                  }
+                  if (incrementTurnFromPlayer && blocked) {
+                    await incrementTurnApi(roomName, totalPlayers, playerNames);
+                  }
+                  break;
 
-export const all_moves = {
-	"Take General Income": move("general_income"),
-	"Take Foreign Aid": move("foreign_aid"),
-	"Take 3 as Duke": move("duke"),
-	"Exchange your cards as Ambassador": move("exchange_cards"),
-	"Steal 2 from a player as Captain": move("steal"),
-	"Assassinate someone you dislike!": move("assassinate"),
-	"Coup a scrub": move("coup")
+                case MOVE_DUKE:
+                  if (turnData.confirmations + 1 === numPlayers || makeMove) {
+                    await Duke(roomName, playerID);
+                    makeMove = false;
+                    if (incrementTurnFromPlayer) {
+                      await incrementTurnApi(roomName, totalPlayers, playerNames);
+                    }
+                  }
+                  break;
+
+                default:
+                  break;
+              }
+            }
+
+            // Handle card exchange after bluff
+            if (exchangeCard && move !== '') {
+              let cardToExchange = move;
+              if (turnData.blocks.length !== 0 && move === MOVE_ASSASSINATE) {
+                cardToExchange = CHAR_CONTESSA;
+              }
+              await exchangeOneCard(roomName, playerID, cardToExchange);
+              exchangeCard = false;
+            }
+          }
+        });
+      registeredTurn = turn;
+    }
+  });
 };
-
-function respond(type, card) {
-	return function (roomName, turn, playerName, playerID, setConfirmed, setMove) {
-		return () => {
-			switch (type) {
-				case "confirm":
-					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-						confirmations: firebase.firestore.FieldValue.increment(1)
-					}).then(() => {
-						//console.log("incremented confirmations");
-						setConfirmed(true);
-						//setMove("");
-						});
-					break;
-				case "call_bluff":
-					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-						bluffs: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName}),
-					}).then(() => {
-						setConfirmed(true);						
-					});
-					break;
-				case "block":
-					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false, card: card}),
-					}).then(() => {
-						setConfirmed(true);
-					});
-					break;
-				case "blockAsCAP":
-					console.log(playerID, playerName);
-					console.log('blocked by');
-					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false, card: "Captain"}),
-					}).then(() => {
-						setConfirmed(true);						
-					});
-					break;
-				case "blockAsAM":
-					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-						blocks: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName, letGo: false, card: "Ambassador"}),
-					}).then(() => {
-						setConfirmed(true);
-					});
-					break;
-				default:
-					alert("Invalid response");
-					break;
-			}
-		}
-	}
-}
-
-function respondBlock(type) {
-	return function (roomName, turn, playerName, playerID, setConfirmed) {
-		return async () => {
-			switch (type) {
-				case "letGo":
-					let playerInfo = {};
-					await firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).get().then((doc) => {
-						playerInfo = doc.data().blocks[0];
-						playerInfo["letGo"] = true;
-					});
-					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-						blocks: [playerInfo]
-					}).then(() => {});
-					break;
-				case "bluff":
-					firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-						bluffs: firebase.firestore.FieldValue.arrayUnion({playerID: playerID, playerName: playerName}),
-					}).then(() => setConfirmed(true));
-					break;
-				default:
-					alert("Invalid response");
-					break;
-			}
-		}
-	}
-}
-
-export const responses = {
-	"Confirm": respond("confirm"),
-	"Call Bluff": respond("call_bluff"),
-	"Block": respond("block"),
-};
-
-export const responsesForeignAid = {
-	"Confirm": respond("confirm"),
-	"Block as Duke": respond("block", "Duke")
-};
-
-export const responsesBlock = {
-	"Let Go": respondBlock("letGo"),
-	"Call Bluff": respondBlock("bluff")
-};
-
-export const responsesAssassin = {
-	"Confirm": respond("confirm"),
-	"Call Bluff": respond("call_bluff"),
-	"Block as Contessa": respond("block", "Contessa")
-};
-
-export const responsesCaptain = {
-	"Confirm": respond("confirm"),
-	"Call Bluff": respond("call_bluff"),
-	"Block as Captain": respond("blockAsCAP"),
-	"Block as Ambassador": respond("blockAsAM"),
-};
-
-export const responsesDuke = {
-	"Confirm": respond("confirm"),
-	"Call Bluff": respond("call_bluff"),
-};
-
-export const responsesAmbassador = {
-	"Confirm": respond("confirm"),
-	"Call Bluff": respond("call_bluff"),
-};
-
-export async function incrementTurn(roomName, totalPlayers, playerNames) {
-	await firestore.collection(root).doc(roomName).get().then(async (room) => {
-		let nextTurn  = room.data().turn + 1;
-		// console.log("Calling incrementTurn from:" + playerName);
-		let winner = false;
-		while(!await nextTurnHasCards(room, nextTurn % totalPlayers)){
-			nextTurn += 1;
-			//console.log(room.data().turn);
-			if (nextTurn % totalPlayers === room.data().turn % totalPlayers) {
-				winner = true;
-				await firestore.collection(root).doc(roomName).update({
-					winner: playerNames[nextTurn % totalPlayers]
-				}).then(() => console.log(`Winner: ${playerNames[nextTurn % totalPlayers]}`));
-				break;
-			}
-		}
-		if(!winner){
-			if(await foundWinner(room, nextTurn % totalPlayers)){
-				await firestore.collection(root).doc(roomName).update({
-					winner: playerNames[nextTurn % totalPlayers]
-				}).then(() => console.log(`Winner: ${playerNames[nextTurn % totalPlayers]}`));
-			}
-		}
-		await firestore.collection(root).doc(roomName).update({
-			turn: nextTurn
-		}).then(() => console.log("incremented turn"));
-	})
-}
-
-async function foundWinner(room, index){
-	return await room.ref.collection("players").get().then((docs) => {
-		let i = 0;
-		let winner = true;
-		docs.forEach((player) => {
-			if(i != index && player.data().cards.length > 0){
-				winner = false;
-			}
-			i++;
-		 });
-		 return winner;
-	})
-}
-async function nextTurnHasCards(room, index){
-	return await room.ref.collection("players").get().then((docs) => {
-		let i = 0;
-		let result = false;
-		docs.forEach((player) => {
-			if(i == index){
-				//console.log("IN BOOL FUNCTION " + player.data().name);
-				//console.log("Cards " + player.data().cards.length);
-				result = player.data().cards.length > 0;
-			}
-			i++;
-		 });
-		 //console.log("RETURNING " + result);
-		 return result;
-
-	})
-}
-
-export async function confirmTurn(roomName, turn, setConfirmed, setWaitingMessage, setMove){
-	//console.log("Incrementing Confiramtions");
-	if(setConfirmed !== null) setConfirmed(true);
-	if(setWaitingMessage !== null) setWaitingMessage("Waiting for others");
-	if(setMove !== null) setMove("");
-	await firestore.collection(root).doc(roomName).collection("turns").doc(turn.toString()).update({
-		confirmations: firebase.firestore.FieldValue.increment(1)
-	});
-}

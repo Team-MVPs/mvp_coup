@@ -14,16 +14,17 @@ function UserDetails(props) {
     const { roomName } = useContext(RoomContext);
 
     React.useEffect(() => {
+        if (!roomName) return;
+
         const unsubscribe = firestore.collection(root).doc(roomName).collection("players").onSnapshot((docs) => {
-            let dict = {};
+            const dict = {};
             docs.forEach(function (doc) {
                 dict[doc.id] = doc.data();
             });
-            //console.log(dict);
             setDetails(dict);
         });
         return () => unsubscribe;
-    }, []);
+    }, [roomName]);
 
     function OwnCards(props) {
         if (playerDetails[props.playerID] !== undefined) {

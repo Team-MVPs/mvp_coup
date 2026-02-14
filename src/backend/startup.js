@@ -1,59 +1,105 @@
-import { firestore, root } from '../config/firebase';
-import { distributeCards } from "../backend/game_logic.js"
+/**
+ * Startup and registration functions for room and player management
+ */
 
-export async function register(setPlayerID, name, roomName) {
-    await firestore.collection(root).doc(roomName).collection("players").add({
-        name: name
-    }).then((docRef) => {
-        const playerID = docRef.id;
-        setPlayerID(playerID);
-        //console.log("Document written with ID: ", playerID);
-    })
-}
+import {
+  createRoom,
+  checkRoomExists,
+  checkGameStarted,
+  startGame as startGameApi,
+} from '../api/roomApi';
+import {
+  registerPlayer,
+  checkPlayerNameExists as checkPlayerExists,
+} from '../api/playerApi';
+import { distributeCards } from '../api/gameApi';
 
-export async function checkRoomNameExists(roomName) {
-    const snapshot = await firestore.collection(root).get();
-    for (let i = 0; i < snapshot.docs.length; i++){
-        if (snapshot.docs[i].id === roomName) {
-            return true;
-        }
-    }
-    return false;
-}
+/**
+ * Registers a new player in a room
+ * @param {Function} setPlayerID - State setter for player ID
+ * @param {string} name - The player's name
+ * @param {string} roomName - The room to join
+ * @returns {Promise<void>}
+ */
+export const register = async (setPlayerID, name, roomName) => {
+  try {
+    const playerID = await registerPlayer(name, roomName);
+    setPlayerID(playerID);
+  } catch (error) {
+    console.error('Error registering player:', error);
+    throw error;
+  }
+};
 
-export async function checkGameStart(roomName) {
-    const doc = await firestore.collection(root).doc(roomName).get();
-    if (doc.data().startGame){
-    	return true
-    } else{
-    	return false
-    }
-    
-}
+/**
+ * Checks if a room name exists
+ * @param {string} roomName - The room name to check
+ * @returns {Promise<boolean>} - True if room exists, false otherwise
+ */
+export const checkRoomNameExists = async (roomName) => {
+  try {
+    return await checkRoomExists(roomName);
+  } catch (error) {
+    console.error('Error checking room existence:', error);
+    throw error;
+  }
+};
 
-export async function checkPlayerNameExists(roomName, playerName) {
-    const currentPlayers = await firestore.collection(root).doc(roomName).collection("players").get();
-    for (let i=0; i<currentPlayers.docs.length; i++){
-        //console.log(currentPlayers.docs[i].data().name);
-        if (currentPlayers.docs[i].data().name === playerName) {
-            return true;
-        }
-    }
-    return false;
-}
+/**
+ * Checks if the game has started in a room
+ * @param {string} roomName - The room name to check
+ * @returns {Promise<boolean>} - True if game has started, false otherwise
+ */
+export const checkGameStart = async (roomName) => {
+  try {
+    return await checkGameStarted(roomName);
+  } catch (error) {
+    console.error('Error checking game start:', error);
+    throw error;
+  }
+};
 
-export async function createRoomName(roomName) {
-    await firestore.collection(root).doc(roomName).set({
-        startGame: false
-    });
-}
+/**
+ * Checks if a player name already exists in a room
+ * @param {string} roomName - The room name
+ * @param {string} playerName - The player name to check
+ * @returns {Promise<boolean>} - True if player name exists, false otherwise
+ */
+export const checkPlayerNameExists = async (roomName, playerName) => {
+  try {
+    return await checkPlayerExists(roomName, playerName);
+  } catch (error) {
+    console.error('Error checking player name existence:', error);
+    throw error;
+  }
+};
 
-export async function startGame(roomName) {
-    await distributeCards(roomName).then(() => {
-        firestore.collection(root).doc(roomName).update({
-            startGame: true,
-            turn: 0
-        });
-    })
-}
+/**
+ * Creates a new room
+ * @param {string} roomName - The name of the room to create
+ * @returns {Promise<void>}
+ */
+export const createRoomName = async (roomName) => {
+  try {
+    await createRoom(roomName);
+  } catch (error) {
+    console.error('Error creating room:', error);
+    throw error;
+  }
+};
+
+/**
+ * Starts the game by distributing cards and updating game state
+ * @param {string} roomName - The room name
+ * @returns {Promise<void>}
+ */
+export const startGame = async (roomName) => {
+  try {
+    await distributeCards(roomName);
+    await startGameApi(roomName);
+  } catch (error) {
+    console.error('Error starting game:', error);
+    throw error;
+  }
+};
 

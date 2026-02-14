@@ -1,8 +1,7 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Button } from 'react-bootstrap';
-import {all_moves, responses, updateTurnInDB, responsesForeignAid, responsesBlock, responsesAssassin, responsesDuke, responsesCaptain, responsesAmbassador} from './move_logic.js';
+import {all_moves, responses, responsesForeignAid, responsesBlock, responsesAssassin, responsesDuke, responsesCaptain, responsesAmbassador} from '../backend/move_logic.js';
 import {firestore, root} from "../config/firebase";
-import firebase from 'firebase';
 
 
 export function MoveList(props) {

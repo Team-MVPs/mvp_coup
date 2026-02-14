@@ -23,7 +23,7 @@ function MovesPopup(props) {
             </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-            <img src={moves} className={styles.movesImage} />
+            <img src={moves} alt="Game moves reference" className={styles.movesImage} />
             </Modal.Body>
             <Modal.Footer>
                 <Button onClick={props.onHide}>Close</Button>
