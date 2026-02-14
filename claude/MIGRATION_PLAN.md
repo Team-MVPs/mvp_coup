@@ -10,13 +10,12 @@
 - **Testing Library**: Multiple packages outdated
 - **Flow**: 0.122.0 → will be replaced with TypeScript
 - **react-scripts**: 3.4.1 → 5.0.1
+- **typescript**: ensure the latest version of typescript is being used
 
 ### Code State
 - ✅ **Already functional components** (no class components to convert)
-- ❌ **14 files with inline styles** (need SCSS module migration)
-- ❌ **3 CSS files** (App.css, index.css, Card.css - need SCSS conversion)
-- ❌ **No TypeScript** (all .js files)
-- ❌ **No mobile responsiveness** (desktop-only)
+- ❌ **14 files with inline styles** (ensure there are no more inline styles)
+- ❌ **No TypeScript** (all .js files, want to use tsx for component files and ts for logic files)
 - ❌ **Flow type checking** (outdated, incomplete coverage)
 
 ### Critical Files Requiring Major Changes
