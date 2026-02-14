@@ -12,17 +12,18 @@ function WaitForHost(props) {
   const { roomName, setPlayerNames } = useContext(RoomContext);
 
   React.useEffect(() => {
+    if (!roomName) return;
+
     const subscribe = firestore.collection(root).doc(roomName).onSnapshot((doc) => {
       if (!doc.exists) {
         return handleDBException();
       }
       if (doc.data().startGame) {
-        //console.log("Game started");
         setStart(true);
       }
     });
     return () => subscribe();
-  }, []);
+  }, [roomName]);
   
   const handleLeaveRoom = () => {
     setLeave(true);

@@ -3,3 +3,4 @@ node_modules
 .firebase/
 build/
 *.DS_Store
+.env

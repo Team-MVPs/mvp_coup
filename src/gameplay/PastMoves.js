@@ -10,16 +10,17 @@ function PastMoves() {
     const { roomName } = useContext(RoomContext);
 
     React.useEffect(() => {
+        if (!roomName) return;
+
 		const subscribe = firestore.collection(root).doc(roomName).onSnapshot((roomDoc) => {
-            let currentTurn = roomDoc.data().turn;
+            const currentTurn = roomDoc.data().turn;
             roomDoc.ref.collection("turns").get().then((docs) => {
-                let moves = Array(docs.length);
+                const movesArray = Array(docs.length);
                 docs.forEach(function (doc) {
                     const turn = doc.data();
-                    const turn_num = parseInt(doc.id);
+                    const turn_num = parseInt(doc.id, 10);
                     const move = turn.move;
-                    let move_msg = [];
-                    console.log(currentTurn);
+                    const move_msg = [];
                     if(currentTurn !== turn_num){
                         switch (turn.move.type) {
                             case "general_income":
@@ -60,15 +61,14 @@ function PastMoves() {
                             move_msg.push(playerName + " bluffed the move");
                             move_msg.push(loser + " lost a card");
                         }
-                        moves[turn_num] = move_msg;
+                        movesArray[turn_num] = move_msg;
                     }
                 });
-                // console.log(moves);
-                setMoves(moves.reverse());
+                setMoves(movesArray.reverse());
             });
 		});
 		return () => subscribe();
-    }, []);
+    }, [roomName]);
 
     return (
         <div align="center">
@@ -78,18 +78,19 @@ function PastMoves() {
                     <Card.Header><h4>Past Moves</h4></Card.Header>
                     <Card.Body className={`overflow-auto ${styles.cardBody}`}>
                         <ListGroup>
-                            {moves.map(move => {
+                            {moves.map((move, idx) => {
                                 if (move !== undefined) {
-                                    return(
-                                        <ListGroup.Item className={styles.listItem}>
+                                    return (
+                                        <ListGroup.Item key={idx} className={styles.listItem}>
                                             <ol className={styles.moveList}>
-                                                {move.map(line => {
-                                                    return (<li>{line}</li>)
-                                                })}
+                                                {move.map((line, lineIdx) => (
+                                                    <li key={lineIdx}>{line}</li>
+                                                ))}
                                             </ol>
                                         </ListGroup.Item>
                                     );
                                 }
+                                return null;
                             })}
                        </ListGroup>
                     </Card.Body>

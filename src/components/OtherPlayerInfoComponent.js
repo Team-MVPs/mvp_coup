@@ -49,8 +49,9 @@ function OtherPlayerInfo(props) {
 			{
 				Object.keys(props.playerDetails).map((key, index) => {
 					if (key !== props.ownID) {
-						return (<AccordianBody data={props.playerDetails[key]} keyIndex={i++} />);
+						return (<AccordianBody key={key} data={props.playerDetails[key]} keyIndex={i++} />);
 					}
+					return null;
 				})
 			}
 		</Accordion>

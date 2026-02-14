@@ -18,31 +18,36 @@ function GameStart(props) {
   const handleClick = () => {
     startGame(roomName).then(() => {
       setPlayerNames(players);
-      let i = 0;
-      for(let i = 0; i < playerIDs.length; i++){
-        if(playerIDs[i] === props.playerID) {
+      for (let i = 0; i < playerIDs.length; i++) {
+        if (playerIDs[i] === props.playerID) {
           props.setPlayerIndex(i);
           break;
         }
       }
       setRedirect(true);
-    })
+    });
   };
 
   React.useEffect(() => {
-    const unsubscribe = firestore.collection(root).doc(roomName).collection("players").onSnapshot((snapshot) => {
-      let newPlayers = [];
-      let newIDs = [];
-      snapshot.docs.forEach((doc) => {
-        let playerName = doc.data().name;
-        newPlayers.push(playerName);
-        newIDs.push(doc.id);
+    if (!roomName) return;
+
+    const unsubscribe = firestore
+      .collection(root)
+      .doc(roomName)
+      .collection('players')
+      .onSnapshot((snapshot) => {
+        const newPlayers = [];
+        const newIDs = [];
+        snapshot.docs.forEach((doc) => {
+          const playerName = doc.data().name;
+          newPlayers.push(playerName);
+          newIDs.push(doc.id);
+        });
+        setPlayers(newPlayers);
+        setPlayerIDs(newIDs);
       });
-      setPlayers(newPlayers);
-      setPlayerIDs(newIDs);
-    });
     return () => unsubscribe();
-  }, []);
+  }, [roomName]);
 
   
   if (players.length>=2 && isDisabled){
@@ -85,9 +90,13 @@ function GameStart(props) {
           </div>
         );
     } else {
-      console.log(props.playerID);
       return (
-        <WaitForHost id = {props.playerID} playerArray = {playerIDs} playerNames = {players} setPlayerIndex = {props.setPlayerIndex}/>
+        <WaitForHost
+          id={props.playerID}
+          playerArray={playerIDs}
+          playerNames={players}
+          setPlayerIndex={props.setPlayerIndex}
+        />
       );
     }
   }

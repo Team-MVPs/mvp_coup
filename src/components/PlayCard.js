@@ -39,10 +39,12 @@ function PlayCard(props) {
                 <div className={styles.cardLabel}>Ambassador</div>
             </div>);
         }
+        default: {
+            return (<div className={styles.cardWrapper}>
+                <img src={back} alt={props.cardName || "Card back"} className={styles.cardImage} />
+            </div>);
+        }
     }
-    return (<div className={styles.cardWrapper}>
-        <img src={back} alt={props.cardName} className={styles.cardImage} />
-    </div>);
 }
 
 export default PlayCard;

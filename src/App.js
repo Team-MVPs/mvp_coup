@@ -35,7 +35,7 @@ function App() {
     sessionStorage.setItem("playerID", playerID);
   }, [playerID]);
 
-
+  // eslint-disable-next-line no-unused-vars
   function showPopup(title, content) {
     setPopupTitle(title);
     setPopupContent(content);
