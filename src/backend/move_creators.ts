@@ -14,30 +14,37 @@ import {
   MOVE_STEAL,
   MOVE_TYPE_LABELS,
 } from '../constants/moveTypes';
+import { Move as MoveInterface, MoveType } from '../types';
 
 /**
  * Creates a move object
- * @param {string} type - The type of move
- * @param {string} player - The player making the move
- * @param {string} to - The target player (if applicable)
- * @returns {Object} - Move object
+ * param type - The type of move
+ * param player - The player making the move
+ * param to - The target player (if applicable)
+ * returns Move object
  */
-export const Move = (type, player, to) => ({
+export const Move = (type: MoveType, player: string, to: string | null): MoveInterface => ({
   type,
   player,
-  to,
+  to: to || undefined,
 });
 
 /**
  * Creates a turn in the database
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @param {string} playerName - The player's name
- * @param {string} playerID - The player's ID
- * @param {Object} move - The move object
- * @returns {Promise<void>}
+ * param roomName - The name of the room
+ * param turn - The turn number
+ * param playerName - The player's name
+ * param playerID - The player's ID
+ * param move - The move object
+ * returns Promise that resolves when turn is created
  */
-export const updateTurnInDB = async (roomName, turn, playerName, playerID, move) => {
+export const updateTurnInDB = async (
+  roomName: string,
+  turn: number,
+  playerName: string,
+  playerID: string,
+  move: MoveInterface
+): Promise<void> => {
   try {
     await createTurn(roomName, turn, playerName, playerID, move);
   } catch (error) {
@@ -48,12 +55,20 @@ export const updateTurnInDB = async (roomName, turn, playerName, playerID, move)
 
 /**
  * Creates a move handler function
- * @param {string} type - The type of move
- * @returns {Function} - Move handler function
+ * param type - The type of move
+ * returns Move handler function
  */
-const createMoveHandler = (type) => {
-  return (roomName, turn, playerName, activePlayerID, setConfirmed) => {
-    return async () => {
+type MoveHandler = (
+  roomName: string,
+  turn: number,
+  playerName: string,
+  activePlayerID: string,
+  setConfirmed: ((value: boolean) => void) | null
+) => () => Promise<void>;
+
+const createMoveHandler = (type: MoveType): MoveHandler => {
+  return (roomName: string, turn: number, playerName: string, activePlayerID: string, setConfirmed: ((value: boolean) => void) | null) => {
+    return async (): Promise<void> => {
       try {
         const move = Move(type, playerName, null);
         await updateTurnInDB(roomName, turn, playerName, activePlayerID, move);
@@ -68,7 +83,7 @@ const createMoveHandler = (type) => {
 /**
  * All available moves mapped to their handlers
  */
-export const all_moves = {
+export const all_moves: Record<string, MoveHandler> = {
   [MOVE_TYPE_LABELS[MOVE_GENERAL_INCOME]]: createMoveHandler(MOVE_GENERAL_INCOME),
   [MOVE_TYPE_LABELS[MOVE_FOREIGN_AID]]: createMoveHandler(MOVE_FOREIGN_AID),
   [MOVE_TYPE_LABELS[MOVE_DUKE]]: createMoveHandler(MOVE_DUKE),
@@ -80,14 +95,20 @@ export const all_moves = {
 
 /**
  * Confirms a turn by incrementing confirmations
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @param {Function} setConfirmed - State setter for confirmed
- * @param {Function} setWaitingMessage - State setter for waiting message
- * @param {Function} setMove - State setter for move
- * @returns {Promise<void>}
+ * param roomName - The name of the room
+ * param turn - The turn number
+ * param setConfirmed - State setter for confirmed
+ * param setWaitingMessage - State setter for waiting message
+ * param setMove - State setter for move
+ * returns Promise that resolves when turn is confirmed
  */
-export const confirmTurn = async (roomName, turn, setConfirmed, setWaitingMessage, setMove) => {
+export const confirmTurn = async (
+  roomName: string,
+  turn: number,
+  setConfirmed: ((value: boolean) => void) | null,
+  setWaitingMessage: ((value: string) => void) | null,
+  setMove: ((value: string) => void) | null
+): Promise<void> => {
   try {
     if (setConfirmed !== null) setConfirmed(true);
     if (setWaitingMessage !== null) setWaitingMessage('Waiting for others');

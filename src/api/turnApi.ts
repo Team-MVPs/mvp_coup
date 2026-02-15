@@ -5,17 +5,23 @@
 import firebase from 'firebase';
 import { firestore } from '../config/firebase';
 import { FIREBASE_ROOT_COLLECTION, TURNS_COLLECTION } from '../constants';
+import { Turn, Move, Block, Bluff } from '../types';
 
 /**
  * Creates a new turn document in the database
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @param {string} playerName - The name of the player making the move
- * @param {string} playerID - The ID of the player making the move
- * @param {Object} move - The move object {type, player, to}
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @param turn - The turn number
+ * @param playerName - The name of the player making the move
+ * @param playerID - The ID of the player making the move
+ * @param move - The move object
  */
-export const createTurn = async (roomName, turn, playerName, playerID, move) => {
+export const createTurn = async (
+  roomName: string,
+  turn: number,
+  playerName: string,
+  playerID: string,
+  move: Move
+): Promise<void> => {
   try {
     await firestore
       .collection(FIREBASE_ROOT_COLLECTION)
@@ -40,11 +46,11 @@ export const createTurn = async (roomName, turn, playerName, playerID, move) => 
 
 /**
  * Gets turn data from the database
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @returns {Promise<Object>} - Turn data
+ * @param roomName - The name of the room
+ * @param turn - The turn number
+ * @returns Turn data
  */
-export const getTurnData = async (roomName, turn) => {
+export const getTurnData = async (roomName: string, turn: number): Promise<Turn> => {
   try {
     const doc = await firestore
       .collection(FIREBASE_ROOT_COLLECTION)
@@ -56,7 +62,7 @@ export const getTurnData = async (roomName, turn) => {
     if (!doc.exists) {
       throw new Error(`Turn ${turn} does not exist`);
     }
-    return doc.data();
+    return doc.data() as Turn;
   } catch (error) {
     console.error('Error getting turn data:', error);
     throw error;
@@ -65,12 +71,11 @@ export const getTurnData = async (roomName, turn) => {
 
 /**
  * Updates turn data in the database
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @param {Object} data - Data to update
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @param turn - The turn number
+ * @param data - Data to update
  */
-export const updateTurn = async (roomName, turn, data) => {
+export const updateTurn = async (roomName: string, turn: number, data: Partial<Turn>): Promise<void> => {
   try {
     await firestore
       .collection(FIREBASE_ROOT_COLLECTION)
@@ -86,11 +91,10 @@ export const updateTurn = async (roomName, turn, data) => {
 
 /**
  * Increments the confirmation count for a turn
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @param turn - The turn number
  */
-export const incrementConfirmations = async (roomName, turn) => {
+export const incrementConfirmations = async (roomName: string, turn: number): Promise<void> => {
   try {
     await firestore
       .collection(FIREBASE_ROOT_COLLECTION)
@@ -108,13 +112,17 @@ export const incrementConfirmations = async (roomName, turn) => {
 
 /**
  * Adds a bluff to the turn
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @param {string} playerID - The ID of the player calling bluff
- * @param {string} playerName - The name of the player calling bluff
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @param turn - The turn number
+ * @param playerID - The ID of the player calling bluff
+ * @param playerName - The name of the player calling bluff
  */
-export const addBluff = async (roomName, turn, playerID, playerName) => {
+export const addBluff = async (
+  roomName: string,
+  turn: number,
+  playerID: string,
+  playerName: string
+): Promise<void> => {
   try {
     await firestore
       .collection(FIREBASE_ROOT_COLLECTION)
@@ -132,14 +140,19 @@ export const addBluff = async (roomName, turn, playerID, playerName) => {
 
 /**
  * Adds a block to the turn
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @param {string} playerID - The ID of the player blocking
- * @param {string} playerName - The name of the player blocking
- * @param {string} card - The card used to block
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @param turn - The turn number
+ * @param playerID - The ID of the player blocking
+ * @param playerName - The name of the player blocking
+ * @param card - The card used to block
  */
-export const addBlock = async (roomName, turn, playerID, playerName, card) => {
+export const addBlock = async (
+  roomName: string,
+  turn: number,
+  playerID: string,
+  playerName: string,
+  card: string
+): Promise<void> => {
   try {
     await firestore
       .collection(FIREBASE_ROOT_COLLECTION)
@@ -162,14 +175,17 @@ export const addBlock = async (roomName, turn, playerID, playerName, card) => {
 
 /**
  * Sets the bluff loser for a turn
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @param {Object} loser - Object with playerID and playerName
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @param turn - The turn number
+ * @param loser - Object with playerID and playerName
  */
-export const setBluffLoser = async (roomName, turn, loser) => {
+export const setBluffLoser = async (
+  roomName: string,
+  turn: number,
+  loser: { playerID: string; playerName: string }
+): Promise<void> => {
   try {
-    await updateTurn(roomName, turn, { bluffLoser: loser });
+    await updateTurn(roomName, turn, { bluffLoser: loser } as Partial<Turn>);
   } catch (error) {
     console.error('Error setting bluff loser:', error);
     throw error;
@@ -178,12 +194,11 @@ export const setBluffLoser = async (roomName, turn, loser) => {
 
 /**
  * Updates the move in a turn (typically to add target player)
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @param {Object} move - The updated move object
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @param turn - The turn number
+ * @param move - The updated move object
  */
-export const updateTurnMove = async (roomName, turn, move) => {
+export const updateTurnMove = async (roomName: string, turn: number, move: Move): Promise<void> => {
   try {
     await updateTurn(roomName, turn, { move });
   } catch (error) {
@@ -194,12 +209,11 @@ export const updateTurnMove = async (roomName, turn, move) => {
 
 /**
  * Updates the block with letGo flag
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @param {Object} blockInfo - Updated block information
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @param turn - The turn number
+ * @param blockInfo - Updated block information
  */
-export const updateBlockLetGo = async (roomName, turn, blockInfo) => {
+export const updateBlockLetGo = async (roomName: string, turn: number, blockInfo: Block): Promise<void> => {
   try {
     await updateTurn(roomName, turn, { blocks: [blockInfo] });
   } catch (error) {
@@ -210,12 +224,15 @@ export const updateBlockLetGo = async (roomName, turn, blockInfo) => {
 
 /**
  * Sets the ambassador bluff flag
- * @param {string} roomName - The name of the room
- * @param {number} turn - The turn number
- * @param {boolean} isAmbassadorBluff - Whether this is an ambassador bluff
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @param turn - The turn number
+ * @param isAmbassadorBluff - Whether this is an ambassador bluff
  */
-export const setAmbassadorBluff = async (roomName, turn, isAmbassadorBluff) => {
+export const setAmbassadorBluff = async (
+  roomName: string,
+  turn: number,
+  isAmbassadorBluff: boolean
+): Promise<void> => {
   try {
     await updateTurn(roomName, turn, { ambassadorBluff: isAmbassadorBluff });
   } catch (error) {

@@ -7,16 +7,22 @@ import vandit_img from "../images/creators/vandit.jpeg";
 import shivam_img from "../images/creators/shivam.jpg";
 
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from './Creators.module.scss';
 
+interface CreatorInfo {
+	name: string;
+	image: string;
+	linkedin: string;
+	github: string;
+}
 
-function Creator(creator) {
+function Creator(creator: CreatorInfo): JSX.Element {
 	const name = creator["name"];
 	const image = creator["image"];
 	const linkedin = creator["linkedin"];
 	const github = creator["github"];
-	
+
 	return (
 		<div className={styles.creatorColumn}>
 			<Card className={styles.creatorCard}>
@@ -36,8 +42,9 @@ function Creator(creator) {
 		</div>
 	)
 }
-function CreatorComponent(props) {
-	const creators = [
+
+const CreatorComponent: React.FC = () => {
+	const creators: CreatorInfo[] = [
 		{
 			"name": "Shehan Suresh",
 			"image": shehan_img,
@@ -69,7 +76,7 @@ function CreatorComponent(props) {
 			"github": "https://github.com/ShivamDh",
 		},
 	];
-	
+
 	return (
 		<Container className={styles.creatorsContainer}>
 			<div className={`${styles.footerLink}`}>

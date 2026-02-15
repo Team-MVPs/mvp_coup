@@ -1,8 +1,13 @@
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, ModalProps } from 'react-bootstrap';
 
+interface PopupProps extends ModalProps {
+    title: string;
+    content: string;
+    onHide: () => void;
+}
 
-function Popup(props) {
+const Popup: React.FC<PopupProps> = (props) => {
     return (
         <Modal
             {...props}
