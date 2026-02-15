@@ -71,13 +71,17 @@ export const RegisterMoveCallback = (
 ) => {
   getActivePlayerCount(roomName).then((numPlayers) => {
     let alreadyInvoked = false;
-    let bluffDecided = false;
-    let blockDecided = false;
     let takeCoins = false;
-    let exchangeCard = false;
     let blocked = false;
-    let makeMove = false;
-    let incrementTurnFromPlayer = true;
+
+    // Create flags object to track state across helper function calls
+    const flags = {
+      bluffDecided: false,
+      blockDecided: false,
+      exchangeCard: false,
+      makeMove: false,
+      incrementTurnFromPlayer: true,
+    };
 
     if (turn >= 0 && turn !== registeredTurn) {
       firestore
@@ -150,8 +154,8 @@ export const RegisterMoveCallback = (
                 }
 
                 // Handle bluff results
-                if (turnData.bluffLoser !== undefined && !bluffDecided) {
-                  bluffDecided = true;
+                if (turnData.bluffLoser !== undefined && !flags.bluffDecided) {
+                  flags.bluffDecided = true;
                   await handleBluffLoser(
                     turnData,
                     playerID,
@@ -172,7 +176,7 @@ export const RegisterMoveCallback = (
                     playerName,
                     move,
                     roomName,
-                    { blockDecided, exchangeCard },
+                    flags,
                     setWaitingMessage,
                     setConfirmed
                   );
@@ -182,7 +186,7 @@ export const RegisterMoveCallback = (
             // Handle moves from current player
             else {
               // Handle bluffs against current player's move
-              if (turnData.bluffs.length !== 0 && !bluffDecided) {
+              if (turnData.bluffs.length !== 0 && !flags.bluffDecided) {
                 await handlePlayerBluffed(
                   turnData,
                   move,
@@ -190,7 +194,7 @@ export const RegisterMoveCallback = (
                   playerID,
                   realPlayerName,
                   turn,
-                  { bluffDecided, incrementTurnFromPlayer, makeMove, exchangeCard },
+                  flags,
                   setWaitingMessage,
                   setConfirmed,
                   setMove
@@ -214,7 +218,7 @@ export const RegisterMoveCallback = (
                   setWaitingMessage(message);
                 }
 
-                incrementTurnFromPlayer = turnData.blocks[0].letGo;
+                flags.incrementTurnFromPlayer = turnData.blocks[0].letGo;
               }
 
               // Execute moves based on type
@@ -239,10 +243,10 @@ export const RegisterMoveCallback = (
                   break;
 
                 case MOVE_EXCHANGE_CARDS:
-                  if (turnData.confirmations + 1 === numPlayers || makeMove) {
-                    if (exchangeCard) {
+                  if (turnData.confirmations + 1 === numPlayers || flags.makeMove) {
+                    if (flags.exchangeCard) {
                       setAmbassadorBluff(true);
-                      exchangeCard = false;
+                      flags.exchangeCard = false;
                       await exchangeOneCard(roomName, playerID, move);
                       setConfirmed(false);
                       setCurrentMove('Ambassador');
@@ -267,7 +271,7 @@ export const RegisterMoveCallback = (
                     setLoseACard(true);
                     setWaitingMessage(`Your Assassin has struck! ${targetPlayer} will lose a card!`);
                   }
-                  if (incrementTurnFromPlayer && blocked) {
+                  if (flags.incrementTurnFromPlayer && blocked) {
                     await incrementTurnApi(roomName, totalPlayers, playerNames);
                   }
                   break;
@@ -279,36 +283,36 @@ export const RegisterMoveCallback = (
                   if (targetPlayer !== null) {
                     setPlayerChosen(targetPlayer);
                   }
-                  if (turnData.confirmations === 1 || makeMove) {
+                  if (turnData.confirmations === 1 || flags.makeMove) {
                     if (!takeCoins) {
                       await updatePlayerCoins(roomName, playerID, CAPTAIN_STEAL_AMOUNT);
                       takeCoins = true;
                     }
-                    if (incrementTurnFromPlayer) {
+                    if (flags.incrementTurnFromPlayer) {
                       await incrementTurnApi(roomName, totalPlayers, playerNames);
                     }
-                  } else if (incrementTurnFromPlayer && blocked) {
+                  } else if (flags.incrementTurnFromPlayer && blocked) {
                     await incrementTurnApi(roomName, totalPlayers, playerNames);
                   }
                   break;
 
                 case MOVE_FOREIGN_AID:
-                  if ((turnData.confirmations + 1 === numPlayers && !blocked) || makeMove) {
+                  if ((turnData.confirmations + 1 === numPlayers && !blocked) || flags.makeMove) {
                     await foreignAid(roomName, playerID);
-                    if (incrementTurnFromPlayer) {
+                    if (flags.incrementTurnFromPlayer) {
                       await incrementTurnApi(roomName, totalPlayers, playerNames);
                     }
                   }
-                  if (incrementTurnFromPlayer && blocked) {
+                  if (flags.incrementTurnFromPlayer && blocked) {
                     await incrementTurnApi(roomName, totalPlayers, playerNames);
                   }
                   break;
 
                 case MOVE_DUKE:
-                  if (turnData.confirmations + 1 === numPlayers || makeMove) {
+                  if (turnData.confirmations + 1 === numPlayers || flags.makeMove) {
                     await Duke(roomName, playerID);
-                    makeMove = false;
-                    if (incrementTurnFromPlayer) {
+                    flags.makeMove = false;
+                    if (flags.incrementTurnFromPlayer) {
                       await incrementTurnApi(roomName, totalPlayers, playerNames);
                     }
                   }
@@ -320,13 +324,13 @@ export const RegisterMoveCallback = (
             }
 
             // Handle card exchange after bluff
-            if (exchangeCard && move !== '') {
+            if (flags.exchangeCard && move !== '') {
               let cardToExchange = move;
               if (turnData.blocks.length !== 0 && move === MOVE_ASSASSINATE) {
                 cardToExchange = CHAR_CONTESSA;
               }
               await exchangeOneCard(roomName, playerID, cardToExchange);
-              exchangeCard = false;
+              flags.exchangeCard = false;
             }
           }
         });
