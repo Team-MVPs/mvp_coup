@@ -14,13 +14,14 @@ import {
   INITIAL_COINS_PER_PLAYER,
   INITIAL_CARDS_PER_PLAYER,
 } from '../constants';
+import { CharacterType } from '../types';
 
 /**
  * Shuffles an array in place using Fisher-Yates algorithm
- * @param {Array} array - The array to shuffle
- * @returns {Array} - The shuffled array
+ * @param array - The array to shuffle
+ * @returns The shuffled array
  */
-const shuffleArray = (array) => {
+const shuffleArray = <T>(array: T[]): T[] => {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -31,10 +32,10 @@ const shuffleArray = (array) => {
 
 /**
  * Determines the number of cards per type based on room size
- * @param {number} roomSize - Number of players in the room
- * @returns {number} - Number of cards per character type
+ * @param roomSize - Number of players in the room
+ * @returns Number of cards per character type
  */
-const getCardsPerType = (roomSize) => {
+const getCardsPerType = (roomSize: number): number => {
   if (roomSize > LARGE_ROOM_THRESHOLD) {
     return CARDS_PER_TYPE_LARGE;
   } else if (roomSize > MEDIUM_ROOM_THRESHOLD) {
@@ -45,17 +46,17 @@ const getCardsPerType = (roomSize) => {
 
 /**
  * Distributes cards to all players and initializes the game
- * @param {string} roomName - The name of the room
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @returns Promise that resolves when distribution is complete
  */
-export const distributeCards = async (roomName) => {
+export const distributeCards = async (roomName: string): Promise<void> => {
   try {
     const players = await getAllPlayers(roomName);
     const roomSize = players.length;
     const cardsPerType = getCardsPerType(roomSize);
 
     // Create and shuffle the deck
-    let cards = [];
+    let cards: CharacterType[] = [];
     ALL_CHARACTERS.forEach((char) => {
       for (let i = 0; i < cardsPerType; i++) {
         cards.push(char);
@@ -66,9 +67,12 @@ export const distributeCards = async (roomName) => {
     // Distribute cards to each player
     const roomRef = getRoomRef(roomName);
     for (const player of players) {
-      const playerCards = [];
+      const playerCards: CharacterType[] = [];
       for (let i = 0; i < INITIAL_CARDS_PER_PLAYER; i++) {
-        playerCards.push(cards.pop());
+        const card = cards.pop();
+        if (card) {
+          playerCards.push(card);
+        }
       }
       await initializePlayer(roomName, player.id, playerCards, INITIAL_COINS_PER_PLAYER);
     }
@@ -83,11 +87,11 @@ export const distributeCards = async (roomName) => {
 
 /**
  * Checks if a specific player (by index) has cards
- * @param {string} roomName - The name of the room
- * @param {number} playerIndex - The player index to check
- * @returns {Promise<boolean>} - True if player has cards, false otherwise
+ * @param roomName - The name of the room
+ * @param playerIndex - The player index to check
+ * @returns True if player has cards, false otherwise
  */
-export const playerAtIndexHasCards = async (roomName, playerIndex) => {
+export const playerAtIndexHasCards = async (roomName: string, playerIndex: number): Promise<boolean> => {
   try {
     const players = await getAllPlayers(roomName);
     if (playerIndex >= players.length) {
@@ -103,11 +107,11 @@ export const playerAtIndexHasCards = async (roomName, playerIndex) => {
 
 /**
  * Checks if there is a winner (only one player has cards)
- * @param {string} roomName - The name of the room
- * @param {number} currentPlayerIndex - Current player index
- * @returns {Promise<boolean>} - True if current player is the only one with cards
+ * @param roomName - The name of the room
+ * @param currentPlayerIndex - Current player index
+ * @returns True if current player is the only one with cards
  */
-export const checkForWinner = async (roomName, currentPlayerIndex) => {
+export const checkForWinner = async (roomName: string, currentPlayerIndex: number): Promise<boolean> => {
   try {
     const players = await getAllPlayers(roomName);
     let playersWithCards = 0;
@@ -130,12 +134,12 @@ export const checkForWinner = async (roomName, currentPlayerIndex) => {
 
 /**
  * Increments the turn to the next player with cards
- * @param {string} roomName - The name of the room
- * @param {number} totalPlayers - Total number of players
- * @param {Array<string>} playerNames - Array of player names
- * @returns {Promise<void>}
+ * @param roomName - The name of the room
+ * @param totalPlayers - Total number of players
+ * @param playerNames - Array of player names
+ * @returns Promise that resolves when turn is incremented
  */
-export const incrementTurn = async (roomName, totalPlayers, playerNames) => {
+export const incrementTurn = async (roomName: string, totalPlayers: number, playerNames: string[]): Promise<void> => {
   try {
     const roomData = await getRoomData(roomName);
     let nextTurn = roomData.turn + 1;

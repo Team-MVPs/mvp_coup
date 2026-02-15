@@ -16,12 +16,16 @@ import { distributeCards } from '../api/gameApi';
 
 /**
  * Registers a new player in a room
- * @param {Function} setPlayerID - State setter for player ID
- * @param {string} name - The player's name
- * @param {string} roomName - The room to join
- * @returns {Promise<void>}
+ * param setPlayerID - State setter for player ID
+ * param name - The player's name
+ * param roomName - The room to join
+ * returns Promise that resolves when player is registered
  */
-export const register = async (setPlayerID, name, roomName) => {
+export const register = async (
+  setPlayerID: (id: string) => void,
+  name: string,
+  roomName: string
+): Promise<void> => {
   try {
     const playerID = await registerPlayer(name, roomName);
     setPlayerID(playerID);
@@ -33,10 +37,10 @@ export const register = async (setPlayerID, name, roomName) => {
 
 /**
  * Checks if a room name exists
- * @param {string} roomName - The room name to check
- * @returns {Promise<boolean>} - True if room exists, false otherwise
+ * param roomName - The room name to check
+ * returns True if room exists, false otherwise
  */
-export const checkRoomNameExists = async (roomName) => {
+export const checkRoomNameExists = async (roomName: string): Promise<boolean> => {
   try {
     return await checkRoomExists(roomName);
   } catch (error) {
@@ -47,10 +51,10 @@ export const checkRoomNameExists = async (roomName) => {
 
 /**
  * Checks if the game has started in a room
- * @param {string} roomName - The room name to check
- * @returns {Promise<boolean>} - True if game has started, false otherwise
+ * param roomName - The room name to check
+ * returns True if game has started, false otherwise
  */
-export const checkGameStart = async (roomName) => {
+export const checkGameStart = async (roomName: string): Promise<boolean> => {
   try {
     return await checkGameStarted(roomName);
   } catch (error) {
@@ -61,11 +65,11 @@ export const checkGameStart = async (roomName) => {
 
 /**
  * Checks if a player name already exists in a room
- * @param {string} roomName - The room name
- * @param {string} playerName - The player name to check
- * @returns {Promise<boolean>} - True if player name exists, false otherwise
+ * param roomName - The room name
+ * param playerName - The player name to check
+ * returns True if player name exists, false otherwise
  */
-export const checkPlayerNameExists = async (roomName, playerName) => {
+export const checkPlayerNameExists = async (roomName: string, playerName: string): Promise<boolean> => {
   try {
     return await checkPlayerExists(roomName, playerName);
   } catch (error) {
@@ -76,10 +80,10 @@ export const checkPlayerNameExists = async (roomName, playerName) => {
 
 /**
  * Creates a new room
- * @param {string} roomName - The name of the room to create
- * @returns {Promise<void>}
+ * param roomName - The name of the room to create
+ * returns Promise that resolves when room is created
  */
-export const createRoomName = async (roomName) => {
+export const createRoomName = async (roomName: string): Promise<void> => {
   try {
     await createRoom(roomName);
   } catch (error) {
@@ -90,10 +94,10 @@ export const createRoomName = async (roomName) => {
 
 /**
  * Starts the game by distributing cards and updating game state
- * @param {string} roomName - The room name
- * @returns {Promise<void>}
+ * param roomName - The room name
+ * returns Promise that resolves when game is started
  */
-export const startGame = async (roomName) => {
+export const startGame = async (roomName: string): Promise<void> => {
   try {
     await distributeCards(roomName);
     await startGameApi(roomName);

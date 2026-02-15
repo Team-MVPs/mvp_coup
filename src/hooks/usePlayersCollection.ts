@@ -5,16 +5,21 @@
 import { useState, useEffect } from 'react';
 import { firestore } from '../config/firebase';
 import { FIREBASE_ROOT_COLLECTION, PLAYERS_COLLECTION } from '../constants';
+import { Player } from '../types';
+
+export interface PlayerWithId extends Player {
+  id: string;
+}
 
 /**
  * Subscribes to players collection and returns real-time updates
- * @param {string} roomName - The name of the room
- * @returns {Object} - { players, loading, error }
+ * @param roomName - The name of the room
+ * @returns Object with players array, loading, and error
  */
-export const usePlayersCollection = (roomName) => {
-  const [players, setPlayers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export const usePlayersCollection = (roomName: string) => {
+  const [players, setPlayers] = useState<PlayerWithId[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!roomName) {
@@ -31,12 +36,12 @@ export const usePlayersCollection = (roomName) => {
           const playersList = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
-          }));
+          } as PlayerWithId));
           setPlayers(playersList);
           setError(null);
           setLoading(false);
         },
-        (err) => {
+        (err: Error) => {
           setError(err);
           setLoading(false);
         }

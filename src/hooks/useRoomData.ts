@@ -5,16 +5,17 @@
 import { useState, useEffect } from 'react';
 import { firestore } from '../config/firebase';
 import { FIREBASE_ROOT_COLLECTION } from '../constants';
+import { Room } from '../types';
 
 /**
  * Subscribes to room document and returns real-time updates
- * @param {string} roomName - The name of the room to subscribe to
- * @returns {Object} - { roomData, loading, error }
+ * @param roomName - The name of the room to subscribe to
+ * @returns Object with roomData, loading, and error
  */
-export const useRoomData = (roomName) => {
-  const [roomData, setRoomData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export const useRoomData = (roomName: string) => {
+  const [roomData, setRoomData] = useState<Room | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!roomName) {
@@ -28,14 +29,14 @@ export const useRoomData = (roomName) => {
       .onSnapshot(
         (doc) => {
           if (doc.exists) {
-            setRoomData(doc.data());
+            setRoomData(doc.data() as Room);
             setError(null);
           } else {
             setError(new Error(`Room ${roomName} does not exist`));
           }
           setLoading(false);
         },
-        (err) => {
+        (err: Error) => {
           setError(err);
           setLoading(false);
         }

@@ -1,16 +1,21 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { firestore, root } from '../config/firebase';
+import { RoomContextType } from '../types';
 
-export const RoomContext = createContext();
+export const RoomContext = createContext<RoomContextType | undefined>(undefined);
 
-const RoomContextProvider = (props) => {
-  const [roomName, setRoomName] = useState(() => {
+interface RoomContextProviderProps {
+  children: ReactNode;
+}
+
+const RoomContextProvider: React.FC<RoomContextProviderProps> = ({ children }) => {
+  const [roomName, setRoomName] = useState<string>(() => {
     const storedRoomName = sessionStorage.getItem('roomName');
     return storedRoomName ? storedRoomName : '';
   });
 
-  const [playerNames, setPlayerNames] = useState([]);
-  const [playerNamesMapping, setPlayerNamesMapping] = useState({});
+  const [playerNames, setPlayerNames] = useState<string[]>([]);
+  const [playerNamesMapping, setPlayerNamesMapping] = useState<Record<string, string>>({});
 
   useEffect(() => {
     sessionStorage.setItem('roomName', roomName);
@@ -22,12 +27,12 @@ const RoomContextProvider = (props) => {
         .collection('players')
         .get()
         .then((snapshot) => {
-          const names = snapshot.docs.map((doc) => doc.data().name);
+          const names = snapshot.docs.map((doc) => doc.data().name as string);
           setPlayerNames(names);
 
-          const namesMapping = {};
+          const namesMapping: Record<string, string> = {};
           snapshot.docs.forEach((doc) => {
-            namesMapping[doc.id] = doc.data().name;
+            namesMapping[doc.id] = doc.data().name as string;
           });
           setPlayerNamesMapping(namesMapping);
         })
@@ -48,7 +53,7 @@ const RoomContextProvider = (props) => {
         setPlayerNamesMapping,
       }}
     >
-      {props.children}
+      {children}
     </RoomContext.Provider>
   );
 };

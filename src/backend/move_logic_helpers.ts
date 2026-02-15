@@ -7,22 +7,23 @@ import { updatePlayerCards } from '../api/playerApi';
 import { incrementTurn as incrementTurnApi } from '../api/gameApi';
 import { loseTwoCoins, HasCard } from '../components/moves/moveHelpers';
 import { MOVE_STEAL, MOVE_ASSASSINATE, MOVE_FOREIGN_AID, MOVE_EXCHANGE_CARDS } from '../constants/moveTypes';
+import { Turn, MoveType, CharacterType } from '../types';
 
 /**
  * Handles when a player loses a bluff
  */
 export const handleBluffLoser = async (
-  turnData,
-  playerID,
-  move,
-  roomName,
-  totalPlayers,
-  playerNames,
-  setWaitingMessage,
-  setMove,
-  setConfirmed
-) => {
-  if (turnData.bluffLoser.playerID === playerID) {
+  turnData: Turn,
+  playerID: string,
+  move: MoveType,
+  roomName: string,
+  totalPlayers: number,
+  playerNames: string[],
+  setWaitingMessage: (value: string) => void,
+  setMove: (value: string) => void,
+  setConfirmed: (value: boolean) => void
+): Promise<void> => {
+  if (turnData.bluffLoser && turnData.bluffLoser.playerID === playerID) {
     if (move === MOVE_STEAL) {
       await loseTwoCoins(roomName, playerID);
     }
@@ -33,7 +34,7 @@ export const handleBluffLoser = async (
       setWaitingMessage('Unsuccessful Bluff. Pick 1 card to lose');
       setMove('bluff');
     }
-  } else {
+  } else if (turnData.bluffLoser) {
     const loser = turnData.bluffLoser.playerName;
     if (turnData.bluffs[0].playerID === playerID) {
       setWaitingMessage(`Successful Bluff! ${loser} is losing a card.`);
@@ -49,15 +50,19 @@ export const handleBluffLoser = async (
  * Handles block bluff scenarios
  */
 export const handleBlockBluff = async (
-  turnData,
-  playerID,
-  playerName,
-  move,
-  roomName,
-  flags,
-  setWaitingMessage,
-  setConfirmed
-) => {
+  turnData: Turn,
+  playerID: string,
+  playerName: string,
+  move: MoveType,
+  roomName: string,
+  flags: {
+    blockDecided: boolean;
+    exchangeCard: boolean;
+    [key: string]: any;
+  },
+  setWaitingMessage: (value: string) => void,
+  setConfirmed: (value: boolean) => void
+): Promise<void> => {
   if (
     turnData.bluffs.length !== 0 &&
     !flags.blockDecided &&
@@ -100,17 +105,23 @@ export const handleBlockBluff = async (
  * Handles when the current player is bluffed
  */
 export const handlePlayerBluffed = async (
-  turnData,
-  move,
-  roomName,
-  playerID,
-  realPlayerName,
-  turn,
-  flags,
-  setWaitingMessage,
-  setConfirmed,
-  setMove
-) => {
+  turnData: Turn,
+  move: MoveType,
+  roomName: string,
+  playerID: string,
+  realPlayerName: string,
+  turn: number,
+  flags: {
+    bluffDecided: boolean;
+    makeMove: boolean;
+    incrementTurnFromPlayer: boolean;
+    exchangeCard: boolean;
+    [key: string]: any;
+  },
+  setWaitingMessage: (value: string) => void,
+  setConfirmed: (value: boolean) => void,
+  setMove: (value: string) => void
+): Promise<void> => {
   if (turnData.blocks.length === 0) {
     const result = await HasCard(roomName, playerID, move);
     flags.bluffDecided = true;
